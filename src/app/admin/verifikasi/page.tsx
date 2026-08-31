@@ -4,11 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { tenantService } from '@/services/tenantService';
 import { Tenant } from '@/types/tenant';
 import { ShieldCheck, XCircle, Clock, Search, ExternalLink } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function VerifikasiTenantPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuthStore();
+  const isSuperAdmin = user?.role?.toLowerCase() === 'superadmin';
 
   const fetchTenants = async () => {
     try {
@@ -162,20 +165,24 @@ export default function VerifikasiTenantPage() {
                       <td className="py-3 px-4 text-center whitespace-nowrap">
                         {tenant.status_verifikasi === 'Pending' ? (
                           <div className="flex items-center justify-center gap-1">
-                            <button 
-                              onClick={() => handleVerify(tenant.id)}
-                              className="bg-[#00a65a] hover:bg-[#008d4c] text-white text-[12px] px-2 py-1 transition-colors shadow-sm"
-                              title="Verifikasi"
-                            >
-                              <ShieldCheck className="w-4 h-4" />
-                            </button>
-                            <button 
-                              onClick={() => handleReject(tenant.id)}
-                              className="bg-[#dd4b39] hover:bg-[#d73925] text-white text-[12px] px-2 py-1 transition-colors shadow-sm"
-                              title="Tolak"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
+                            {isSuperAdmin && (
+                              <>
+                                <button 
+                                  onClick={() => handleVerify(tenant.id)}
+                                  className="bg-[#00a65a] hover:bg-[#008d4c] text-white text-[12px] px-2 py-1 transition-colors shadow-sm"
+                                  title="Verifikasi"
+                                >
+                                  <ShieldCheck className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  onClick={() => handleReject(tenant.id)}
+                                  className="bg-[#dd4b39] hover:bg-[#d73925] text-white text-[12px] px-2 py-1 transition-colors shadow-sm"
+                                  title="Tolak"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
                             <button 
                               className="bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 text-[12px] px-2 py-1 transition-colors shadow-sm"
                               title="Lihat Dokumen"

@@ -31,6 +31,18 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
     { href: "/admin/parkir", label: "Smart Parking", icon: <Car /> },
   ];
 
+  const isSuperAdmin = user?.role?.toLowerCase() === 'superadmin';
+
+  let filteredNavItems = navItems;
+  if (isSuperAdmin) {
+    filteredNavItems = navItems.filter(item => 
+      item.href === '/admin/verifikasi'
+    );
+  } else {
+    // Admin biasa (bukan superadmin) tidak melihat Verifikasi Tenant
+    filteredNavItems = navItems.filter(item => item.href !== '/admin/verifikasi');
+  }
+
   return (
     <aside className={`${isOpen ? 'w-56' : 'w-16'} bg-[#222d32] text-white flex-shrink-0 flex flex-col h-full z-20 overflow-hidden transition-all duration-300`}>
       <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4">
@@ -58,7 +70,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
         )}
         
         <ul className="text-[14px] mt-2">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <li key={item.href}>

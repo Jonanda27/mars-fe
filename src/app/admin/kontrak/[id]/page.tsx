@@ -4,13 +4,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { contractService } from '@/services/contractService';
 import { Contract } from '@/types/contract';
-import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download } from 'lucide-react';
+import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download, Edit } from 'lucide-react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
 import SuratPKS from '@/components/SuratPKS';
 import SignaturePad from '@/components/SignaturePad';
-import html2pdf from 'html2pdf.js';
+import EditContractModal from '@/components/EditContractModal';
 
 export default function AdminKontrakDetailPage() {
   const { id } = useParams();
@@ -18,6 +18,7 @@ export default function AdminKontrakDetailPage() {
   const [contract, setContract] = useState<Contract | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   
   // TTE States
   const [showSignaturePad, setShowSignaturePad] = useState(false);
@@ -61,8 +62,10 @@ export default function AdminKontrakDetailPage() {
     }
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     if (!pksRef.current || !contract) return;
+    
+    const html2pdf = (await import('html2pdf.js')).default;
     
     const element = pksRef.current;
     const opt = {
@@ -138,12 +141,20 @@ export default function AdminKontrakDetailPage() {
 
           {/* Admin TTE button - Available only in Draft mode */}
           {contract.status === 'Draft' && (
-            <button
-              onClick={() => setShowSignaturePad(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
-            >
-              <FileSignature className="w-4 h-4 mr-2" /> Tinjau Dokumen & TTE
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+              >
+                <Edit className="w-4 h-4 mr-2" /> Edit Draft
+              </button>
+              <button
+                onClick={() => setShowSignaturePad(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+              >
+                <FileSignature className="w-4 h-4 mr-2" /> Tinjau Dokumen & TTE
+              </button>
+            </div>
           )}
 
           {/* Terminate button */}
@@ -177,6 +188,17 @@ export default function AdminKontrakDetailPage() {
           />
         </div>
       ) : null}
+
+      {showEditModal && contract && (
+        <EditContractModal
+          contract={contract}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={() => {
+            setShowEditModal(false);
+            fetchContract();
+          }}
+        />
+      )}
 
       {/* Dokumen PKS Preview */}
       <div className="bg-gray-200 p-8 rounded-lg overflow-auto flex justify-center mb-10">

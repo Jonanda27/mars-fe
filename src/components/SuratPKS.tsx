@@ -16,8 +16,15 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
   return (
     <div 
       ref={ref} 
-      className="bg-white text-black p-12 mx-auto w-full max-w-[210mm] min-h-[297mm] shadow-sm border border-slate-200 print:shadow-none print:border-none"
-      style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '12pt', lineHeight: '1.5' }}
+      className="p-12 mx-auto w-full max-w-[210mm] min-h-[297mm] shadow-sm print:shadow-none print:border-none"
+      style={{ 
+        fontFamily: '"Times New Roman", Times, serif', 
+        fontSize: '12pt', 
+        lineHeight: '1.5',
+        backgroundColor: '#ffffff',
+        color: '#000000',
+        border: '1px solid #e2e8f0'
+      }}
     >
       <div className="text-center mb-8 font-bold underline text-[14pt]">
         SURAT PERJANJIAN KERJASAMA
@@ -100,11 +107,11 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
       <div className="flex justify-between text-center px-4">
         <div className="w-1/3 flex flex-col items-center">
           <div className="mb-2">Pihak Pertama,</div>
-          <div className="h-24 w-full flex items-center justify-center border-b border-dotted border-black/30 mb-2 relative">
+          <div className="h-24 w-full flex items-center justify-center mb-2 relative" style={{ borderBottom: '1px dotted rgba(0,0,0,0.3)' }}>
             {contract.admin_signature ? (
               <img src={contract.admin_signature} alt="TTE Admin" className="h-20 object-contain mix-blend-multiply" />
             ) : (
-              <span className="text-gray-300 italic text-sm">(Tanda Tangan TTE)</span>
+              <span className="italic text-sm" style={{ color: '#d1d5db' }}>(Tanda Tangan TTE)</span>
             )}
           </div>
           <div>Admin UPBU</div>
@@ -116,11 +123,11 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
 
         <div className="w-1/3 flex flex-col items-center">
           <div className="mb-2">Pihak Kedua,</div>
-          <div className="h-24 w-full flex items-center justify-center border-b border-dotted border-black/30 mb-2 relative">
+          <div className="h-24 w-full flex items-center justify-center mb-2 relative" style={{ borderBottom: '1px dotted rgba(0,0,0,0.3)' }}>
             {contract.tenant_signature ? (
               <img src={contract.tenant_signature} alt="TTE Tenant" className="h-20 object-contain mix-blend-multiply" />
             ) : (
-              <span className="text-gray-300 italic text-sm">(Tanda Tangan TTE)</span>
+              <span className="italic text-sm" style={{ color: '#d1d5db' }}>(Tanda Tangan TTE)</span>
             )}
           </div>
           <div>{contract.tenants?.pic || 'Pimpinan Perusahaan'}</div>

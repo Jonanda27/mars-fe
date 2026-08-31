@@ -9,6 +9,7 @@ import {
 import { tenantService } from '@/services/tenantService';
 import { Tenant } from '@/types/tenant';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah } from '@/utils/formatCurrency';
 
 export default function AdminPenyewaDetailPage() {
@@ -17,6 +18,8 @@ export default function AdminPenyewaDetailPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const { user } = useAuthStore();
+  const isSuperAdmin = user?.role?.toLowerCase() === 'superadmin';
 
   useEffect(() => {
     fetchTenant();
@@ -102,26 +105,30 @@ export default function AdminPenyewaDetailPage() {
         <div className="flex gap-2">
           {!isComplete && tenant.status_verifikasi !== 'Verified' && (
             <div className="text-xs text-red-600 bg-red-50 p-2 rounded flex items-center mr-2 border border-red-100">
-              <AlertTriangle className="w-4 h-4 mr-1" /> Dokumen Legalitas Belum Lengkap. Tombol Verify Dikunci.
+              <AlertTriangle className="w-4 h-4 mr-1" /> Dokumen Legalitas Belum Lengkap.
             </div>
           )}
           
-          <button
-            onClick={() => handleVerify('Verified')}
-            disabled={isUpdating || !isComplete || tenant.status_verifikasi === 'Verified'}
-            className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
-            Approve & Verify
-          </button>
-          
-          <button
-            onClick={() => handleVerify('Suspended')}
-            disabled={isUpdating || tenant.status_verifikasi === 'Suspended'}
-            className="bg-[#dd4b39] hover:bg-[#d73925] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50"
-          >
-            <Lock className="w-4 h-4 mr-2" /> Suspend Account
-          </button>
+          {isSuperAdmin && (
+            <>
+              <button
+                onClick={() => handleVerify('Verified')}
+                disabled={isUpdating || tenant.status_verifikasi === 'Verified'}
+                className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
+                Approve & Verify
+              </button>
+              
+              <button
+                onClick={() => handleVerify('Suspended')}
+                disabled={isUpdating || tenant.status_verifikasi === 'Suspended'}
+                className="bg-[#dd4b39] hover:bg-[#d73925] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50"
+              >
+                <Lock className="w-4 h-4 mr-2" /> Suspend Account
+              </button>
+            </>
+          )}
         </div>
       </div>
 

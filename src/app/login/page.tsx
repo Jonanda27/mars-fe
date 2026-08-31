@@ -26,13 +26,15 @@ export default function LoginPage() {
       const { user } = useAuthStore.getState();
       
       // Routing logic based on roles/verification status
-      if (user?.role === 'Tenant') {
+      const userRole = user?.role?.toLowerCase();
+      
+      if (userRole === 'tenant') {
         if (user?.status_verifikasi === 'Pending') {
           router.push('/tenant/profil');
         } else {
           router.push('/tenant');
         }
-      } else if (user?.role === 'Admin') {
+      } else if (userRole === 'admin' || userRole === 'superadmin') {
         router.push('/admin');
       } else {
         router.push('/');

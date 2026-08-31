@@ -1,20 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { assetService } from '@/services/assetService';
-import { Building, Save, ArrowLeft, Loader2 } from 'lucide-react';
+import { Building, Save, ArrowLeft, Loader2, ChevronRight, ChevronLeft, MapPin, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useAirportStore } from '@/store/useAirportStore';
+import { useZoneStore } from '@/store/useZoneStore';
+import { useTariffStore } from '@/store/useTariffStore';
 
 export default function TambahAsetPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState(1);
+
+  const { airports, fetchAirports } = useAirportStore();
+  const { zones, fetchZones } = useZoneStore();
+  const { tariffs, fetchTariffs } = useTariffStore();
+
+  useEffect(() => {
+    fetchAirports();
+    fetchZones();
+    fetchTariffs();
+  }, []);
+
   const [formData, setFormData] = useState({
     kode_aset: '',
     jenis_aset: 'Hanggar',
     nama_aset: '',
     lokasi: '',
-    zona: '',
+    airport_id: '',
+    zone_id: '',
     koordinat_gis: '',
     luas: '',
     satuan: 'm²',
@@ -57,6 +73,8 @@ export default function TambahAsetPage() {
     try {
       const payload = {
         ...formData,
+        airport_id: formData.airport_id ? parseInt(formData.airport_id) : null,
+        zone_id: formData.zone_id ? parseInt(formData.zone_id) : null,
         luas: formData.luas ? parseFloat(formData.luas) : null,
         master_tariff_id: formData.master_tariff_id ? parseInt(formData.master_tariff_id) : null,
         spesifikasi_detail: formData.jenis_aset === 'Hanggar' ? spesifikasi : null
@@ -76,6 +94,23 @@ export default function TambahAsetPage() {
     ? ['Available', 'Reserved', 'Leased', 'Maintenance', 'Restricted', 'Closed']
     : ['Available', 'Reserved', 'Contracted', 'Active', 'Maintenance', 'Vacant'];
 
+  const filteredZones = zones.filter(z => !formData.airport_id || z.airport_id === parseInt(formData.airport_id));
+  const activeTariffs = tariffs.filter(t => t.status === 'Active');
+
+  const tabs = [
+    { id: 1, title: 'Informasi Dasar', icon: Building },
+    { id: 2, title: 'Dimensi & Pengelolaan', icon: MapPin },
+    ...(isHanggar ? [{ id: 3, title: 'Spesifikasi Hanggar', icon: CheckCircle }] : [])
+  ];
+
+  const handleNext = () => {
+    if (activeTab < tabs.length) setActiveTab(activeTab + 1);
+  };
+
+  const handlePrev = () => {
+    if (activeTab > 1) setActiveTab(activeTab - 1);
+  };
+
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
       <header className="flex justify-between items-end mb-4">
@@ -84,178 +119,224 @@ export default function TambahAsetPage() {
         </h1>
       </header>
 
-      <div className="bg-white border-t-[3px] border-[#00a65a] shadow-sm rounded-sm">
-        <div className="p-3 border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <Building className="w-5 h-5 mr-2 text-[#00a65a]" /> Formulir Data Aset
-          </h3>
-          <Link href="/admin/aset" className="bg-[#f4f4f4] text-[#444] border border-[#d2d6de] px-3 py-1.5 text-[12px] hover:bg-[#e0e0e0] transition-colors flex items-center rounded-sm">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Kembali
-          </Link>
+      <div className="bg-white shadow-sm rounded-sm overflow-hidden">
+        
+        {/* WIZARD HEADER */}
+        <div className="bg-[#f4f4f4] border-b border-[#d2d6de]">
+          <div className="flex">
+            {tabs.map((tab, idx) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const isPast = activeTab > tab.id;
+              return (
+                <div 
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-1 py-4 px-6 flex flex-col items-center justify-center border-t-[3px] cursor-pointer transition-colors
+                    ${isActive ? 'border-[#3c8dbc] bg-white text-[#3c8dbc]' : 'border-transparent text-gray-500 hover:bg-gray-200'}`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 
+                    ${isActive ? 'bg-[#3c8dbc] text-white' : isPast ? 'bg-[#00a65a] text-white' : 'bg-gray-300 text-gray-600'}`}>
+                    {isPast ? <CheckCircle className="w-4 h-4" /> : tab.id}
+                  </div>
+                  <span className="text-sm font-bold uppercase tracking-wider">{tab.title}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Kolom Kiri: Informasi Dasar */}
-            <div>
-              <h4 className="font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]">Informasi Utama</h4>
-              
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Asset ID (Kode) <span className="text-red-500">*</span></label>
-                <input required type="text" name="kode_aset" value={formData.kode_aset} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Contoh: HGR-001" />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Jenis Aset <span className="text-red-500">*</span></label>
-                <select required name="jenis_aset" value={formData.jenis_aset} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
-                  <option value="Hanggar">Hanggar</option>
-                  <option value="Ruang Office">Ruang Office</option>
-                  <option value="Gudang Warehouse">Gudang Warehouse</option>
-                  <option value="Lahan">Lahan Terbuka</option>
-                  <option value="Konter Tiket">Konter Tiket</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Nama Aset <span className="text-red-500">*</span></label>
-                <input required type="text" name="nama_aset" value={formData.nama_aset} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Contoh: Hanggar A" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
+        <form onSubmit={handleSubmit} className="p-8">
+          
+          {/* TAB 1: Informasi Dasar */}
+          {activeTab === 1 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Lokasi</label>
-                  <input type="text" name="lokasi" value={formData.lokasi} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Asset ID (Kode) <span className="text-red-500">*</span></label>
+                  <input required type="text" name="kode_aset" value={formData.kode_aset} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Contoh: HGR-001" />
                 </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Zona</label>
-                  <input type="text" name="zona" value={formData.zona} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-              </div>
 
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Koordinat GIS</label>
-                <input type="text" name="koordinat_gis" value={formData.koordinat_gis} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Contoh: -4.545, 136.885" />
-              </div>
-
-            </div>
-
-            {/* Kolom Kanan: Dimensi & Status */}
-            <div>
-              <h4 className="font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]">Dimensi & Pengelolaan</h4>
-              
-              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Luas</label>
-                  <input type="number" step="0.01" name="luas" value={formData.luas} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Satuan</label>
-                  <input type="text" name="satuan" value={formData.satuan} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="m²" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Kapasitas</label>
-                  <input type="text" name="kapasitas" value={formData.kapasitas} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Kondisi</label>
-                  <select name="kondisi" value={formData.kondisi} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
-                    <option value="Baik">Baik</option>
-                    <option value="Rusak Ringan">Rusak Ringan</option>
-                    <option value="Rusak Berat">Rusak Berat</option>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Jenis Aset <span className="text-red-500">*</span></label>
+                  <select required name="jenis_aset" value={formData.jenis_aset} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
+                    <option value="Hanggar">Hanggar</option>
+                    <option value="Ruang Office">Ruang Office</option>
+                    <option value="Gudang Warehouse">Gudang Warehouse</option>
+                    <option value="Lahan">Lahan Terbuka</option>
+                    <option value="Konter Tiket">Konter Tiket</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Nama Aset <span className="text-red-500">*</span></label>
+                  <input required type="text" name="nama_aset" value={formData.nama_aset} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Contoh: Hanggar A" />
+                </div>
               </div>
+              
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Bandara <span className="text-red-500">*</span></label>
+                  <select required name="airport_id" value={formData.airport_id} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
+                    <option value="">-- Pilih Bandara --</option>
+                    {airports.map(airport => (
+                      <option key={airport.id} value={airport.id}>{airport.kode_bandara} - {airport.nama_bandara}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Status Aset <span className="text-red-500">*</span></label>
-                <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
-                  {statusOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Zona <span className="text-red-500">*</span></label>
+                  <select required name="zone_id" value={formData.zone_id} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white" disabled={!formData.airport_id}>
+                    <option value="">-- Pilih Zona --</option>
+                    {filteredZones.map(zone => (
+                      <option key={zone.id} value={zone.id}>{zone.nama_zona} ({zone.kode_zona})</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="mb-4">
-                <label className="block text-[#444] text-[13px] font-bold mb-1">Pilih Master Tarif / Harga (Opsional)</label>
-                <select name="master_tariff_id" value={formData.master_tariff_id} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
-                  <option value="">-- Tidak ada tarif / Hanggar --</option>
-                  <option value="1">Ruang Perkantoran / Gedung - Rp 60.000 / m2</option>
-                  <option value="2">Ruang Kantin - Rp 35.000 / m2</option>
-                  <option value="3">Gudang Tertutup - Rp 27.500 / m2</option>
-                  <option value="4">Lahan Terbuka / Gudang Terbuka - Rp 15.000 / m2</option>
-                </select>
-                <p className="text-[11px] text-[#777] mt-1">Kosongkan jika ini aset Hanggar, karena tarif ditentukan dari pesawat.</p>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Dok. Kepemilikan/Pengelolaan</label>
-                <input type="text" name="dokumen_kepemilikan" value={formData.dokumen_kepemilikan} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Contoh: SHM No. 123" />
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* Form Ekstra Khusus Hanggar */}
-          {isHanggar && (
-            <div className="mt-8 bg-slate-50 p-6 border border-[#d2d6de] rounded-sm">
-              <h4 className="font-bold text-[#00a65a] mb-4 pb-2 border-b border-[#00a65a]/20 flex items-center">
-                Spesifikasi Khusus Hanggar
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Tinggi Bangunan</label>
-                  <input type="text" name="tinggi_bangunan" value={spesifikasi.tinggi_bangunan} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Kapasitas Pesawat</label>
-                  <input type="text" name="kapasitas_pesawat" value={spesifikasi.kapasitas_pesawat} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Jenis Pesawat (Maks)</label>
-                  <input type="text" name="jenis_pesawat" value={spesifikasi.jenis_pesawat} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Misal: Boeing 737" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Fasilitas Listrik</label>
-                  <input type="text" name="fasilitas_listrik" value={spesifikasi.fasilitas_listrik} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Fasilitas Air</label>
-                  <input type="text" name="fasilitas_air" value={spesifikasi.fasilitas_air} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Pintu Hanggar</label>
-                  <input type="text" name="pintu_hanggar" value={spesifikasi.pintu_hanggar} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Apron Connection</label>
-                  <input type="text" name="apron_connection" value={spesifikasi.apron_connection} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Fire Safety</label>
-                  <input type="text" name="fire_safety" value={spesifikasi.fire_safety} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-bold text-[#333] mb-1">Workshop / Office / Toilet</label>
-                  <input type="text" name="workshop" value={spesifikasi.workshop} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Ya / Tidak" />
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Koordinat GIS</label>
+                  <input type="text" name="koordinat_gis" value={formData.koordinat_gis} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Contoh: -4.545, 136.885" />
                 </div>
               </div>
             </div>
           )}
 
-          <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-[#f4f4f4]">
-            <Link href="/admin/aset" className="bg-[#f4f4f4] text-[#444] border border-[#d2d6de] px-5 py-2 text-[14px] font-bold hover:bg-[#e0e0e0] transition-colors rounded-sm">
-              Batal
-            </Link>
-            <button type="submit" disabled={loading} className="bg-[#00a65a] text-white px-5 py-2 text-[14px] font-bold hover:bg-[#008d4c] transition-colors rounded-sm flex items-center shadow-sm disabled:opacity-70">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-              Simpan Data Aset
-            </button>
+          {/* TAB 2: Dimensi & Pengelolaan */}
+          {activeTab === 2 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#333] mb-1">Luas</label>
+                    <input type="number" step="0.01" name="luas" value={formData.luas} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-bold text-[#333] mb-1">Satuan</label>
+                    <input type="text" name="satuan" value={formData.satuan} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="m²" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Kapasitas</label>
+                  <input type="text" name="kapasitas" value={formData.kapasitas} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" />
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Dok. Kepemilikan/Pengelolaan</label>
+                  <input type="text" name="dokumen_kepemilikan" value={formData.dokumen_kepemilikan} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Contoh: SHM No. 123" />
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Kondisi</label>
+                  <select name="kondisi" value={formData.kondisi} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
+                    <option value="Baik">Baik</option>
+                    <option value="Rusak Ringan">Rusak Ringan</option>
+                    <option value="Rusak Berat">Rusak Berat</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[13px] font-bold text-[#333] mb-1">Status Aset <span className="text-red-500">*</span></label>
+                  <select name="status" value={formData.status} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
+                    {statusOptions.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[#444] text-[13px] font-bold mb-1">Pilih Master Tarif / Harga (Opsional)</label>
+                  <select name="master_tariff_id" value={formData.master_tariff_id} onChange={handleChange} className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
+                    <option value="">-- Tidak ada tarif / Custom --</option>
+                    {activeTariffs.map(tariff => (
+                      <option key={tariff.id} value={tariff.id}>
+                        {tariff.jenis_layanan} - {tariff.objek} (Rp {parseInt(tariff.tarif as string).toLocaleString('id-ID')} / {tariff.satuan})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[11px] text-[#777] mt-1">Sesuai Peraturan yang berlaku. Kosongkan jika tagihan dihitung dari sistem lain.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: Spesifikasi Hanggar */}
+          {activeTab === 3 && isHanggar && (
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="bg-[#f0f7fb] p-6 border-l-4 border-[#3c8dbc] mb-6">
+                <h4 className="font-bold text-[#3c8dbc] text-lg mb-1">Spesifikasi Detail Hanggar</h4>
+                <p className="text-sm text-gray-600">Mohon lengkapi data spesifikasi fisik dan utilitas hanggar untuk ditampilkan di katalog Tenant.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Tinggi Bangunan</label>
+                  <input type="text" name="tinggi_bangunan" value={spesifikasi.tinggi_bangunan} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: 25 Meter" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Kapasitas Pesawat</label>
+                  <input type="text" name="kapasitas_pesawat" value={spesifikasi.kapasitas_pesawat} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: 2 Pesawat Narrow Body" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Jenis Pesawat (Maks)</label>
+                  <input type="text" name="jenis_pesawat" value={spesifikasi.jenis_pesawat} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: Boeing 737 / A320" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Daya Listrik</label>
+                  <input type="text" name="fasilitas_listrik" value={spesifikasi.fasilitas_listrik} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: 15.000 VA" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Sistem Air</label>
+                  <input type="text" name="fasilitas_air" value={spesifikasi.fasilitas_air} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: PAM / Sumur Bor" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Pintu Hanggar</label>
+                  <input type="text" name="pintu_hanggar" value={spesifikasi.pintu_hanggar} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: Motorized Sliding Door" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Koneksi Apron</label>
+                  <input type="text" name="apron_connection" value={spesifikasi.apron_connection} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: Akses Langsung Taxiway" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Fire Safety System</label>
+                  <input type="text" name="fire_safety" value={spesifikasi.fire_safety} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: Hydrant & Sprinkler" />
+                </div>
+                <div>
+                  <label className="block text-[12px] uppercase font-bold tracking-wider text-gray-600 mb-1">Office & Toilet</label>
+                  <input type="text" name="office" value={spesifikasi.office} onChange={handleSpesifikasiChange} className="w-full border border-[#d2d6de] px-4 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white" placeholder="Misal: 2 Ruang Office, 4 Toilet" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* WIZARD NAVIGATION */}
+          <div className="mt-10 flex justify-between pt-6 border-t border-gray-200">
+            {activeTab > 1 ? (
+              <button type="button" onClick={handlePrev} className="px-6 py-2.5 bg-gray-100 text-gray-700 font-bold uppercase tracking-wider text-sm hover:bg-gray-200 transition-colors flex items-center">
+                <ChevronLeft className="w-4 h-4 mr-2" /> Sebelumnya
+              </button>
+            ) : (
+              <Link href="/admin/aset" className="px-6 py-2.5 bg-white border border-gray-300 text-gray-600 font-bold uppercase tracking-wider text-sm hover:bg-gray-50 transition-colors flex items-center">
+                Batal
+              </Link>
+            )}
+
+            {activeTab < tabs.length ? (
+              <button type="button" onClick={handleNext} className="px-6 py-2.5 bg-[#3c8dbc] text-white font-bold uppercase tracking-wider text-sm hover:bg-[#367fa9] transition-colors flex items-center shadow-sm">
+                Selanjutnya <ChevronRight className="w-4 h-4 ml-2" />
+              </button>
+            ) : (
+              <button type="submit" disabled={loading} className="px-8 py-2.5 bg-[#00a65a] text-white font-bold uppercase tracking-wider text-sm hover:bg-[#008d4c] transition-colors flex items-center shadow-md disabled:opacity-70">
+                {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Save className="w-5 h-5 mr-2" />}
+                {loading ? 'Menyimpan...' : 'Simpan Aset'}
+              </button>
+            )}
           </div>
+
         </form>
       </div>
     </div>

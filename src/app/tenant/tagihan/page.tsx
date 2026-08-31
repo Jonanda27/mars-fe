@@ -1,16 +1,40 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { invoiceService } from '@/services/invoiceService';
 import { Invoice } from '@/types/invoice';
-import { FileText, Loader2, CheckCircle2, Clock, AlertCircle, Banknote } from 'lucide-react';
+import { FileText, Loader2, CheckCircle2, Clock, AlertCircle, Banknote, Download, X } from 'lucide-react';
 import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
+import SuratSKRD from '@/components/SuratSKRD';
 
 export default function TenantTagihanPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
+  
+  // SKRD Modal state
+  const [showSkrdModal, setShowSkrdModal] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const skrdRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPdf = async () => {
+    if (!skrdRef.current || !selectedInvoice) return;
+    
+    // dynamically import html2pdf to avoid SSR issues
+    const html2pdf = (await import('html2pdf.js')).default;
+    
+    const element = skrdRef.current;
+    const opt = {
+      margin:       10,
+      filename:     `SKRD_${selectedInvoice.invoice_number}.pdf`,
+      image:        { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+    };
+
+    html2pdf().set(opt).from(element).save();
+  };
 
   useEffect(() => {
     fetchInvoices();
@@ -129,7 +153,17 @@ export default function TenantTagihanPage() {
                   </div>
 
                   {invoice.status === 'Unpaid' && (
-                    <div className="p-4 border-t border-slate-100 bg-orange-50 flex justify-end">
+                    <div className="p-4 border-t border-slate-100 bg-orange-50 flex justify-end gap-2">
+                      <button 
+                        onClick={() => {
+                          setSelectedInvoice(invoice);
+                          setShowSkrdModal(true);
+                        }}
+                        className="inline-flex items-center justify-center bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                      >
+                        <FileText className="w-4 h-4 mr-2" /> 
+                        Lihat e-SKRD
+                      </button>
                       <button 
                         onClick={() => handlePay(invoice.id)}
                         disabled={isPaying}
@@ -145,6 +179,16 @@ export default function TenantTagihanPage() {
                       <div className="flex items-center font-medium">
                         <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" /> Lunas pada {dayjs(invoice.payment_date).format('DD MMM YYYY')}
                       </div>
+                      <button 
+                        onClick={() => {
+                          setSelectedInvoice(invoice);
+                          setShowSkrdModal(true);
+                        }}
+                        className="inline-flex items-center justify-center bg-white border border-green-200 text-green-700 hover:bg-green-100 px-4 py-1.5 rounded text-xs font-semibold transition-colors shadow-sm"
+                      >
+                        <FileText className="w-3 h-3 mr-1" /> 
+                        Cetak e-SKRD
+                      </button>
                     </div>
                   )}
                 </div>
@@ -153,6 +197,33 @@ export default function TenantTagihanPage() {
           )}
         </div>
       </div>
+
+      {showSkrdModal && selectedInvoice && (
+        <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <h2 className="text-lg font-bold text-gray-800">Preview e-SKRD</h2>
+              <div className="flex gap-2">
+                <button 
+                  onClick={handleDownloadPdf}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium flex items-center"
+                >
+                  <Download className="w-4 h-4 mr-2" /> Download PDF
+                </button>
+                <button 
+                  onClick={() => setShowSkrdModal(false)}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium flex items-center"
+                >
+                  <X className="w-4 h-4 mr-1" /> Tutup
+                </button>
+              </div>
+            </div>
+            <div className="p-4 overflow-y-auto flex justify-center bg-gray-200 flex-1">
+              <SuratSKRD invoice={selectedInvoice} ref={skrdRef} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
