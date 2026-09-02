@@ -33,6 +33,35 @@ export default function AdminTagihanSKRDPage() {
     }
   };
 
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifyingInvoice, setVerifyingInvoice] = useState<Invoice | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const handleVerify = async (id: number) => {
+    if (!confirm('Anda yakin ingin memverifikasi dan melunaskan tagihan ini?')) return;
+    try {
+      setIsVerifying(true);
+      const res = await fetch(`http://localhost:5000/api/invoices/${id}/verify`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (res.ok) {
+        alert('Verifikasi berhasil, status tagihan menjadi Lunas (Paid).');
+        setShowVerifyModal(false);
+        fetchInvoices();
+      } else {
+        alert('Gagal melakukan verifikasi');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Terjadi kesalahan');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   const handleDownloadPdf = async () => {
     if (!skrdRef.current || !selectedInvoice) return;
     
@@ -59,6 +88,28 @@ export default function AdminTagihanSKRDPage() {
             Manajemen Tagihan & e-SKRD
           </h1>
           <p className="text-[12px] text-[#777]">Monitoring Pembayaran e-SKRD</p>
+        </div>
+        <div>
+          <button 
+            onClick={async () => {
+              try {
+                const res = await fetch('http://localhost:5000/api/cron/trigger-billing', { method: 'POST' });
+                const data = await res.json();
+                if (res.ok) {
+                  alert(data.message);
+                  fetchInvoices();
+                } else {
+                  alert('Gagal: ' + data.message);
+                }
+              } catch (e) {
+                alert('Terjadi kesalahan saat memicu cron job.');
+              }
+            }}
+            className="bg-[#f39c12] hover:bg-[#e08e0b] text-white px-4 py-2 rounded-sm text-sm font-bold flex items-center shadow-sm"
+          >
+            <PlayCircle className="w-4 h-4 mr-2" />
+            Simulasi Tagihan Bulanan
+          </button>
         </div>
       </header>
 
@@ -88,14 +139,17 @@ export default function AdminTagihanSKRDPage() {
               {invoices.map((item) => (
                 <tr key={item.id} className="border-b border-[#f4f4f4] hover:bg-slate-50">
                   <td className="py-4 px-5">
-                    <div className="font-bold text-[#333] text-[15px]">{item.contracts?.tenants?.nama_perusahaan}</div>
+                    <div className="font-bold text-[#333] text-[15px]">{item.tenants?.nama_perusahaan || '-'}</div>
                   </td>
                   <td className="py-4 px-5">
                     <div className="font-bold text-[#3c8dbc]">{item.invoice_number}</div>
                     <div className="text-[11px] text-[#777]">Ref: {item.contracts?.contract_number}</div>
                   </td>
                   <td className="py-4 px-5 text-right font-mono font-bold text-[#333]">
-                    {formatRupiah(item.amount)}
+                    {formatRupiah(Number(item.amount) + Number(item.penalty_amount || 0))}
+                    {Number(item.penalty_amount) > 0 && (
+                      <div className="text-[11px] text-red-600 font-bold mt-1">+ Denda: {formatRupiah(Number(item.penalty_amount))}</div>
+                    )}
                   </td>
                   <td className="py-4 px-5 text-center">
                     <span className="font-bold text-[#333]">{item.due_date ? dayjs(item.due_date).format('DD MMM YYYY') : '-'}</span>
@@ -105,22 +159,46 @@ export default function AdminTagihanSKRDPage() {
                       <span className="inline-flex items-center bg-[#00a65a]/10 text-[#00a65a] border border-[#00a65a]/20 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
                         Lunas
                       </span>
+                    ) : item.status === 'Pending Verification' ? (
+                      <span className="inline-flex items-center bg-blue-100 text-blue-700 border border-blue-200 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
+                        Menunggu Verifikasi
+                      </span>
+                    ) : item.status === 'Scheduled' ? (
+                      <span className="inline-flex items-center bg-slate-100 text-slate-600 border border-slate-200 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
+                        Terjadwal
+                      </span>
+                    ) : item.status === 'Overdue' ? (
+                      <span className="inline-flex items-center bg-red-100 text-red-700 border border-red-200 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
+                        Menunggak
+                      </span>
                     ) : (
                       <span className="inline-flex items-center bg-[#dd4b39]/10 text-[#dd4b39] border border-[#dd4b39]/20 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
                         Belum Lunas
                       </span>
                     )}
                   </td>
-                  <td className="py-4 px-5 text-center">
-                     <button 
-                       onClick={() => {
-                         setSelectedInvoice(item);
-                         setShowSkrdModal(true);
-                       }}
-                       className="bg-white border border-[#d2d6de] text-[#444] hover:bg-[#f4f4f4] px-2 py-1 text-[12px] font-bold inline-flex items-center justify-center shadow-sm"
-                     >
-                       <FileText className="w-3.5 h-3.5 mr-1 text-[#3c8dbc]" /> Lihat / Cetak
-                     </button>
+                  <td className="py-4 px-5 text-center space-x-2">
+                     {item.status === 'Pending Verification' ? (
+                       <button 
+                         onClick={() => {
+                           setVerifyingInvoice(item);
+                           setShowVerifyModal(true);
+                         }}
+                         className="bg-[#3c8dbc] border border-[#367fa9] text-white hover:bg-[#367fa9] px-2 py-1 text-[12px] font-bold inline-flex items-center justify-center shadow-sm rounded-sm"
+                       >
+                         <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-white" /> Verifikasi
+                       </button>
+                     ) : (
+                       <button 
+                         onClick={() => {
+                           setSelectedInvoice(item);
+                           setShowSkrdModal(true);
+                         }}
+                         className="bg-white border border-[#d2d6de] text-[#444] hover:bg-[#f4f4f4] px-2 py-1 text-[12px] font-bold inline-flex items-center justify-center shadow-sm rounded-sm"
+                       >
+                         <FileText className="w-3.5 h-3.5 mr-1 text-[#3c8dbc]" /> Lihat / Cetak
+                       </button>
+                     )}
                   </td>
                 </tr>
               ))}
@@ -135,6 +213,86 @@ export default function AdminTagihanSKRDPage() {
         </div>
       </div>
 
+      {/* MODAL VERIFIKASI PEMBAYARAN */}
+      {showVerifyModal && verifyingInvoice && (
+        <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[95vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <h2 className="text-lg font-bold text-gray-800">Verifikasi Bukti Pembayaran</h2>
+              <button onClick={() => setShowVerifyModal(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex flex-col items-center flex-1 space-y-6">
+              <div className="w-full grid grid-cols-2 gap-4 border p-4 rounded-lg bg-slate-50">
+                <div>
+                  <div className="text-xs text-gray-500 font-bold uppercase">Nomor Tagihan</div>
+                  <div className="font-bold text-gray-800">{verifyingInvoice.invoice_number}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 font-bold uppercase">Metode Pembayaran</div>
+                  <div className="font-bold text-gray-800">{verifyingInvoice.payment_method || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 font-bold uppercase">Nama Tenant</div>
+                  <div className="font-bold text-gray-800">{verifyingInvoice.tenants?.nama_perusahaan}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 font-bold uppercase">Jumlah Dibayar</div>
+                  <div className="font-bold text-orange-600 text-lg">
+                    {formatRupiah(Number(verifyingInvoice.amount) + Number(verifyingInvoice.penalty_amount || 0))}
+                  </div>
+                  {Number(verifyingInvoice.penalty_amount) > 0 && (
+                     <div className="text-xs text-red-600 font-bold">Termasuk Denda: {formatRupiah(Number(verifyingInvoice.penalty_amount))}</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="w-full flex flex-col items-center border border-dashed border-gray-300 p-4 rounded-lg bg-gray-50">
+                 <h3 className="font-bold text-gray-700 mb-4">Lampiran Bukti Bayar:</h3>
+                 {verifyingInvoice.payment_receipt ? (
+                    verifyingInvoice.payment_receipt.endsWith('.pdf') ? (
+                       <a href={`http://localhost:5000/uploads/receipts/${verifyingInvoice.payment_receipt}`} target="_blank" rel="noreferrer" className="text-blue-600 underline font-bold flex items-center">
+                         <FileText className="w-5 h-5 mr-2" /> Buka Dokumen PDF
+                       </a>
+                    ) : (
+                       <img 
+                         src={`http://localhost:5000/uploads/receipts/${verifyingInvoice.payment_receipt}`} 
+                         alt="Bukti Bayar"
+                         className="max-w-full max-h-[400px] object-contain shadow-sm border border-gray-200"
+                       />
+                    )
+                 ) : (
+                    <div className="text-gray-500 italic">Tidak ada file terlampir</div>
+                 )}
+              </div>
+            </div>
+            <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 flex-shrink-0">
+               <button 
+                 onClick={() => setShowVerifyModal(false)}
+                 className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 font-bold"
+               >
+                 Tutup
+               </button>
+               <button 
+                 onClick={() => alert('Fitur penolakan segera hadir')}
+                 className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 font-bold"
+               >
+                 Tolak
+               </button>
+               <button 
+                 onClick={() => handleVerify(verifyingInvoice.id)}
+                 disabled={isVerifying}
+                 className="px-6 py-2 bg-[#00a65a] hover:bg-[#008d4c] text-white rounded font-bold shadow disabled:opacity-70 flex items-center"
+               >
+                 {isVerifying ? 'Memproses...' : <><CheckCircle2 className="w-4 h-4 mr-2" /> Setujui (Lunas)</>}
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL E-SKRD */}
       {showSkrdModal && selectedInvoice && (
         <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden">
@@ -161,8 +319,6 @@ export default function AdminTagihanSKRDPage() {
           </div>
         </div>
       )}
-
-
     </div>
   );
 }

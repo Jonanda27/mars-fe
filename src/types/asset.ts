@@ -22,5 +22,6 @@ export interface Asset {
   airports?: any;
   zones?: any;
   master_tariffs?: any;
+  contracts?: any[];
 }
 

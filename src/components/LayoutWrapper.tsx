@@ -28,7 +28,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }, [user, pathname, router]);
 
   // Jika di halaman awal (Login), register, atau portal Eksekutif, tampilkan full-screen tanpa sidebar
-  if (noSidebarRoutes.includes(pathname) || pathname.startsWith('/eksekutif')) {
+  if (noSidebarRoutes.includes(pathname) || pathname.startsWith('/eksekutif') || pathname === '/admin/dashboard') {
     return <>{children}</>;
   }
 

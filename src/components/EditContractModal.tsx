@@ -15,10 +15,11 @@ export default function EditContractModal({ contract, onClose, onSuccess }: Edit
     total_amount: contract.total_amount?.toString() || '0',
     deposit_jaminan: contract.deposit_jaminan?.toString() || '0',
     denda: contract.denda || '',
+    periode_pembayaran: contract.periode_pembayaran || 'Bulanan',
     fasilitas: contract.fasilitas ? JSON.stringify(contract.fasilitas) : ''
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -38,9 +39,10 @@ export default function EditContractModal({ contract, onClose, onSuccess }: Edit
       }
 
       const payload = {
-        total_amount: formData.total_amount,
-        deposit_jaminan: formData.deposit_jaminan,
+        total_amount: Number(formData.total_amount),
+        deposit_jaminan: Number(formData.deposit_jaminan),
         denda: formData.denda,
+        periode_pembayaran: formData.periode_pembayaran,
         fasilitas: parsedFasilitas
       };
 
@@ -78,9 +80,20 @@ export default function EditContractModal({ contract, onClose, onSuccess }: Edit
             </div>
           </div>
           
-          <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-700 mb-1">Ketentuan Denda</label>
-            <input type="text" name="denda" value={formData.denda} onChange={handleChange} placeholder="Contoh: 2% per bulan dari total tagihan..." className="w-full border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Ketentuan Denda</label>
+              <input type="text" name="denda" value={formData.denda} onChange={handleChange} placeholder="Contoh: 2% per bulan dari total tagihan..." className="w-full border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Periode Pembayaran <span className="text-red-500">*</span></label>
+              <select name="periode_pembayaran" value={formData.periode_pembayaran} onChange={handleChange} className="w-full border border-gray-300 px-3 py-2 rounded outline-none focus:border-blue-500">
+                <option value="Sekaligus">Sekaligus (Lump Sum)</option>
+                <option value="Harian">Harian</option>
+                <option value="Bulanan">Bulanan</option>
+                <option value="Tahunan">Tahunan</option>
+              </select>
+            </div>
           </div>
 
           <div className="mb-6">

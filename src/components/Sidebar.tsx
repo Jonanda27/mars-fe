@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { 
   Building2, Users, FileText, Activity, 
   Calculator, Receipt, CreditCard, RefreshCcw, BarChart3,
-  Circle, User, Car, Clock, FileSpreadsheet, Database, AlertTriangle
+  Circle, User, Car, Clock, FileSpreadsheet, Database, AlertTriangle, Map as MapIcon
 } from 'lucide-react';
 
 export default function Sidebar({ isOpen }: { isOpen: boolean }) {
@@ -16,6 +16,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: <BarChart3 /> },
+    { href: "/admin/dashboard", label: "GIS Dashboard", icon: <MapIcon /> },
     { href: "/admin/permohonan", label: "Permohonan Masuk", icon: <FileText /> },
     { href: "/admin/tagihan", label: "SKRD / Tagihan", icon: <Receipt /> },
     { href: "/admin/pembayaran", label: "Pembayaran", icon: <CreditCard /> },

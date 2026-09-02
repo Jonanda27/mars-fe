@@ -14,6 +14,12 @@ export default function TenantTagihanPage() {
   const [isPaying, setIsPaying] = useState(false);
   
   // SKRD Modal state
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadInvoice, setUploadInvoice] = useState<Invoice | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('Transfer Bank Papua');
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+
+  // SKRD Modal state
   const [showSkrdModal, setShowSkrdModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const skrdRef = useRef<HTMLDivElement>(null);
@@ -51,17 +57,39 @@ export default function TenantTagihanPage() {
     }
   };
 
-  const handlePay = async (id: number) => {
-    if (!confirm('Simulasi: Apakah Anda yakin ingin melakukan pembayaran lunas untuk tagihan ini? (Hak penggunaan aset akan langsung aktif setelah ini)')) return;
+  const handleUploadReceipt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadInvoice || !receiptFile) {
+        alert('Pilih file bukti bayar terlebih dahulu');
+        return;
+    }
     
     try {
       setIsPaying(true);
-      await invoiceService.payInvoice(id);
-      alert('Pembayaran Berhasil! Tagihan lunas dan status kontrak Anda kini ACTIVE.');
-      fetchInvoices();
+      const formData = new FormData();
+      formData.append('receipt', receiptFile);
+      formData.append('payment_method', paymentMethod);
+
+      const res = await fetch(`http://localhost:5000/api/invoices/${uploadInvoice.id}/upload-receipt`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      if (res.ok) {
+        alert('Bukti bayar berhasil diunggah! Menunggu verifikasi admin.');
+        setShowUploadModal(false);
+        setReceiptFile(null);
+        fetchInvoices();
+      } else {
+        const data = await res.json();
+        alert(`Gagal mengunggah bukti bayar: ${data.message || 'Unknown error'}`);
+      }
     } catch (error) {
       console.error(error);
-      alert('Gagal memproses pembayaran');
+      alert('Terjadi kesalahan saat mengunggah');
     } finally {
       setIsPaying(false);
     }
@@ -75,6 +103,10 @@ export default function TenantTagihanPage() {
         return <span className="px-3 py-1.5 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full flex items-center w-max"><Clock className="w-4 h-4 mr-1" /> Belum Dibayar</span>;
       case 'Overdue':
         return <span className="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full flex items-center w-max"><AlertCircle className="w-4 h-4 mr-1" /> Menunggak</span>;
+      case 'Scheduled':
+        return <span className="px-3 py-1.5 bg-slate-200 text-slate-600 text-xs font-semibold rounded-full flex items-center w-max"><Clock className="w-4 h-4 mr-1" /> Terjadwal</span>;
+      case 'Pending Verification':
+        return <span className="px-3 py-1.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex items-center w-max"><Clock className="w-4 h-4 mr-1" /> Menunggu Verifikasi</span>;
       default:
         return <span className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs rounded-full">{status}</span>;
     }
@@ -108,89 +140,149 @@ export default function TenantTagihanPage() {
               <p className="text-sm mt-1">Anda tidak memiliki tagihan SKRD saat ini.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {invoices.map((invoice) => (
-                <div key={invoice.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow">
-                  <div className="p-5 border-b border-slate-100 flex justify-between items-start bg-slate-50">
-                    <div>
-                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor SKRD</div>
-                      <div className="font-bold text-lg text-slate-800">{invoice.invoice_number}</div>
+            <div className="space-y-8">
+              {Object.entries(
+                invoices.reduce((acc, invoice) => {
+                  const contractNum = invoice.contracts?.contract_number || 'Tagihan Lainnya';
+                  if (!acc[contractNum]) acc[contractNum] = [];
+                  acc[contractNum].push(invoice);
+                  return acc;
+                }, {} as Record<string, Invoice[]>)
+              ).map(([contractNum, contractInvoices]) => (
+                <div key={contractNum} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="bg-slate-100 p-4 border-b border-slate-200 flex justify-between items-center">
+                    <div className="font-bold text-slate-800 flex items-center">
+                      <FileText className="w-5 h-5 mr-2 text-slate-500" />
+                      Kontrak: {contractNum}
                     </div>
-                    <div>
-                      {getStatusBadge(invoice.status)}
+                    <div className="text-xs font-semibold text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
+                      {contractInvoices.length} Tagihan
                     </div>
                   </div>
                   
-                  <div className="p-5 flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Terkait Kontrak</div>
-                      <div className="bg-orange-50/50 p-3 rounded-lg border border-orange-100 flex items-center">
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                          <FileText className="w-5 h-5 text-orange-600" />
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-800 leading-tight">{invoice.contracts?.contract_number}</div>
-                          <div className="text-[12px] text-slate-500 mt-0.5 font-medium">{invoice.contracts?.assets?.nama_aset}</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div>
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Jatuh Tempo</div>
-                        <div className="font-medium text-slate-700 text-sm">
-                          {invoice.due_date ? dayjs(invoice.due_date).format('DD MMM YYYY') : '-'}
-                        </div>
-                      </div>
+                  <div className="p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 bg-slate-50">
+                    {contractInvoices.map((invoice, index) => {
+                      const isScheduled = invoice.status === 'Scheduled';
+                      const isPending = invoice.status === 'Pending Verification';
+                      const total = Number(invoice.amount) + Number(invoice.penalty_amount || 0);
                       
-                      <div>
-                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Bayar</div>
-                        <div className="font-bold text-orange-600 text-xl">
-                          {formatRupiah(invoice.amount)}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      return (
+                        <div key={invoice.id} className={`bg-white rounded-xl shadow-sm border ${isScheduled ? 'border-slate-200 opacity-60 grayscale-[50%]' : 'border-orange-100 hover:shadow-md'} overflow-hidden flex flex-col transition-all relative`}>
+                          
+                          {isScheduled && (
+                            <div className="absolute inset-0 bg-slate-50/50 z-10 flex items-center justify-center backdrop-blur-[1px] pointer-events-none">
+                              <div className="bg-slate-800/80 text-white px-4 py-2 rounded-full font-bold text-sm flex items-center shadow-lg transform rotate-[-5deg]">
+                                <Clock className="w-4 h-4 mr-2" /> Belum Waktunya
+                              </div>
+                            </div>
+                          )}
 
-                  {invoice.status === 'Unpaid' && (
-                    <div className="p-4 border-t border-slate-100 bg-orange-50 flex justify-end gap-2">
-                      <button 
-                        onClick={() => {
-                          setSelectedInvoice(invoice);
-                          setShowSkrdModal(true);
-                        }}
-                        className="inline-flex items-center justify-center bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm"
-                      >
-                        <FileText className="w-4 h-4 mr-2" /> 
-                        Lihat e-SKRD
-                      </button>
-                      <button 
-                        onClick={() => handlePay(invoice.id)}
-                        disabled={isPaying}
-                        className="w-full sm:w-auto inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm disabled:opacity-70"
-                      >
-                        <Banknote className="w-4 h-4 mr-2" /> 
-                        {isPaying ? 'Memproses...' : 'Simulasi Pembayaran'}
-                      </button>
-                    </div>
-                  )}
-                  {invoice.status === 'Paid' && (
-                    <div className="p-4 border-t border-slate-100 bg-green-50 flex justify-between items-center text-green-700 text-sm">
-                      <div className="flex items-center font-medium">
-                        <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" /> Lunas pada {dayjs(invoice.payment_date).format('DD MMM YYYY')}
-                      </div>
-                      <button 
-                        onClick={() => {
-                          setSelectedInvoice(invoice);
-                          setShowSkrdModal(true);
-                        }}
-                        className="inline-flex items-center justify-center bg-white border border-green-200 text-green-700 hover:bg-green-100 px-4 py-1.5 rounded text-xs font-semibold transition-colors shadow-sm"
-                      >
-                        <FileText className="w-3 h-3 mr-1" /> 
-                        Cetak e-SKRD
-                      </button>
-                    </div>
-                  )}
+                          <div className={`p-4 border-b ${isScheduled ? 'border-slate-100 bg-slate-50' : 'border-orange-50 bg-orange-50/30'} flex justify-between items-start`}>
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">TAGIHAN KE-{index + 1}</span>
+                              </div>
+                              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor SKRD</div>
+                              <div className="font-bold text-lg text-slate-800">{invoice.invoice_number}</div>
+                            </div>
+                            <div className="z-20">
+                              {getStatusBadge(invoice.status)}
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Terkait Kontrak</div>
+                              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center">
+                                <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                                  <FileText className="w-4 h-4 text-slate-500" />
+                                </div>
+                                <div>
+                                  <div className="text-[12px] text-slate-600 font-medium">{invoice.contracts?.assets?.nama_aset}</div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-4">
+                              <div>
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Jatuh Tempo</div>
+                                <div className="font-medium text-slate-700 text-sm">
+                                  {invoice.due_date ? dayjs(invoice.due_date).format('DD MMM YYYY') : '-'}
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Bayar</div>
+                                <div className={`font-bold text-xl ${isScheduled ? 'text-slate-600' : 'text-orange-600'}`}>
+                                  {formatRupiah(total)}
+                                  {Number(invoice.penalty_amount) > 0 && (
+                                    <div className="text-xs text-red-600 font-bold">+ Denda: {formatRupiah(Number(invoice.penalty_amount))}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {!isScheduled && invoice.status === 'Unpaid' && (
+                            <div className="p-4 border-t border-slate-100 bg-orange-50 flex justify-end gap-2 z-20">
+                              <button 
+                                onClick={() => {
+                                  setSelectedInvoice(invoice);
+                                  setShowSkrdModal(true);
+                                }}
+                                className="inline-flex items-center justify-center bg-white border border-orange-200 text-orange-600 hover:bg-orange-50 px-4 py-2 rounded text-sm font-semibold transition-colors shadow-sm"
+                              >
+                                <FileText className="w-4 h-4 mr-2" /> 
+                                Lihat e-SKRD
+                              </button>
+                              <button 
+                                onClick={() => {
+                                    setUploadInvoice(invoice);
+                                    setShowUploadModal(true);
+                                }}
+                                className="w-full sm:w-auto inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded text-sm font-semibold transition-colors shadow-sm"
+                              >
+                                <Banknote className="w-4 h-4 mr-2" /> 
+                                Upload Bukti Bayar
+                              </button>
+                            </div>
+                          )}
+
+                          {!isScheduled && invoice.status === 'Pending Verification' && (
+                            <div className="p-4 border-t border-slate-100 bg-blue-50 flex justify-between items-center text-blue-700 text-sm z-20">
+                              <div className="flex items-center font-medium">
+                                <Clock className="w-4 h-4 mr-2 text-blue-600" /> Bukti bayar sedang diperiksa Admin
+                              </div>
+                            </div>
+                          )}
+
+                          {!isScheduled && invoice.status === 'Paid' && (
+                            <div className="p-4 border-t border-slate-100 bg-green-50 flex justify-between items-center text-green-700 text-sm z-20">
+                              <div className="flex items-center font-medium">
+                                <CheckCircle2 className="w-4 h-4 mr-2 text-green-600" /> Lunas pada {dayjs(invoice.payment_date).format('DD MMM YYYY')}
+                              </div>
+                              <button 
+                                onClick={() => {
+                                  setSelectedInvoice(invoice);
+                                  setShowSkrdModal(true);
+                                }}
+                                className="inline-flex items-center justify-center bg-white border border-green-200 text-green-700 hover:bg-green-100 px-4 py-1.5 rounded text-xs font-semibold transition-colors shadow-sm"
+                              >
+                                <FileText className="w-3 h-3 mr-1" /> 
+                                Cetak e-SKRD
+                              </button>
+                            </div>
+                          )}
+
+                          {isScheduled && (
+                             <div className="p-4 border-t border-slate-200 bg-slate-100 flex justify-center text-slate-500 text-xs font-medium">
+                                Tagihan ini belum aktif dan belum bisa dibayar.
+                             </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
             </div>
@@ -198,6 +290,79 @@ export default function TenantTagihanPage() {
         </div>
       </div>
 
+      {/* MODAL UPLOAD BUKTI BAYAR */}
+      {showUploadModal && uploadInvoice && (
+        <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+              <h2 className="text-lg font-bold text-gray-800">Upload Bukti Pembayaran</h2>
+              <button onClick={() => {setShowUploadModal(false); setReceiptFile(null);}} className="text-gray-500 hover:text-gray-700">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleUploadReceipt}>
+              <div className="p-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Nomor Tagihan</label>
+                  <div className="bg-gray-100 p-2 rounded text-gray-800 font-bold">{uploadInvoice.invoice_number}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Jumlah Harus Dibayar</label>
+                  <div className="text-xl font-bold text-orange-600">
+                    {formatRupiah(Number(uploadInvoice.amount) + Number(uploadInvoice.penalty_amount || 0))}
+                  </div>
+                  {Number(uploadInvoice.penalty_amount) > 0 && (
+                     <div className="text-xs text-red-600 font-bold mt-1">Termasuk Denda: {formatRupiah(Number(uploadInvoice.penalty_amount))}</div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Metode Transfer / Bank</label>
+                  <select 
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-orange-500"
+                    required
+                  >
+                    <option value="Transfer Bank Papua">Transfer Bank Papua</option>
+                    <option value="Transfer Bank Mandiri">Transfer Bank Mandiri</option>
+                    <option value="Transfer Bank BRI">Transfer Bank BRI</option>
+                    <option value="Setoran Tunai di Loket">Setoran Tunai di Loket</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Upload File Resi (JPG/PNG/PDF)</label>
+                  <input 
+                    type="file" 
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e) => setReceiptFile(e.target.files ? e.target.files[0] : null)}
+                    className="w-full border border-gray-300 rounded-lg p-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-2">
+                <button 
+                  type="button" 
+                  onClick={() => {setShowUploadModal(false); setReceiptFile(null);}}
+                  className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isPaying}
+                  className="px-6 py-2 bg-orange-500 rounded-lg text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-70 flex items-center"
+                >
+                  {isPaying ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Banknote className="w-4 h-4 mr-2" />}
+                  Kirim Bukti Bayar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL E-SKRD */}
       {showSkrdModal && selectedInvoice && (
         <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden">

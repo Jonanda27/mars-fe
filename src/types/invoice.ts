@@ -8,7 +8,11 @@ export interface Invoice {
   amount: number | string;
   due_date: string;
   status: string;
-  payment_date: string | null;
+  payment_method?: string | null;
+  payment_receipt?: string | null;
+  payment_date?: string | null;
+  penalty_amount?: string | number | null;
   created_at: string;
   contracts?: Contract;
+  tenants?: any;
 }
