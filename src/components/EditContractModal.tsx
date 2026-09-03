@@ -38,8 +38,8 @@ export default function EditContractModal({ contract, onClose, onSuccess }: Edit
       }
 
       const payload = {
-        total_amount: formData.total_amount,
-        deposit_jaminan: formData.deposit_jaminan,
+        total_amount: Number(formData.total_amount) || 0,
+        deposit_jaminan: Number(formData.deposit_jaminan) || 0,
         denda: formData.denda,
         fasilitas: parsedFasilitas
       };

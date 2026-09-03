@@ -12,3 +12,6 @@ export const formatRupiah = (value: number | string | undefined | null): string 
     maximumFractionDigits: 0,
   }).format(numValue);
 };
+
+export default formatRupiah;
+

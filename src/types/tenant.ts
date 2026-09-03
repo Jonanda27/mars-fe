@@ -10,6 +10,7 @@ export interface Tenant {
   nomor_telepon: string | null;
   alamat: string | null;
   status_verifikasi: string;
+  status_pembayaran?: string | null;
   created_at: string;
   legalitas?: Record<string, string>;
   informasi_bank?: {
