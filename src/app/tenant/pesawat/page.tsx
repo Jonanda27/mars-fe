@@ -16,18 +16,23 @@ export default function DataPesawatPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [armadaList, setArmadaList] = useState<Aircraft[]>([]);
+  const [aircraftTypes, setAircraftTypes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   React.useEffect(() => {
-    fetchAircrafts();
+    fetchData();
   }, []);
 
-  const fetchAircrafts = async () => {
+  const fetchData = async () => {
     try {
-      const data = await aircraftService.getTenantAircrafts();
+      const [data, types] = await Promise.all([
+        aircraftService.getTenantAircrafts(),
+        aircraftService.getMasterTypes()
+      ]);
       setArmadaList(data);
+      setAircraftTypes(types);
     } catch (error) {
-      console.error('Gagal mengambil data pesawat:', error);
+      console.error('Gagal mengambil data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -39,6 +44,7 @@ export default function DataPesawatPage() {
   const [formData, setFormData] = useState({
     registrasi: '',
     tipe: '',
+    customTipe: '',
     mtow: '',
     kapasitasPenumpang: '10',
     fotoPreview: ''
@@ -57,7 +63,10 @@ export default function DataPesawatPage() {
 
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.registrasi || !formData.tipe || !formData.mtow) {
+    
+    const finalTipe = formData.tipe === 'Lainnya' ? formData.customTipe : formData.tipe;
+
+    if (!formData.registrasi || !finalTipe || !formData.mtow) {
       alert("Mohon lengkapi Nomor Registrasi, Tipe Pesawat, dan Berat MTOW!");
       return;
     }
@@ -66,7 +75,7 @@ export default function DataPesawatPage() {
       if (editingId) {
         const updatedPesawat = await aircraftService.updateTenantAircraft(editingId, {
           registration_number: formData.registrasi.toUpperCase(),
-          aircraft_type: formData.tipe,
+          aircraft_type: finalTipe,
           mtow: Number(formData.mtow),
           capacity: Number(formData.kapasitasPenumpang),
           foto: formData.fotoPreview || undefined
@@ -77,7 +86,7 @@ export default function DataPesawatPage() {
       } else {
         const newPesawat = await aircraftService.createTenantAircraft({
           registration_number: formData.registrasi.toUpperCase(),
-          aircraft_type: formData.tipe,
+          aircraft_type: finalTipe,
           mtow: Number(formData.mtow),
           capacity: Number(formData.kapasitasPenumpang),
           status: 'aktif',
@@ -92,6 +101,7 @@ export default function DataPesawatPage() {
       setFormData({
         registrasi: '',
         tipe: '',
+        customTipe: '',
         mtow: '',
         kapasitasPenumpang: '10',
         fotoPreview: ''
@@ -103,9 +113,13 @@ export default function DataPesawatPage() {
 
   const handleEdit = (item: Aircraft) => {
     setEditingId(item.id!);
+    
+    const isCustomType = !aircraftTypes.includes(item.aircraft_type);
+
     setFormData({
       registrasi: item.registration_number,
-      tipe: item.aircraft_type,
+      tipe: isCustomType ? 'Lainnya' : item.aircraft_type,
+      customTipe: isCustomType ? item.aircraft_type : '',
       mtow: item.mtow ? item.mtow.toString() : '',
       kapasitasPenumpang: item.capacity ? item.capacity.toString() : '',
       fotoPreview: item.foto || ''
@@ -160,6 +174,7 @@ export default function DataPesawatPage() {
                 setFormData({
                   registrasi: '',
                   tipe: '',
+                  customTipe: '',
                   mtow: '',
                   kapasitasPenumpang: '10',
                   fotoPreview: ''
@@ -231,29 +246,35 @@ export default function DataPesawatPage() {
                     required
                   >
                     <option value="" disabled>-- Pilih Tipe Pesawat --</option>
-                    <optgroup label="Helicopter (Rotary Wing)">
-                      <option value="AS350 Series">AS350 Series</option>
-                      <option value="Bell 206 - Bell 407 Series">Bell 206 - Bell 407 Series</option>
-                      <option value="Bell 412 - Bell 212">Bell 412 - Bell 212</option>
-                      <option value="Kamov - MI">Kamov - MI</option>
-                    </optgroup>
-                    <optgroup label="Pesawat Terbang (Fixed Wing)">
-                      <option value="Cessna Caravan C208">Cessna Caravan C208</option>
-                      <option value="PAC 750 XL">PAC 750 XL</option>
-                      <option value="DHC-6 Series">DHC-6 Series</option>
-                      <option value="ATR Series">ATR Series</option>
-                    </optgroup>
+                    {aircraftTypes.map((type, idx) => (
+                      <option key={idx} value={type}>{type}</option>
+                    ))}
+                    <option value="Lainnya">Lainnya (Ketik Manual)...</option>
                   </select>
+                  
+                  {formData.tipe === 'Lainnya' && (
+                    <input 
+                      type="text" 
+                      placeholder="Masukkan tipe pesawat..." 
+                      value={formData.customTipe}
+                      onChange={(e) => setFormData({ ...formData, customTipe: e.target.value })}
+                      className="w-full mt-2 p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none font-semibold bg-indigo-50" 
+                      required
+                    />
+                  )}
                 </div>
 
                 <div>
                   <label className="block mb-1 font-bold text-[#444]">Berat Maksimal (MTOW) <span className="text-[#dd4b39]">*</span></label>
                   <div className="flex">
                     <input 
-                      type="number" 
+                      type="text" 
                       placeholder="Contoh: 3629" 
                       value={formData.mtow}
-                      onChange={(e) => setFormData({ ...formData, mtow: e.target.value })}
+                      onChange={(e) => {
+                         const val = e.target.value.replace(/[^0-9]/g, '');
+                         setFormData({ ...formData, mtow: val });
+                      }}
                       className="w-full p-2 border border-[#d2d6de] border-r-0 focus:border-[#3c8dbc] focus:outline-none font-mono" 
                     />
                     <span className="bg-[#f4f4f4] border border-[#d2d6de] px-3 flex items-center text-[#777] font-bold">Kg</span>
@@ -283,6 +304,7 @@ export default function DataPesawatPage() {
                   setFormData({
                     registrasi: '',
                     tipe: '',
+                    customTipe: '',
                     mtow: '',
                     kapasitasPenumpang: '10',
                     fotoPreview: ''

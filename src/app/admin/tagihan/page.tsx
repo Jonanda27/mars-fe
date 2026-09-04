@@ -70,7 +70,7 @@ export default function AdminTagihanSKRDPage() {
     
     const element = skrdRef.current;
     const opt = {
-      margin:       10,
+      margin:       0,
       filename:     `SKRD_${selectedInvoice.invoice_number}.pdf`,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
@@ -89,28 +89,7 @@ export default function AdminTagihanSKRDPage() {
           </h1>
           <p className="text-[12px] text-[#777]">Monitoring Pembayaran e-SKRD</p>
         </div>
-        <div>
-          <button 
-            onClick={async () => {
-              try {
-                const res = await fetch('http://localhost:5000/api/cron/trigger-billing', { method: 'POST' });
-                const data = await res.json();
-                if (res.ok) {
-                  alert(data.message);
-                  fetchInvoices();
-                } else {
-                  alert('Gagal: ' + data.message);
-                }
-              } catch (e) {
-                alert('Terjadi kesalahan saat memicu cron job.');
-              }
-            }}
-            className="bg-[#f39c12] hover:bg-[#e08e0b] text-white px-4 py-2 rounded-sm text-sm font-bold flex items-center shadow-sm"
-          >
-            <PlayCircle className="w-4 h-4 mr-2" />
-            Simulasi Tagihan Bulanan
-          </button>
-        </div>
+
       </header>
 
       <div className="bg-white shadow-sm flex-1 flex flex-col">

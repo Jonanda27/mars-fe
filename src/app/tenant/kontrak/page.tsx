@@ -4,13 +4,38 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { contractService } from '@/services/contractService';
 import { Contract } from '@/types/contract';
-import { FileText, Eye, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { FileText, Eye, CheckCircle2, Clock, AlertCircle, Loader2, X } from 'lucide-react';
 import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
 
 export default function TenantKontrakPage() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Extension Modal States
+  const [showExtendModal, setShowExtendModal] = useState(false);
+  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [newEndDate, setNewEndDate] = useState<string>('');
+  const [isExtending, setIsExtending] = useState(false);
+
+  const handleExtendSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedContract || !newEndDate) return;
+    
+    setIsExtending(true);
+    try {
+      await contractService.extendContract(selectedContract.id!, newEndDate);
+      alert('Pengajuan perpanjangan berhasil dibuat! Silakan cek menu Permohonan Anda.');
+      setShowExtendModal(false);
+      setSelectedContract(null);
+      setNewEndDate('');
+      fetchContracts();
+    } catch (error: any) {
+      alert(error.response?.data?.message || error.message || 'Gagal mengajukan perpanjangan.');
+    } finally {
+      setIsExtending(false);
+    }
+  };
 
   useEffect(() => {
     fetchContracts();
@@ -133,7 +158,22 @@ export default function TenantKontrakPage() {
                   </div>
                 </div>
                 
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                  {(contract.status === 'Active' || contract.status === 'Expiring') && (
+                    <button 
+                      onClick={() => {
+                        setSelectedContract(contract);
+                        // Default new end date is 1 month after current end date
+                        const defaultEnd = dayjs(contract.end_date).add(1, 'month').format('YYYY-MM-DD');
+                        setNewEndDate(defaultEnd);
+                        setShowExtendModal(true);
+                      }}
+                      className="inline-flex items-center justify-center bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm"
+                    >
+                      <Clock className="w-4 h-4 mr-2" /> 
+                      Perpanjang
+                    </button>
+                  )}
                   <Link 
                     href={`/tenant/kontrak/${contract.id}`}
                     className="inline-flex items-center justify-center bg-white border border-slate-300 text-slate-700 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
@@ -147,6 +187,90 @@ export default function TenantKontrakPage() {
           </div>
         )}
       </div>
+      
+      {/* EXTENSION MODAL */}
+      {showExtendModal && selectedContract && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex flex-col justify-center items-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-5 flex justify-between items-center text-white">
+              <div className="flex items-center">
+                <Clock className="w-5 h-5 mr-3 text-indigo-100" />
+                <h3 className="font-bold text-lg tracking-wide">Perpanjang Masa Sewa</h3>
+              </div>
+              <button onClick={() => setShowExtendModal(false)} className="text-white/70 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleExtendSubmit} className="p-6">
+              <div className="mb-5 bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor Kontrak Saat Ini</p>
+                <p className="font-bold text-lg text-slate-800">{selectedContract.contract_number}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-5">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-slate-300"></div>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Berakhir Pada</p>
+                  <p className="font-bold text-slate-700 text-[15px]">{dayjs(selectedContract.end_date).format('DD MMM YYYY')}</p>
+                </div>
+                <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                  <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider mb-1">Mulai Ekstensi</p>
+                  <p className="font-bold text-indigo-700 text-[15px]">{dayjs(selectedContract.end_date).add(1, 'day').format('DD MMM YYYY')}</p>
+                </div>
+              </div>
+
+              <div className="mb-6 relative">
+                <label className="block text-[13px] font-bold text-slate-700 mb-2">Pilih Tanggal Berakhir Baru (New End Date)</label>
+                <input 
+                  type="date" 
+                  required
+                  min={dayjs(selectedContract.end_date).add(2, 'day').format('YYYY-MM-DD')}
+                  value={newEndDate}
+                  onChange={(e) => setNewEndDate(e.target.value)}
+                  className="w-full border-2 border-slate-200 rounded-xl p-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700 cursor-pointer"
+                />
+                
+                {newEndDate && (
+                  <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold text-green-600 uppercase tracking-wider mb-0.5">Total Durasi Perpanjangan</p>
+                      <p className="text-sm text-green-700">Akan diperpanjang hingga {dayjs(newEndDate).format('DD MMM YYYY')}</p>
+                    </div>
+                    <div className="bg-green-100 text-green-800 font-bold px-3 py-1.5 rounded-lg text-lg border border-green-200 shadow-sm">
+                      {Math.max(0, dayjs(newEndDate).diff(dayjs(selectedContract.end_date).add(1, 'day'), 'day'))} Malam
+                    </div>
+                  </div>
+                )}
+                
+                <p className="text-[12px] text-slate-500 mt-3 flex items-start">
+                  <AlertCircle className="w-4 h-4 mr-1.5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                  Permohonan ini akan diteruskan ke Admin UPBU untuk ditinjau ulang sebelum SKRD baru diterbitkan.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-5 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  onClick={() => setShowExtendModal(false)}
+                  className="px-5 py-2.5 bg-white border border-slate-300 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-colors"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isExtending || !newEndDate}
+                  className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-md shadow-indigo-200"
+                >
+                  {isExtending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</> : 'Ajukan Perpanjangan Sekarang'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       </div>
     </div>
   );

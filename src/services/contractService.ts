@@ -43,8 +43,8 @@ export const contractService = {
     return response.data.data;
   },
 
-  extendContract: async (id: number, durationMonths: number): Promise<any> => {
-    const response = await api.post(`/contracts/tenant/${id}/extend`, { duration_months: durationMonths });
+  extendContract: async (id: number, newEndDate: string): Promise<any> => {
+    const response = await api.post(`/contracts/tenant/${id}/extend`, { new_end_date: newEndDate });
     return response.data;
   }
 };

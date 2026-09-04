@@ -66,9 +66,7 @@ export default function PermohonanTenantPage() {
               <FileText className="w-16 h-16 text-slate-300 mb-4" />
               <h3 className="text-lg font-bold text-slate-700">Belum Ada Permohonan</h3>
               <p className="text-sm mt-1">Anda belum mengajukan permohonan sewa aset.</p>
-              <Link href="/tenant/permohonan/buat" className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition-colors flex items-center">
-                <Plus className="w-5 h-5 mr-2" /> Buat Permohonan Sekarang
-              </Link>
+
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

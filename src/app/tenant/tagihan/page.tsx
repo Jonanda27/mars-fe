@@ -32,7 +32,7 @@ export default function TenantTagihanPage() {
     
     const element = skrdRef.current;
     const opt = {
-      margin:       10,
+      margin:       0,
       filename:     `SKRD_${selectedInvoice.invoice_number}.pdf`,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
@@ -330,14 +330,36 @@ export default function TenantTagihanPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Upload File Resi (JPG/PNG/PDF)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Upload File Resi (Maks 2MB, PDF/JPG)</label>
                   <input 
                     type="file" 
-                    accept=".jpg,.jpeg,.png,.pdf"
-                    onChange={(e) => setReceiptFile(e.target.files ? e.target.files[0] : null)}
+                    accept=".jpg,.jpeg,.pdf"
+                    onChange={(e) => {
+                      const file = e.target.files ? e.target.files[0] : null;
+                      if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                          alert('Ukuran file melebihi 2MB! Silakan unggah file yang lebih kecil.');
+                          e.target.value = ''; // Reset input
+                          setReceiptFile(null);
+                          return;
+                        }
+                        
+                        const allowedTypes = ['application/pdf', 'image/jpeg'];
+                        if (!allowedTypes.includes(file.type)) {
+                          alert('Hanya file PDF dan JPG yang diperbolehkan!');
+                          e.target.value = ''; // Reset input
+                          setReceiptFile(null);
+                          return;
+                        }
+                        setReceiptFile(file);
+                      } else {
+                        setReceiptFile(null);
+                      }
+                    }}
                     className="w-full border border-gray-300 rounded-lg p-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
                     required
                   />
+                  <p className="text-[11px] text-gray-500 mt-1">Format yang diizinkan: .pdf, .jpg, .jpeg</p>
                 </div>
               </div>
               <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-2">

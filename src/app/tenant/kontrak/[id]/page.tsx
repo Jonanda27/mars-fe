@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { contractService } from '@/services/contractService';
 import { Contract } from '@/types/contract';
-import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download } from 'lucide-react';
+import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download, Clock, X } from 'lucide-react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
@@ -25,7 +25,7 @@ export default function TenantKontrakDetailPage() {
   
   // Extension States
   const [showExtendModal, setShowExtendModal] = useState(false);
-  const [extendDuration, setExtendDuration] = useState(12);
+  const [newEndDate, setNewEndDate] = useState<string>('');
   const [isExtending, setIsExtending] = useState(false);
 
   useEffect(() => {
@@ -66,17 +66,19 @@ export default function TenantKontrakDetailPage() {
     }
   };
 
-  const handleExtend = async () => {
-    if (!contract) return;
+  const handleExtendSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contract || !newEndDate) return;
     try {
       setIsExtending(true);
-      await contractService.extendContract(contract.id as number, extendDuration);
+      await contractService.extendContract(contract.id as number, newEndDate);
       alert('Pengajuan perpanjangan berhasil dikirim! Silakan cek di menu Permohonan Sewa.');
       setShowExtendModal(false);
+      setNewEndDate('');
       router.push('/tenant/permohonan');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Gagal mengajukan perpanjangan.');
+      alert(error.response?.data?.message || error.message || 'Gagal mengajukan perpanjangan.');
     } finally {
       setIsExtending(false);
     }
@@ -87,7 +89,7 @@ export default function TenantKontrakDetailPage() {
     
     const element = pksRef.current;
     const opt = {
-      margin:       10,
+      margin:       0,
       filename:     `PKS_${contract.contract_number}.pdf`,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
@@ -168,7 +170,11 @@ export default function TenantKontrakDetailPage() {
           {/* Extension button - Available if status is Expiring */}
           {contract.status === 'Expiring' && (
             <button
-              onClick={() => setShowExtendModal(true)}
+              onClick={() => {
+                const defaultEnd = dayjs(contract.end_date).add(1, 'month').format('YYYY-MM-DD');
+                setNewEndDate(defaultEnd);
+                setShowExtendModal(true);
+              }}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
             >
               <Calendar className="w-4 h-4 mr-2" /> Ajukan Perpanjangan
@@ -192,43 +198,84 @@ export default function TenantKontrakDetailPage() {
       </div>
 
       {/* Extension Modal */}
-      {showExtendModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Pengajuan Perpanjangan Kontrak</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Masa berlaku kontrak ini akan segera habis. Silakan pilih durasi perpanjangan yang Anda inginkan.
-            </p>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Durasi Perpanjangan</label>
-              <select 
-                className="w-full border-gray-300 rounded-md shadow-sm p-2 border"
-                value={extendDuration}
-                onChange={(e) => setExtendDuration(Number(e.target.value))}
-              >
-                <option value={1}>1 Bulan</option>
-                <option value={3}>3 Bulan</option>
-                <option value={6}>6 Bulan</option>
-                <option value={12}>1 Tahun</option>
-                <option value={24}>2 Tahun</option>
-                <option value={36}>3 Tahun</option>
-              </select>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button 
-                onClick={() => setShowExtendModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
-              >
-                Batal
-              </button>
-              <button 
-                onClick={handleExtend}
-                disabled={isExtending}
-                className="px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50"
-              >
-                {isExtending ? 'Mengirim...' : 'Kirim Pengajuan'}
+      {showExtendModal && contract && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex flex-col justify-center items-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-5 flex justify-between items-center text-white">
+              <div className="flex items-center">
+                <Clock className="w-5 h-5 mr-3 text-indigo-100" />
+                <h3 className="font-bold text-lg tracking-wide">Perpanjang Masa Sewa</h3>
+              </div>
+              <button onClick={() => setShowExtendModal(false)} className="text-white/70 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors">
+                <X className="w-5 h-5" />
               </button>
             </div>
+            
+            <form onSubmit={handleExtendSubmit} className="p-6">
+              <div className="mb-5 bg-slate-50 border border-slate-100 rounded-xl p-4">
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor Kontrak Saat Ini</p>
+                <p className="font-bold text-lg text-slate-800">{contract.contract_number}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-5">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-slate-300"></div>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Berakhir Pada</p>
+                  <p className="font-bold text-slate-700 text-[15px]">{dayjs(contract.end_date).format('DD MMM YYYY')}</p>
+                </div>
+                <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                  <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider mb-1">Mulai Ekstensi</p>
+                  <p className="font-bold text-indigo-700 text-[15px]">{dayjs(contract.end_date).add(1, 'day').format('DD MMM YYYY')}</p>
+                </div>
+              </div>
+
+              <div className="mb-6 relative">
+                <label className="block text-[13px] font-bold text-slate-700 mb-2">Pilih Tanggal Berakhir Baru (New End Date)</label>
+                <input 
+                  type="date" 
+                  required
+                  min={dayjs(contract.end_date).add(2, 'day').format('YYYY-MM-DD')}
+                  value={newEndDate}
+                  onChange={(e) => setNewEndDate(e.target.value)}
+                  className="w-full border-2 border-slate-200 rounded-xl p-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700 cursor-pointer"
+                />
+                
+                {newEndDate && (
+                  <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold text-green-600 uppercase tracking-wider mb-0.5">Total Durasi Perpanjangan</p>
+                      <p className="text-sm text-green-700">Akan diperpanjang hingga {dayjs(newEndDate).format('DD MMM YYYY')}</p>
+                    </div>
+                    <div className="bg-green-100 text-green-800 font-bold px-3 py-1.5 rounded-lg text-lg border border-green-200 shadow-sm">
+                      {Math.max(0, dayjs(newEndDate).diff(dayjs(contract.end_date).add(1, 'day'), 'day'))} Malam
+                    </div>
+                  </div>
+                )}
+                
+                <p className="text-[12px] text-slate-500 mt-3 flex items-start">
+                  <AlertCircle className="w-4 h-4 mr-1.5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                  Permohonan ini akan diteruskan ke Admin UPBU untuk ditinjau ulang sebelum SKRD baru diterbitkan.
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-5 border-t border-slate-100">
+                <button 
+                  type="button" 
+                  onClick={() => setShowExtendModal(false)}
+                  className="px-5 py-2.5 bg-white border border-slate-300 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-colors"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isExtending || !newEndDate}
+                  className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-md shadow-indigo-200"
+                >
+                  {isExtending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</> : 'Ajukan Perpanjangan Sekarang'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

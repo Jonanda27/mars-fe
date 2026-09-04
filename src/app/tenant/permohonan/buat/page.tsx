@@ -33,9 +33,7 @@ export default function BuatPermohonanPage() {
   });
 
   const [specificNeeds, setSpecificNeeds] = useState({
-    aircraft_id: '',
-    jenis_pesawat: '',
-    mtow: '',
+    aircraft_ids: [] as string[],
     kebutuhan_ruang_pendukung: ''
   });
 
@@ -76,7 +74,9 @@ export default function BuatPermohonanPage() {
           }
 
           const spec = app.specific_needs;
-          if (spec && spec.aircraft_id) {
+          if (spec && Array.isArray(spec.aircraft_ids)) {
+            spec.aircraft_ids.forEach((id: string) => usedAircraftIds.add(id.toString()));
+          } else if (spec && spec.aircraft_id) { // Fallback for old data
             usedAircraftIds.add(spec.aircraft_id.toString());
           }
         }
@@ -111,27 +111,7 @@ export default function BuatPermohonanPage() {
 
   const handleNeedsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
-    if (name === 'aircraft_id') {
-      const selectedAircraft = tenantAircrafts.find(a => a.id.toString() === value);
-      if (selectedAircraft) {
-        setSpecificNeeds(prev => ({
-          ...prev,
-          aircraft_id: value,
-          jenis_pesawat: selectedAircraft.aircraft_type,
-          mtow: selectedAircraft.mtow?.toString() || ''
-        }));
-      } else {
-        setSpecificNeeds(prev => ({
-          ...prev,
-          aircraft_id: '',
-          jenis_pesawat: '',
-          mtow: ''
-        }));
-      }
-    } else {
-      setSpecificNeeds(prev => ({ ...prev, [name]: value }));
-    }
+    setSpecificNeeds(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -273,46 +253,80 @@ export default function BuatPermohonanPage() {
                     <label className="block text-[11px] text-[#777] mb-1">Tanggal Selesai</label>
                     <input required type="date" name="end_date" value={formData.end_date} onChange={handleChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] transition-colors" />
                   </div>
+                  <div className="w-24">
+                    <label className="block text-[11px] text-[#777] mb-1 text-center">Durasi</label>
+                    {(() => {
+                      if (formData.start_date && formData.end_date) {
+                        const start = new Date(formData.start_date);
+                        const end = new Date(formData.end_date);
+                        if (end >= start) {
+                          const diffTime = end.getTime() - start.getTime();
+                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          const nights = diffDays === 0 ? 1 : diffDays;
+                          return (
+                            <div className="w-full bg-[#f4f4f4] border border-[#d2d6de] px-3 py-2 text-[14px] font-bold text-[#333] text-center h-[38px] flex items-center justify-center">
+                              {nights} Malam
+                            </div>
+                          );
+                        }
+                      }
+                      return (
+                        <div className="w-full bg-[#f4f4f4] border border-[#d2d6de] px-3 py-2 text-[14px] font-medium text-[#999] text-center h-[38px] flex items-center justify-center">
+                          -
+                        </div>
+                      );
+                    })()}
+                  </div>
                 </div>
+                {formData.start_date && formData.end_date && new Date(formData.end_date) < new Date(formData.start_date) && (
+                  <div className="mt-2 text-red-500 text-[11px] font-bold">
+                    Tanggal selesai tidak boleh mendahului tanggal mulai.
+                  </div>
+                )}
               </div>
-
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Tujuan Penggunaan Sewa <span className="text-red-500">*</span></label>
-                <textarea required name="purpose" value={formData.purpose} onChange={handleChange} rows={3} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc]" placeholder="Deskripsikan untuk apa aset tersebut disewa..."></textarea>
-              </div>
-
             </div>
 
             <div>
               <h4 className="font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]">Rincian Kebutuhan Spesifik (Opsional)</h4>
               
               <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Pilih Armada Pesawat</label>
-                <select name="aircraft_id" value={specificNeeds.aircraft_id} onChange={handleNeedsChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
-                  <option value="">-- Pilih Pesawat --</option>
+                <label className="block text-[13px] font-bold text-[#333] mb-2">Pilih Armada Pesawat</label>
+                <div className="border border-[#d2d6de] rounded-sm max-h-[200px] overflow-y-auto bg-white p-2">
                   {fetchingAircrafts ? (
-                    <option disabled>Memuat armada pesawat...</option>
+                    <div className="text-sm text-gray-500 p-2">Memuat armada pesawat...</div>
+                  ) : tenantAircrafts.length === 0 ? (
+                    <div className="text-sm text-gray-500 p-2">Tidak ada armada pesawat tersedia yang belum terkait kontrak.</div>
                   ) : (
-                    tenantAircrafts.map(aircraft => (
-                      <option key={aircraft.id} value={aircraft.id}>
-                        {aircraft.registration_number} - {aircraft.aircraft_type}
-                      </option>
-                    ))
+                    tenantAircrafts.map(aircraft => {
+                      const isSelected = specificNeeds.aircraft_ids.includes(aircraft.id.toString());
+                      return (
+                        <label key={aircraft.id} className="flex items-center p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0">
+                          <input 
+                            type="checkbox" 
+                            className="mr-3 w-4 h-4 text-[#00a65a] rounded focus:ring-[#00a65a]"
+                            checked={isSelected}
+                            onChange={(e) => {
+                               if (e.target.checked) {
+                                 setSpecificNeeds(prev => ({ ...prev, aircraft_ids: [...prev.aircraft_ids, aircraft.id.toString()] }));
+                               } else {
+                                 setSpecificNeeds(prev => ({ ...prev, aircraft_ids: prev.aircraft_ids.filter(id => id !== aircraft.id.toString()) }));
+                               }
+                            }}
+                          />
+                          <div>
+                            <div className="font-bold text-[#333] text-[13px]">{aircraft.registration_number}</div>
+                            <div className="text-[11px] text-[#777]">{aircraft.aircraft_type} - MTOW: {aircraft.mtow || '-'} Kg</div>
+                          </div>
+                        </label>
+                      );
+                    })
                   )}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Jenis Pesawat</label>
-                <input type="text" disabled value={specificNeeds.jenis_pesawat} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] bg-[#f4f4f4] text-[#777] outline-none" placeholder="Otomatis terisi saat memilih armada" />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Estimasi MTOW (Max Take-Off Weight)</label>
-                <div className="flex">
-                  <input type="text" disabled value={specificNeeds.mtow} className="w-full border border-[#d2d6de] border-r-0 px-3 py-2 text-[14px] bg-[#f4f4f4] text-[#777] outline-none" placeholder="Otomatis terisi" />
-                  <span className="bg-[#f4f4f4] border border-[#d2d6de] px-3 flex items-center text-[#777] font-bold">Kg</span>
                 </div>
+                {specificNeeds.aircraft_ids.length > 0 && (
+                   <div className="mt-2 text-[11px] text-[#00a65a] font-bold bg-[#e8f5e9] p-2 rounded">
+                     {specificNeeds.aircraft_ids.length} armada dipilih. Tarif akan diakumulasikan.
+                   </div>
+                )}
               </div>
 
               <div className="mb-4">

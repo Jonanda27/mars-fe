@@ -69,7 +69,7 @@ export default function AdminKontrakDetailPage() {
     
     const element = pksRef.current;
     const opt = {
-      margin:       10,
+      margin:       0,
       filename:     `PKS_${contract.contract_number}.pdf`,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },

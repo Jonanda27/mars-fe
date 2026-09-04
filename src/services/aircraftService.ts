@@ -7,6 +7,11 @@ export const aircraftService = {
     return response.data.data;
   },
 
+  getMasterTypes: async (): Promise<string[]> => {
+    const response = await api.get('/aircrafts/types/master');
+    return response.data.data;
+  },
+
   createTenantAircraft: async (data: Omit<Aircraft, 'id'>): Promise<Aircraft> => {
     const response = await api.post('/aircrafts/tenant', data);
     return response.data.data;

@@ -173,6 +173,15 @@ export default function ReviewPermohonanPage() {
                     <p className="text-[11px] text-slate-500 mb-1">Tanggal Selesai</p>
                     <p className="font-bold text-slate-800">{dayjs(app.end_date).format('DD MMMM YYYY')}</p>
                   </div>
+                  <div className="w-32 bg-indigo-600 text-white p-3 rounded shadow-sm flex flex-col items-center justify-center flex-shrink-0">
+                    <p className="text-[10px] text-indigo-100 uppercase tracking-wider mb-0.5">Durasi Sewa</p>
+                    <p className="font-bold text-lg">
+                      {(() => {
+                        const diff = dayjs(app.end_date).diff(dayjs(app.start_date), 'day');
+                        return diff === 0 ? 1 : diff;
+                      })()} Malam
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -188,12 +197,19 @@ export default function ReviewPermohonanPage() {
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center"><Plane className="w-4 h-4 mr-1.5" /> Kebutuhan Spesifik Aset</p>
                   <ul className="space-y-3 bg-slate-50 p-3 rounded-md border border-slate-100 min-h-[80px]">
                     <li className="flex flex-col">
-                      <span className="text-[11px] text-slate-500">Jenis Pesawat / Armada</span>
-                      <span className="font-medium text-slate-800">{app.specific_needs?.jenis_pesawat || '-'}</span>
-                    </li>
-                    <li className="flex flex-col">
-                      <span className="text-[11px] text-slate-500">Max Take-Off Weight (MTOW)</span>
-                      <span className="font-mono text-slate-800">{app.specific_needs?.mtow || '-'}</span>
+                      <span className="text-[11px] text-slate-500">Jenis Pesawat / Armada (MTOW)</span>
+                      {app.specific_needs?.aircraft_details && Array.isArray(app.specific_needs.aircraft_details) ? (
+                        <div className="space-y-1 mt-1">
+                           {app.specific_needs.aircraft_details.map((ac: any) => (
+                             <div key={ac.id} className="text-sm font-medium text-slate-800 bg-white border border-slate-200 px-2 py-1 rounded">
+                               {ac.registration_number} - {ac.aircraft_type} 
+                               <span className="text-xs text-slate-500 ml-1 font-mono">({ac.mtow ? `${ac.mtow} Kg` : 'N/A'})</span>
+                             </div>
+                           ))}
+                        </div>
+                      ) : (
+                        <span className="font-medium text-slate-800">-</span>
+                      )}
                     </li>
                     <li className="flex flex-col">
                       <span className="text-[11px] text-slate-500">Ruang / Fasilitas Pendukung Khusus</span>

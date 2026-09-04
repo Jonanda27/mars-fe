@@ -43,11 +43,12 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
       
       {/* HALAMAN 1: SKRD UTAMA */}
       <div 
-        className="p-8 shadow-lg bg-white mb-8 mx-auto" 
+        className="p-8 shadow-lg mb-8 mx-auto" 
         style={{ 
           width: '210mm', 
           minHeight: '297mm', 
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          backgroundColor: '#ffffff'
         }}
       >
         <table className="w-full border-collapse border border-black text-sm">
@@ -62,7 +63,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
               <td className="border border-black p-2 text-center w-1/3 font-bold text-xl">
                 SKRD
               </td>
-              <td className="border border-black p-2 text-center w-1/3 bg-gray-50">
+              <td className="border border-black p-2 text-center w-1/3" style={{ backgroundColor: '#f9fafb' }}>
                 <div className="font-bold">No. SKRD</div>
               </td>
             </tr>
@@ -118,7 +119,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
             </tr>
             
             {/* Items Header */}
-            <tr className="text-center font-bold bg-gray-50">
+            <tr className="text-center font-bold" style={{ backgroundColor: '#f9fafb' }}>
               <td className="border border-black p-2">Kode Rekening</td>
               <td className="border border-black p-2">Jenis Retribusi Daerah</td>
               <td className="border border-black p-2">Jumlah (Rp.)</td>
@@ -147,10 +148,10 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                 <td className="border border-black p-2 text-center align-top">
                   4.1.4.01.01
                 </td>
-                <td className="border border-black p-2 align-top text-red-600">
+                <td className="border border-black p-2 align-top" style={{ color: '#dc2626' }}>
                   <div className="font-bold">Denda Keterlambatan Pembayaran (2% per bulan)</div>
                 </td>
-                <td className="border border-black p-2 text-right align-top font-bold text-red-600">
+                <td className="border border-black p-2 text-right align-top font-bold" style={{ color: '#dc2626' }}>
                   {penaltyAmount.toLocaleString('id-ID')}
                 </td>
               </tr>
@@ -161,7 +162,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
               <td colSpan={2} className="border border-black p-2 text-right pr-4">
                 Jumlah Ketetapan Pokok {penaltyAmount > 0 ? '+ Denda' : ''}
               </td>
-              <td className="border border-black p-2 text-right font-bold bg-gray-50">
+              <td className="border border-black p-2 text-right font-bold" style={{ backgroundColor: '#f9fafb' }}>
                 {totalAmount.toLocaleString('id-ID')}
               </td>
             </tr>
@@ -189,7 +190,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                  
                  <div className="flex">
                     <div className="w-1/2 p-4 flex items-center justify-center border-r border-black">
-                       <div className="w-28 h-28 border border-dashed border-gray-400 flex items-center justify-center bg-gray-50 text-gray-400 text-xs text-center p-2">
+                       <div className="w-28 h-28 border border-dashed flex items-center justify-center text-xs text-center p-2" style={{ borderColor: '#9ca3af', backgroundColor: '#f9fafb', color: '#9ca3af' }}>
                           [QR Code Placeholder]
                        </div>
                     </div>
@@ -212,18 +213,19 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
 
       {/* HALAMAN 2: TANDA TERIMA */}
       <div 
-        className="p-8 shadow-lg bg-white mx-auto" 
+        className="p-8 shadow-lg mx-auto" 
         style={{ 
           width: '210mm', 
           minHeight: '297mm', 
           boxSizing: 'border-box',
-          pageBreakBefore: 'always'
+          pageBreakBefore: 'always',
+          backgroundColor: '#ffffff'
         }}
       >
         <table className="w-full border-collapse border border-black text-sm">
           <tbody>
             <tr>
-              <td colSpan={3} className="border border-black p-1 text-center font-bold bg-gray-50">
+              <td colSpan={3} className="border border-black p-1 text-center font-bold" style={{ backgroundColor: '#f9fafb' }}>
                  No. SKRD: {invoice.invoice_number}
               </td>
             </tr>
@@ -273,7 +275,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                           <tr>
                             <td className="py-1">Denda</td>
                             <td className="py-1">:</td>
-                            <td className="py-1 text-red-600 font-bold">{penaltyAmount.toLocaleString('id-ID')}</td>
+                            <td className="py-1 font-bold" style={{ color: '#dc2626' }}>{penaltyAmount.toLocaleString('id-ID')}</td>
                           </tr>
                           <tr>
                             <td className="py-1">Jumlah</td>
@@ -284,7 +286,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                       </table>
                    </div>
                    <div className="w-1/2 p-4 text-center text-xs flex flex-col justify-between items-center relative">
-                      <div className="text-right w-full text-gray-500">
+                      <div className="text-right w-full" style={{ color: '#6b7280' }}>
                          Timika, .............................. {dayjs().format('YYYY')}
                       </div>
                       <div className="mb-16 mt-4 font-bold">Yang Menerima</div>

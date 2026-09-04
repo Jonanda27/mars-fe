@@ -16,7 +16,7 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: <BarChart3 /> },
-    { href: "/admin/dashboard", label: "GIS Dashboard", icon: <MapIcon /> },
+    { href: "/admin/dashboard", label: "GIS", icon: <MapIcon /> },
     { href: "/admin/permohonan", label: "Permohonan Masuk", icon: <FileText /> },
     { href: "/admin/tagihan", label: "SKRD / Tagihan", icon: <Receipt /> },
     { href: "/admin/pembayaran", label: "Pembayaran", icon: <CreditCard /> },
