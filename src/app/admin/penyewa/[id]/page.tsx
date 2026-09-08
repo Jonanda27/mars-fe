@@ -25,6 +25,18 @@ export default function AdminPenyewaDetailPage() {
     fetchTenant();
   }, [id]);
 
+  const getBaseUrl = () => {
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  };
+
+  const getFileUrl = (path: string) => {
+    if (!path) return '#';
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return `${getBaseUrl()}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
   const fetchTenant = async () => {
     try {
       const data = await tenantService.getTenantById(Number(id));
@@ -247,7 +259,7 @@ export default function AdminPenyewaDetailPage() {
                 </div>
                 <div>
                   {legal[doc.id] ? (
-                    <a href={`http://localhost:5000${legal[doc.id]}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs flex items-center">
+                    <a href={getFileUrl(legal[doc.id])} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs flex items-center">
                       <Download className="w-3 h-3 mr-1" /> View PDF
                     </a>
                   ) : (

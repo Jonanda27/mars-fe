@@ -12,20 +12,20 @@ import {
 export default function TenantSidebar({ isOpen }: { isOpen: boolean }) {
   const pathname = usePathname();
   const { user } = useAuthStore();
-  const isPending = user?.status_verifikasi === 'Pending';
+  const isVerified = user?.status_verifikasi === 'Verified';
 
   const navItems = [
     { href: "/tenant", label: "Dashboard Tenant", icon: <Plane /> },
     { href: "/tenant/permohonan", label: "Permohonan Sewa", icon: <FileText /> },
     { href: "/tenant/kontrak", label: "Kontrak & Aset", icon: <FileText /> },
-    { href: "/tenant/pesawat", label: "Data Pesawat", icon: <Plane /> },
+    ...(user?.jenis_tenant !== 'Umum' ? [{ href: "/tenant/pesawat", label: "Data Pesawat", icon: <Plane /> }] : []),
     { href: "/tenant/tagihan", label: "e-SKRD & Tagihan", icon: <Receipt /> },
     { href: "/tenant/pembayaran", label: "Riwayat Pembayaran", icon: <CreditCard /> },
     { href: "/tenant/profil", label: "Profil & Legalitas", icon: <ShieldCheck /> },
   ];
 
-  // Filter items if pending
-  const visibleNavItems = isPending ? navItems.filter(item => item.href === '/tenant/profil') : navItems;
+  // Filter items if not verified (Pending or Rejected)
+  const visibleNavItems = isVerified ? navItems : navItems.filter(item => item.href === '/tenant/profil');
 
   return (
     <aside className={`${isOpen ? 'w-56' : 'w-16'} bg-[#222d32] text-white flex-shrink-0 flex flex-col h-full z-20 overflow-hidden transition-all duration-300`}>
@@ -40,8 +40,8 @@ export default function TenantSidebar({ isOpen }: { isOpen: boolean }) {
             <div className="ml-3">
               <p className="font-semibold text-[14px] truncate max-w-[130px]">{user?.nama_perusahaan || 'Tenant'}</p>
               <p className="text-[11px] text-slate-300 flex items-center mt-1">
-                {isPending ? (
-                  <><Circle className="w-[10px] h-[10px] mr-1 fill-yellow-500 text-yellow-500" /> Pending Approval</>
+                {!isVerified ? (
+                  <><Circle className="w-[10px] h-[10px] mr-1 fill-yellow-500 text-yellow-500" /> Pending/Unverified</>
                 ) : (
                   <><Circle className="w-[10px] h-[10px] mr-1 fill-[#3c8dbc] text-[#3c8dbc]" /> Verified Tenant</>
                 )}

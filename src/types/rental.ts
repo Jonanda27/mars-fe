@@ -8,6 +8,7 @@ export interface RentalApplication {
   status: string;
   start_date?: string;
   end_date?: string;
+  signed_document_url?: string;
   created_at?: string;
   assets?: any;
   tenants?: any;

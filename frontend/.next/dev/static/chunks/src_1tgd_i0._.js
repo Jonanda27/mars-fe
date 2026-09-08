@@ -17,6 +17,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$left$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronLeft$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/chevron-left.mjs [app-client] (ecmascript) <export default as ChevronLeft>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/map-pin.mjs [app-client] (ecmascript) <export default as MapPin>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2d$big$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-check-big.mjs [app-client] (ecmascript) <export default as CheckCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/zap.mjs [app-client] (ecmascript) <export default as Zap>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAirportStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/store/useAirportStore.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useZoneStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/store/useZoneStore.ts [app-client] (ecmascript)");
@@ -112,6 +113,43 @@ function TambahAsetPage() {
             setLoading(false);
         }
     };
+    const handleFillDummy = ()=>{
+        const mozes = airports.find((a)=>a.kode_bandara === 'TIM' || a.nama_bandara.toLowerCase().includes('mozes'));
+        const airportId = mozes ? mozes.id.toString() : '';
+        const firstZone = zones.find((z)=>z.airport_id === parseInt(airportId));
+        const zoneId = firstZone ? firstZone.id.toString() : '';
+        setFormData({
+            kode_aset: 'TIM-HGR-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0'),
+            jenis_aset: 'Hanggar',
+            nama_aset: 'Hanggar Utama Mozes Kilangin',
+            lokasi: 'Area Komersial Timur, Bandara Mozes Kilangin',
+            airport_id: airportId,
+            zone_id: zoneId,
+            koordinat_gis: '-4.529243, 136.885121',
+            luas: '3000',
+            satuan: 'm²',
+            kapasitas: '3 Pesawat Narrow Body',
+            kondisi: 'Baik',
+            status: 'Available',
+            master_tariff_id: '',
+            dokumen_kepemilikan: 'SHM-UPBU-MZK-2023'
+        });
+        setSpesifikasi({
+            tinggi_bangunan: '35 Meter',
+            kapasitas_pesawat: '3 Pesawat Narrow Body (B737/A320)',
+            jenis_pesawat: 'Boeing 737 / Airbus A320 / ATR 72',
+            fasilitas_listrik: '50.000 VA',
+            fasilitas_air: 'Air PAM & Sumur Bor',
+            pintu_hanggar: 'Motorized Sliding Door (Lebar 50m)',
+            apron_connection: 'Akses Langsung ke Taxiway Alpha',
+            workshop: 'Tersedia 200m2',
+            office: '3 Ruangan Office Full AC',
+            storage: 'Gudang Sparepart 100m2',
+            toilet: '4 Toilet Standar',
+            fire_safety: 'Hydrant, Sprinkler, Foam Extinguisher',
+            fasilitas_lainnya: 'CCTV 24 Jam Terintegrasi'
+        });
+    };
     const isHanggar = formData.jenis_aset === 'Hanggar';
     const statusOptions = isHanggar ? [
         'Available',
@@ -160,17 +198,38 @@ function TambahAsetPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
                 className: "flex justify-between items-end mb-4",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                    className: "text-[24px] font-normal text-[#333] flex items-center",
-                    children: "Tambah Aset Baru"
-                }, void 0, false, {
-                    fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                    lineNumber: 117,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: "text-[24px] font-normal text-[#333] flex items-center",
+                        children: "Tambah Aset Baru"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
+                        lineNumber: 158,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        onClick: handleFillDummy,
+                        type: "button",
+                        className: "bg-[#f39c12] text-white px-3 py-1.5 text-[12px] font-bold hover:bg-[#e67e22] transition-colors flex items-center shadow-sm rounded-sm uppercase tracking-wider",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$zap$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Zap$3e$__["Zap"], {
+                                className: "w-4 h-4 mr-1.5"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
+                                lineNumber: 166,
+                                columnNumber: 11
+                            }, this),
+                            " Isi Data Dummy Mozes Kilangin"
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
+                        lineNumber: 161,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                lineNumber: 116,
+                lineNumber: 157,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -196,12 +255,12 @@ function TambahAsetPage() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 140,
+                                                lineNumber: 188,
                                                 columnNumber: 31
                                             }, this) : tab.id
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                            lineNumber: 138,
+                                            lineNumber: 186,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -209,24 +268,24 @@ function TambahAsetPage() {
                                             children: tab.title
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                            lineNumber: 142,
+                                            lineNumber: 190,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, tab.id, true, {
                                     fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                    lineNumber: 132,
+                                    lineNumber: 180,
                                     columnNumber: 17
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                            lineNumber: 126,
+                            lineNumber: 174,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                        lineNumber: 125,
+                        lineNumber: 173,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -250,13 +309,13 @@ function TambahAsetPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 156,
+                                                                lineNumber: 204,
                                                                 columnNumber: 99
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 156,
+                                                        lineNumber: 204,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -269,13 +328,13 @@ function TambahAsetPage() {
                                                         placeholder: "Contoh: HGR-001"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 157,
+                                                        lineNumber: 205,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 155,
+                                                lineNumber: 203,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -289,13 +348,13 @@ function TambahAsetPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 161,
+                                                                lineNumber: 209,
                                                                 columnNumber: 94
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 161,
+                                                        lineNumber: 209,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -310,7 +369,7 @@ function TambahAsetPage() {
                                                                 children: "Hanggar"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 163,
+                                                                lineNumber: 211,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -318,7 +377,7 @@ function TambahAsetPage() {
                                                                 children: "Ruang Office"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 164,
+                                                                lineNumber: 212,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -326,7 +385,7 @@ function TambahAsetPage() {
                                                                 children: "Gudang Warehouse"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 165,
+                                                                lineNumber: 213,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -334,7 +393,7 @@ function TambahAsetPage() {
                                                                 children: "Lahan Terbuka"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 166,
+                                                                lineNumber: 214,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -342,19 +401,19 @@ function TambahAsetPage() {
                                                                 children: "Konter Tiket"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 167,
+                                                                lineNumber: 215,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 162,
+                                                        lineNumber: 210,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 160,
+                                                lineNumber: 208,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -368,13 +427,13 @@ function TambahAsetPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 172,
+                                                                lineNumber: 220,
                                                                 columnNumber: 93
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 172,
+                                                        lineNumber: 220,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -387,19 +446,19 @@ function TambahAsetPage() {
                                                         placeholder: "Contoh: Hanggar A"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 173,
+                                                        lineNumber: 221,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 219,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 154,
+                                        lineNumber: 202,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -416,13 +475,13 @@ function TambahAsetPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 179,
+                                                                lineNumber: 227,
                                                                 columnNumber: 91
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 179,
+                                                        lineNumber: 227,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -437,7 +496,7 @@ function TambahAsetPage() {
                                                                 children: "-- Pilih Bandara --"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 181,
+                                                                lineNumber: 229,
                                                                 columnNumber: 21
                                                             }, this),
                                                             airports.map((airport)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -449,19 +508,19 @@ function TambahAsetPage() {
                                                                     ]
                                                                 }, airport.id, true, {
                                                                     fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                    lineNumber: 183,
+                                                                    lineNumber: 231,
                                                                     columnNumber: 23
                                                                 }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 180,
+                                                        lineNumber: 228,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 178,
+                                                lineNumber: 226,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -475,13 +534,13 @@ function TambahAsetPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 189,
+                                                                lineNumber: 237,
                                                                 columnNumber: 88
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 189,
+                                                        lineNumber: 237,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -497,7 +556,7 @@ function TambahAsetPage() {
                                                                 children: "-- Pilih Zona --"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 191,
+                                                                lineNumber: 239,
                                                                 columnNumber: 21
                                                             }, this),
                                                             filteredZones.map((zone)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -510,19 +569,19 @@ function TambahAsetPage() {
                                                                     ]
                                                                 }, zone.id, true, {
                                                                     fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                    lineNumber: 193,
+                                                                    lineNumber: 241,
                                                                     columnNumber: 23
                                                                 }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 190,
+                                                        lineNumber: 238,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 188,
+                                                lineNumber: 236,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -532,7 +591,7 @@ function TambahAsetPage() {
                                                         children: "Koordinat GIS"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 199,
+                                                        lineNumber: 247,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -544,25 +603,25 @@ function TambahAsetPage() {
                                                         placeholder: "Contoh: -4.545, 136.885"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 200,
+                                                        lineNumber: 248,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 198,
+                                                lineNumber: 246,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 225,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                lineNumber: 153,
+                                lineNumber: 201,
                                 columnNumber: 13
                             }, this),
                             activeTab === 2 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -581,7 +640,7 @@ function TambahAsetPage() {
                                                                 children: "Luas"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 212,
+                                                                lineNumber: 260,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -593,13 +652,13 @@ function TambahAsetPage() {
                                                                 className: "w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 213,
+                                                                lineNumber: 261,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 211,
+                                                        lineNumber: 259,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -609,7 +668,7 @@ function TambahAsetPage() {
                                                                 children: "Satuan"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 216,
+                                                                lineNumber: 264,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -621,19 +680,19 @@ function TambahAsetPage() {
                                                                 placeholder: "m²"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 217,
+                                                                lineNumber: 265,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 215,
+                                                        lineNumber: 263,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 210,
+                                                lineNumber: 258,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -643,7 +702,7 @@ function TambahAsetPage() {
                                                         children: "Kapasitas"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 222,
+                                                        lineNumber: 270,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -654,13 +713,13 @@ function TambahAsetPage() {
                                                         className: "w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-gray-50 focus:bg-white"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 223,
+                                                        lineNumber: 271,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 221,
+                                                lineNumber: 269,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -670,7 +729,7 @@ function TambahAsetPage() {
                                                         children: "Dok. Kepemilikan/Pengelolaan"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 227,
+                                                        lineNumber: 275,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -682,19 +741,19 @@ function TambahAsetPage() {
                                                         placeholder: "Contoh: SHM No. 123"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 228,
+                                                        lineNumber: 276,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 226,
+                                                lineNumber: 274,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 209,
+                                        lineNumber: 257,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -707,7 +766,7 @@ function TambahAsetPage() {
                                                         children: "Kondisi"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 234,
+                                                        lineNumber: 282,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -721,7 +780,7 @@ function TambahAsetPage() {
                                                                 children: "Baik"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 236,
+                                                                lineNumber: 284,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -729,7 +788,7 @@ function TambahAsetPage() {
                                                                 children: "Rusak Ringan"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 237,
+                                                                lineNumber: 285,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -737,19 +796,19 @@ function TambahAsetPage() {
                                                                 children: "Rusak Berat"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 238,
+                                                                lineNumber: 286,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 235,
+                                                        lineNumber: 283,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 233,
+                                                lineNumber: 281,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -763,13 +822,13 @@ function TambahAsetPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 243,
+                                                                lineNumber: 291,
                                                                 columnNumber: 95
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 243,
+                                                        lineNumber: 291,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -782,18 +841,18 @@ function TambahAsetPage() {
                                                                 children: opt
                                                             }, opt, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 246,
+                                                                lineNumber: 294,
                                                                 columnNumber: 23
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 244,
+                                                        lineNumber: 292,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 242,
+                                                lineNumber: 290,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -803,7 +862,7 @@ function TambahAsetPage() {
                                                         children: "Pilih Master Tarif / Harga (Opsional)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 252,
+                                                        lineNumber: 300,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -817,7 +876,7 @@ function TambahAsetPage() {
                                                                 children: "-- Tidak ada tarif / Custom --"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                lineNumber: 254,
+                                                                lineNumber: 302,
                                                                 columnNumber: 21
                                                             }, this),
                                                             activeTariffs.map((tariff)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -834,13 +893,13 @@ function TambahAsetPage() {
                                                                     ]
                                                                 }, tariff.id, true, {
                                                                     fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                                    lineNumber: 256,
+                                                                    lineNumber: 304,
                                                                     columnNumber: 23
                                                                 }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 253,
+                                                        lineNumber: 301,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -848,25 +907,25 @@ function TambahAsetPage() {
                                                         children: "Sesuai Peraturan yang berlaku. Kosongkan jika tagihan dihitung dari sistem lain."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 261,
+                                                        lineNumber: 309,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 251,
+                                                lineNumber: 299,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 232,
+                                        lineNumber: 280,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                lineNumber: 208,
+                                lineNumber: 256,
                                 columnNumber: 13
                             }, this),
                             activeTab === 3 && isHanggar && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -880,7 +939,7 @@ function TambahAsetPage() {
                                                 children: "Spesifikasi Detail Hanggar"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 271,
+                                                lineNumber: 319,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -888,13 +947,13 @@ function TambahAsetPage() {
                                                 children: "Mohon lengkapi data spesifikasi fisik dan utilitas hanggar untuk ditampilkan di katalog Tenant."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 272,
+                                                lineNumber: 320,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 270,
+                                        lineNumber: 318,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -907,7 +966,7 @@ function TambahAsetPage() {
                                                         children: "Tinggi Bangunan"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 277,
+                                                        lineNumber: 325,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -919,13 +978,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: 25 Meter"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 278,
+                                                        lineNumber: 326,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 276,
+                                                lineNumber: 324,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -935,7 +994,7 @@ function TambahAsetPage() {
                                                         children: "Kapasitas Pesawat"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 281,
+                                                        lineNumber: 329,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -947,13 +1006,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: 2 Pesawat Narrow Body"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 282,
+                                                        lineNumber: 330,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 280,
+                                                lineNumber: 328,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -963,7 +1022,7 @@ function TambahAsetPage() {
                                                         children: "Jenis Pesawat (Maks)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 285,
+                                                        lineNumber: 333,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -975,13 +1034,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: Boeing 737 / A320"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 286,
+                                                        lineNumber: 334,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 284,
+                                                lineNumber: 332,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -991,7 +1050,7 @@ function TambahAsetPage() {
                                                         children: "Daya Listrik"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 289,
+                                                        lineNumber: 337,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1003,13 +1062,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: 15.000 VA"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 290,
+                                                        lineNumber: 338,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 288,
+                                                lineNumber: 336,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1019,7 +1078,7 @@ function TambahAsetPage() {
                                                         children: "Sistem Air"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 293,
+                                                        lineNumber: 341,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1031,13 +1090,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: PAM / Sumur Bor"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 294,
+                                                        lineNumber: 342,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 292,
+                                                lineNumber: 340,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1047,7 +1106,7 @@ function TambahAsetPage() {
                                                         children: "Pintu Hanggar"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 297,
+                                                        lineNumber: 345,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1059,13 +1118,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: Motorized Sliding Door"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 298,
+                                                        lineNumber: 346,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 296,
+                                                lineNumber: 344,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1075,7 +1134,7 @@ function TambahAsetPage() {
                                                         children: "Koneksi Apron"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 301,
+                                                        lineNumber: 349,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1087,13 +1146,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: Akses Langsung Taxiway"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 302,
+                                                        lineNumber: 350,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 348,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1103,7 +1162,7 @@ function TambahAsetPage() {
                                                         children: "Fire Safety System"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 305,
+                                                        lineNumber: 353,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1115,13 +1174,13 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: Hydrant & Sprinkler"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 306,
+                                                        lineNumber: 354,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 304,
+                                                lineNumber: 352,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1131,7 +1190,7 @@ function TambahAsetPage() {
                                                         children: "Office & Toilet"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 309,
+                                                        lineNumber: 357,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1143,25 +1202,25 @@ function TambahAsetPage() {
                                                         placeholder: "Misal: 2 Ruang Office, 4 Toilet"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                        lineNumber: 310,
+                                                        lineNumber: 358,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 308,
+                                                lineNumber: 356,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 275,
+                                        lineNumber: 323,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                lineNumber: 269,
+                                lineNumber: 317,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1176,14 +1235,14 @@ function TambahAsetPage() {
                                                 className: "w-4 h-4 mr-2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 320,
+                                                lineNumber: 368,
                                                 columnNumber: 17
                                             }, this),
                                             " Sebelumnya"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 319,
+                                        lineNumber: 367,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                         href: "/admin/aset",
@@ -1191,7 +1250,7 @@ function TambahAsetPage() {
                                         children: "Batal"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 323,
+                                        lineNumber: 371,
                                         columnNumber: 15
                                     }, this),
                                     activeTab < tabs.length ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1204,13 +1263,13 @@ function TambahAsetPage() {
                                                 className: "w-4 h-4 ml-2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 330,
+                                                lineNumber: 378,
                                                 columnNumber: 29
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 329,
+                                        lineNumber: 377,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "submit",
@@ -1221,44 +1280,44 @@ function TambahAsetPage() {
                                                 className: "w-5 h-5 animate-spin mr-2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 334,
+                                                lineNumber: 382,
                                                 columnNumber: 28
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$save$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Save$3e$__["Save"], {
                                                 className: "w-5 h-5 mr-2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                                lineNumber: 334,
+                                                lineNumber: 382,
                                                 columnNumber: 80
                                             }, this),
                                             loading ? 'Menyimpan...' : 'Simpan Aset'
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                        lineNumber: 333,
+                                        lineNumber: 381,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                                lineNumber: 317,
+                                lineNumber: 365,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                        lineNumber: 149,
+                        lineNumber: 197,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-                lineNumber: 122,
+                lineNumber: 170,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/admin/aset/tambah/page.tsx",
-        lineNumber: 115,
+        lineNumber: 156,
         columnNumber: 5
     }, this);
 }
@@ -1338,6 +1397,10 @@ const assetService = {
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].put(`/assets/${id}`, data);
         return response.data.data;
     },
+    getAssetCapacity: async (id)=>{
+        const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].get(`/assets/${id}/capacity`);
+        return response.data.data;
+    },
     deleteAsset: async (id)=>{
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].delete(`/assets/${id}`);
     }
@@ -1358,19 +1421,19 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts
 const tariffService = {
     getAll: async ()=>{
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].get('/tariffs');
-        return response.data;
+        return response.data.data;
     },
     getById: async (id)=>{
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].get(`/tariffs/${id}`);
-        return response.data;
+        return response.data.data;
     },
     create: async (data)=>{
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post('/tariffs', data);
-        return response.data;
+        return response.data.data;
     },
     update: async (id, data)=>{
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].put(`/tariffs/${id}`, data);
-        return response.data;
+        return response.data.data;
     },
     delete: async (id)=>{
         const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].delete(`/tariffs/${id}`);

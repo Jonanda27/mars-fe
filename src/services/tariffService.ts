@@ -4,22 +4,22 @@ import { MasterTariff } from '../types/tariff';
 export const tariffService = {
   getAll: async () => {
     const response = await api.get('/tariffs');
-    return response.data;
+    return response.data.data;
   },
   
   getById: async (id: number) => {
     const response = await api.get(`/tariffs/${id}`);
-    return response.data;
+    return response.data.data;
   },
   
   create: async (data: Partial<MasterTariff>) => {
     const response = await api.post('/tariffs', data);
-    return response.data;
+    return response.data.data;
   },
   
   update: async (id: number, data: Partial<MasterTariff>) => {
     const response = await api.put(`/tariffs/${id}`, data);
-    return response.data;
+    return response.data.data;
   },
   
   delete: async (id: number) => {

@@ -6,14 +6,26 @@ import {
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useWarningStore } from '@/store/useWarningStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function TenantDashboard() {
   const { tenantWarnings, fetchTenantWarnings } = useWarningStore();
+  const { user } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
-    fetchTenantWarnings();
-  }, [fetchTenantWarnings]);
+    if (user && user.status_verifikasi !== 'Verified') {
+      router.push('/tenant/profil');
+    } else {
+      fetchTenantWarnings();
+    }
+  }, [fetchTenantWarnings, user, router]);
+
+  if (!user || user.status_verifikasi !== 'Verified') {
+    return null; // Don't render dashboard while redirecting
+  }
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
@@ -22,9 +34,22 @@ export default function TenantDashboard() {
           Tenant Portal - Ringkasan Akun
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Dashboard</span> / <span className="ml-1 font-medium">PT. Jaya Dirgantara</span>
+          <span className="mr-1">Dashboard</span> / <span className="ml-1 font-medium">{user?.nama_perusahaan || 'Tenant'}</span>
         </div>
       </header>
+
+      {user && user.status_verifikasi !== 'Verified' && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg flex items-start shadow-sm">
+          <AlertTriangle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-yellow-600" />
+          <div>
+            <h4 className="font-bold text-sm">Akun Belum Diverifikasi (Status: {user.status_verifikasi || 'Pending'})</h4>
+            <p className="text-sm mt-1">
+              Silakan lengkapi Dokumen Legalitas Anda (NIB, NPWP, Akta) di menu <Link href="/tenant/profil" className="underline font-bold text-blue-600 hover:text-blue-800">Profil & Dokumen</Link>. 
+              Anda tidak dapat menggunakan fitur transaksional seperti mengajukan permohonan kontrak sebelum dokumen disetujui oleh UPBU.
+            </p>
+          </div>
+        </div>
+      )}
 
       {tenantWarnings.length > 0 && (
         <div className="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-800 rounded flex items-start shadow-sm">
@@ -172,7 +197,7 @@ export default function TenantDashboard() {
               <div className="w-16 h-16 bg-[#3c8dbc] text-white rounded-full flex items-center justify-center mb-3 text-2xl font-bold">
                 JD
               </div>
-              <h3 className="text-[18px] font-bold text-[#333]">PT. Jaya Dirgantara</h3>
+              <h3 className="text-[18px] font-bold text-[#333]">PT. Geo</h3>
               <p className="text-[13px] text-[#777] mb-2">Maskapai Charter Nasional</p>
               <div className="flex items-center text-[12px] bg-[#3c8dbc] text-white px-2 py-0.5 rounded-sm">
                 <CheckCircle2 className="w-3 h-3 mr-1" /> Terverifikasi

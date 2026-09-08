@@ -3,8 +3,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { contractService } from '@/services/contractService';
+import { invoiceService } from '@/services/invoiceService';
 import { Contract } from '@/types/contract';
-import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download, Edit } from 'lucide-react';
+import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download, Edit, Eye } from 'lucide-react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
@@ -129,6 +130,41 @@ export default function AdminKontrakDetailPage() {
         </div>
         
         <div className="flex gap-2">
+          {/* Verify Document Button */}
+          {contract.status === 'Menunggu Verifikasi Admin' && (
+            <>
+              {contract.signed_document_url && (
+                <a
+                  href={`${process.env.NEXT_PUBLIC_API_URL}${contract.signed_document_url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+                >
+                  <Eye className="w-4 h-4 mr-2" /> Preview File
+                </a>
+              )}
+              <button
+                onClick={async () => {
+                  try {
+                    setIsUpdating(true);
+                    await contractService.verifyContract(contract.id as number);
+                    alert('Kontrak berhasil diverifikasi dan diaktifkan!');
+                    fetchContract();
+                  } catch (error) {
+                    alert('Gagal memverifikasi kontrak');
+                  } finally {
+                    setIsUpdating(false);
+                  }
+                }}
+                disabled={isUpdating}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50"
+              >
+                {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />} 
+                Verifikasi & Aktifkan
+              </button>
+            </>
+          )}
+
           {/* Download PDF button - Available if both signatures exist */}
           {(contract.admin_signature && contract.tenant_signature) && (
             <button
@@ -155,6 +191,32 @@ export default function AdminKontrakDetailPage() {
                 <FileSignature className="w-4 h-4 mr-2" /> Tinjau Dokumen & TTE
               </button>
             </div>
+          )}
+
+          {/* Generate SKRD Button - Available for Active/Approved/Waiting Payment if no invoice exists */}
+          {['Active', 'Approved', 'Waiting Payment', 'Expiring'].includes(contract.status || '') && (!contract.invoices || contract.invoices.length === 0) && (
+            <button
+              onClick={async () => {
+                if (window.confirm('Yakin ingin menerbitkan SKRD untuk kontrak ini?')) {
+                  try {
+                    setIsUpdating(true);
+                    await invoiceService.generateSkrd(contract.id as number);
+                    alert('SKRD berhasil diterbitkan!');
+                    fetchContract();
+                  } catch (error: any) {
+                    console.error(error);
+                    alert('Gagal menerbitkan SKRD: ' + (error.response?.data?.message || error.message));
+                  } finally {
+                    setIsUpdating(false);
+                  }
+                }
+              }}
+              disabled={isUpdating}
+              className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-70"
+            >
+              {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />} 
+              Terbitkan SKRD
+            </button>
           )}
 
           {/* Terminate button */}

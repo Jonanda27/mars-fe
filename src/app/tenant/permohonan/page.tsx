@@ -4,12 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { rentalService } from '@/services/rentalService';
 import { RentalApplication } from '@/types/rental';
-import { FileText, Plus, Clock, Search, Loader2 } from 'lucide-react';
+import { FileText, Plus, Clock, Search, Loader2, AlertTriangle } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
 import dayjs from 'dayjs';
+
+import api from '@/services/api';
 
 export default function PermohonanTenantPage() {
   const [applications, setApplications] = useState<RentalApplication[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuthStore();
+  const isVerified = user?.status_verifikasi === 'Verified';
 
   useEffect(() => {
     fetchApplications();
@@ -45,14 +50,32 @@ export default function PermohonanTenantPage() {
         </h1>
       </header>
 
+      {!isVerified && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg flex items-start shadow-sm">
+          <AlertTriangle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-yellow-600" />
+          <div>
+            <h4 className="font-bold text-sm">Fitur Terkunci (Akun Belum Diverifikasi)</h4>
+            <p className="text-sm mt-1">
+              Anda tidak dapat mengajukan permohonan sewa baru. Silakan lengkapi Dokumen Legalitas (NIB, NPWP, Akta) di menu Profil & Dokumen, lalu tunggu persetujuan dari Admin UPBU.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
         <div className="p-3 border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50">
           <h3 className="text-[16px] text-[#444] font-bold flex items-center">
             <FileText className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Daftar Permohonan Anda
           </h3>
-          <Link href="/tenant/permohonan/buat" className="bg-[#3c8dbc] text-white px-3 py-1.5 text-[12px] font-medium hover:bg-[#367fa9] transition-colors flex items-center rounded-sm">
-            <Plus className="w-4 h-4 mr-1" /> Ajukan Sewa Baru
-          </Link>
+          {isVerified ? (
+            <Link href="/tenant/permohonan/buat" className="bg-[#3c8dbc] text-white px-3 py-1.5 text-[12px] font-medium hover:bg-[#367fa9] transition-colors flex items-center rounded-sm">
+              <Plus className="w-4 h-4 mr-1" /> Ajukan Sewa Baru
+            </Link>
+          ) : (
+            <button disabled className="bg-gray-400 text-white px-3 py-1.5 text-[12px] font-medium cursor-not-allowed flex items-center rounded-sm opacity-60" title="Lengkapi Dokumen Legalitas untuk Mengajukan Sewa">
+              <Plus className="w-4 h-4 mr-1" /> Ajukan Sewa Baru (Terkunci)
+            </button>
+          )}
         </div>
 
         <div className="p-4 bg-slate-50 min-h-[400px]">
@@ -115,8 +138,13 @@ export default function PermohonanTenantPage() {
                     </div>
                   </div>
                   
-                  <div className="bg-slate-50 p-4 border-t border-slate-100 text-[12px] text-slate-500 flex justify-between items-center">
-                    <span>Diajukan pada {dayjs(app.created_at).format('DD MMM YYYY')}</span>
+                  <div className="bg-slate-50 p-4 border-t border-slate-100 flex flex-col gap-3">
+                    <div className="text-[12px] text-slate-500 flex justify-between items-center">
+                      <span>Diajukan pada {dayjs(app.created_at).format('DD MMM YYYY')}</span>
+                      {app.status === 'Signed' && app.signed_document_url && (
+                        <a href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/${app.signed_document_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:underline">Lihat TTD &rarr;</a>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

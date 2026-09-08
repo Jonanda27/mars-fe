@@ -1,7 +1,12 @@
 export interface Aircraft {
   id: number;
   registration_number: string;
-  aircraft_type: string;
+  aircraft_type_id?: number;
+  aircraft_types?: {
+    id: number;
+    jenis_pesawat: string;
+    luas_efektif_m2: string;
+  };
   aircraft_owner?: string;
   operator?: string;
   mtow?: number;
@@ -10,5 +15,11 @@ export interface Aircraft {
   asset_id?: number;
   capacity?: number;
   foto?: string;
+  custom_type_name?: string;
+  custom_type_area?: string;
   created_at?: string;
+  assets?: {
+    nama_aset: string;
+    kode_aset: string;
+  };
 }

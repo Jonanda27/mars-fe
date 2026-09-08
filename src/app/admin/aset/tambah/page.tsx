@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { assetService } from '@/services/assetService';
-import { Building, Save, ArrowLeft, Loader2, ChevronRight, ChevronLeft, MapPin, CheckCircle } from 'lucide-react';
+import { Building, Save, ArrowLeft, Loader2, ChevronRight, ChevronLeft, MapPin, CheckCircle, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useAirportStore } from '@/store/useAirportStore';
 import { useZoneStore } from '@/store/useZoneStore';
@@ -88,6 +88,47 @@ export default function TambahAsetPage() {
     }
   };
 
+  const handleFillDummy = () => {
+    const mozes = airports.find(a => a.kode_bandara === 'TIM' || a.nama_bandara.toLowerCase().includes('mozes'));
+    const airportId = mozes ? mozes.id.toString() : '';
+
+    const firstZone = zones.find(z => z.airport_id === parseInt(airportId));
+    const zoneId = firstZone ? firstZone.id.toString() : '';
+
+    setFormData({
+      kode_aset: 'TIM-HGR-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0'),
+      jenis_aset: 'Hanggar',
+      nama_aset: 'Hanggar Utama Mozes Kilangin',
+      lokasi: 'Area Komersial Timur, Bandara Mozes Kilangin',
+      airport_id: airportId,
+      zone_id: zoneId,
+      koordinat_gis: '-4.529243, 136.885121',
+      luas: '3000',
+      satuan: 'm²',
+      kapasitas: '3 Pesawat Narrow Body',
+      kondisi: 'Baik',
+      status: 'Available',
+      master_tariff_id: '',
+      dokumen_kepemilikan: 'SHM-UPBU-MZK-2023',
+    });
+
+    setSpesifikasi({
+      tinggi_bangunan: '35 Meter',
+      kapasitas_pesawat: '3 Pesawat Narrow Body (B737/A320)',
+      jenis_pesawat: 'Boeing 737 / Airbus A320 / ATR 72',
+      fasilitas_listrik: '50.000 VA',
+      fasilitas_air: 'Air PAM & Sumur Bor',
+      pintu_hanggar: 'Motorized Sliding Door (Lebar 50m)',
+      apron_connection: 'Akses Langsung ke Taxiway Alpha',
+      workshop: 'Tersedia 200m2',
+      office: '3 Ruangan Office Full AC',
+      storage: 'Gudang Sparepart 100m2',
+      toilet: '4 Toilet Standar',
+      fire_safety: 'Hydrant, Sprinkler, Foam Extinguisher',
+      fasilitas_lainnya: 'CCTV 24 Jam Terintegrasi'
+    });
+  };
+
   const isHanggar = formData.jenis_aset === 'Hanggar';
 
   const statusOptions = isHanggar 
@@ -117,6 +158,13 @@ export default function TambahAsetPage() {
         <h1 className="text-[24px] font-normal text-[#333] flex items-center">
           Tambah Aset Baru
         </h1>
+        <button 
+          onClick={handleFillDummy}
+          type="button"
+          className="bg-[#f39c12] text-white px-3 py-1.5 text-[12px] font-bold hover:bg-[#e67e22] transition-colors flex items-center shadow-sm rounded-sm uppercase tracking-wider"
+        >
+          <Zap className="w-4 h-4 mr-1.5" /> Isi Data Dummy Mozes Kilangin
+        </button>
       </header>
 
       <div className="bg-white shadow-sm rounded-sm overflow-hidden">

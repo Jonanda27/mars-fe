@@ -20,5 +20,10 @@ export const invoiceService = {
   payInvoice: async (id: number): Promise<Invoice> => {
     const response = await api.put(`/invoices/${id}/pay`);
     return response.data.data;
+  },
+
+  generateSkrd: async (contractId: number): Promise<Invoice> => {
+    const response = await api.post(`/invoices/generate-skrd/${contractId}`);
+    return response.data.data;
   }
 };

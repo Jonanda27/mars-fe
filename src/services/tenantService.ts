@@ -12,8 +12,13 @@ export const tenantService = {
     return response.data.data;
   },
 
-  verifyTenant: async (id: number, status: string): Promise<Tenant> => {
-    const response = await api.put(`/tenants/${id}/verify`, { status });
+  verifyTenant: async (id: number, status: string, alasan_penolakan?: string): Promise<Tenant> => {
+    const response = await api.put(`/tenants/${id}/verify`, { status, alasan_penolakan });
+    return response.data.data;
+  },
+
+  updateProfile: async (id: number, data: any): Promise<Tenant> => {
+    const response = await api.put(`/tenants/${id}/profile`, data);
     return response.data.data;
   },
 

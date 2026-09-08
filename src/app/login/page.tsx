@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { LoginPayload } from '@/types/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +14,8 @@ export default function LoginPage() {
     username: '',
     password: '',
   });
+  
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +39,10 @@ export default function LoginPage() {
         }
       } else if (userRole === 'admin' || userRole === 'superadmin') {
         router.push('/admin');
+      } else if (userRole === 'kepala dinas') {
+        router.push('/eksekutif');
+      } else if (userRole === 'petugas lapangan') {
+        router.push('/petugas');
       } else {
         router.push('/');
       }
@@ -92,18 +99,28 @@ export default function LoginPage() {
                 placeholder="Masukkan username"
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Password</label>
-              <input
-                type="password"
-                name="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full border border-gray-300 bg-gray-50 p-3 text-gray-900 focus:outline-none focus:border-[#3c8dbc] focus:bg-white transition-colors rounded-none"
-                placeholder="Masukkan password"
-              />
-            </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:outline-none focus:border-[#3c8dbc] focus:bg-white transition-colors rounded-none"
+                    placeholder="Masukkan password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#3c8dbc] transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
 
             {/* Submit Area */}
             <div className="pt-6 mt-8 border-t border-gray-200">

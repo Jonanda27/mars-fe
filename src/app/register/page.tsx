@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { RegisterTenantPayload } from '@/types/auth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function RegisterPage() {
     username: '',
     password: '',
     nama_perusahaan: '',
+    jenis_tenant: 'Maskapai',
     pic: '',
     nomor_telepon: '',
     email: '',
@@ -22,6 +24,7 @@ export default function RegisterPage() {
   });
 
   const [localError, setLocalError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,7 +79,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-4xl bg-white border border-gray-200 shadow-sm p-8 md:p-12">
           
           <div className="mb-10 text-center">
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Registrasi Mitra (Tenant)</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Registrasi Tenant</h1>
             <p className="text-gray-500 font-light">Lengkapi informasi di bawah ini untuk bergabung dalam ekosistem operasional MARS.</p>
           </div>
 
@@ -111,15 +114,25 @@ export default function RegisterPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Password <span className="text-red-500">*</span></label>
-                  <input
-                    type="password"
-                    name="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 bg-gray-50 p-3 text-gray-900 focus:outline-none focus:border-[#3c8dbc] focus:bg-white transition-colors rounded-none"
-                    placeholder="Minimal 6 karakter"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      required
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:outline-none focus:border-[#3c8dbc] focus:bg-white transition-colors rounded-none"
+                      placeholder="Minimal 6 karakter"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#3c8dbc] transition-colors"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Alamat Email <span className="text-red-500">*</span></label>
@@ -145,6 +158,27 @@ export default function RegisterPage() {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Tipe Perusahaan / Entitas <span className="text-red-500">*</span></label>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <label className={`flex-1 border p-4 cursor-pointer transition-all ${formData.jenis_tenant === 'Maskapai' ? 'border-[#3c8dbc] bg-[#f0f7fb]' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
+                      <div className="flex items-center">
+                        <input type="radio" name="jenis_tenant" value="Maskapai" checked={formData.jenis_tenant === 'Maskapai'} onChange={handleChange} className="w-4 h-4 text-[#3c8dbc] focus:ring-[#3c8dbc]" />
+                        <span className="ml-3 font-bold text-gray-900">Maskapai Penerbangan</span>
+                      </div>
+                      <p className="mt-1 ml-7 text-xs text-gray-500">Memiliki armada pesawat, menyewa hanggar/apron, wajib melampirkan AOC.</p>
+                    </label>
+                    
+                    <label className={`flex-1 border p-4 cursor-pointer transition-all ${formData.jenis_tenant === 'Umum' ? 'border-[#3c8dbc] bg-[#f0f7fb]' : 'border-gray-200 hover:border-gray-300 bg-white'}`}>
+                      <div className="flex items-center">
+                        <input type="radio" name="jenis_tenant" value="Umum" checked={formData.jenis_tenant === 'Umum'} onChange={handleChange} className="w-4 h-4 text-[#3c8dbc] focus:ring-[#3c8dbc]" />
+                        <span className="ml-3 font-bold text-gray-900">Perusahaan Umum (Non-Maskapai)</span>
+                      </div>
+                      <p className="mt-1 ml-7 text-xs text-gray-500">Kargo, Ground Handling, Tenant Kios, dll. Menyewa Gudang/Lahan/Kantor.</p>
+                    </label>
+                  </div>
+                </div>
+
                 <div className="md:col-span-2">
                   <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Nama Perusahaan / Institusi <span className="text-red-500">*</span></label>
                   <input

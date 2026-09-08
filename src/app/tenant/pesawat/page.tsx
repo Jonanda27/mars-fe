@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { 
   Plane, Plus, Search, Trash2, Edit, X, Upload, 
-  CheckCircle2, Wrench, ShieldAlert, Weight, Tag, LayoutGrid, List, Eye
+  CheckCircle2, Wrench, ShieldAlert, Weight, Tag, LayoutGrid, List, Eye, MapPin
 } from 'lucide-react';
 
 import { aircraftService } from '@/services/aircraftService';
@@ -16,7 +16,7 @@ export default function DataPesawatPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [armadaList, setArmadaList] = useState<Aircraft[]>([]);
-  const [aircraftTypes, setAircraftTypes] = useState<string[]>([]);
+  const [aircraftTypes, setAircraftTypes] = useState<{id: number, jenis_pesawat: string, luas_efektif_m2: string}[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   React.useEffect(() => {
@@ -45,6 +45,7 @@ export default function DataPesawatPage() {
     registrasi: '',
     tipe: '',
     customTipe: '',
+    customLuas: '',
     mtow: '',
     kapasitasPenumpang: '10',
     fotoPreview: ''
@@ -61,13 +62,19 @@ export default function DataPesawatPage() {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const finalTipe = formData.tipe === 'Lainnya' ? formData.customTipe : formData.tipe;
+    const isCustom = formData.tipe === 'Lainnya';
+    const finalTipe = isCustom ? formData.customTipe : formData.tipe;
 
-    if (!formData.registrasi || !finalTipe || !formData.mtow) {
-      alert("Mohon lengkapi Nomor Registrasi, Tipe Pesawat, dan Berat MTOW!");
+    if (!formData.registrasi || !finalTipe || !formData.mtow || (isCustom && !formData.customLuas)) {
+      alert("Mohon lengkapi Nomor Registrasi, Tipe Pesawat, Luas, dan Berat MTOW!");
       return;
     }
 
@@ -75,7 +82,9 @@ export default function DataPesawatPage() {
       if (editingId) {
         const updatedPesawat = await aircraftService.updateTenantAircraft(editingId, {
           registration_number: formData.registrasi.toUpperCase(),
-          aircraft_type: finalTipe,
+          aircraft_type_id: isCustom ? undefined : Number(formData.tipe),
+          custom_type_name: isCustom ? formData.customTipe : undefined,
+          custom_type_area: isCustom ? formData.customLuas : undefined,
           mtow: Number(formData.mtow),
           capacity: Number(formData.kapasitasPenumpang),
           foto: formData.fotoPreview || undefined
@@ -86,7 +95,9 @@ export default function DataPesawatPage() {
       } else {
         const newPesawat = await aircraftService.createTenantAircraft({
           registration_number: formData.registrasi.toUpperCase(),
-          aircraft_type: finalTipe,
+          aircraft_type_id: isCustom ? undefined : Number(formData.tipe),
+          custom_type_name: isCustom ? formData.customTipe : undefined,
+          custom_type_area: isCustom ? formData.customLuas : undefined,
           mtow: Number(formData.mtow),
           capacity: Number(formData.kapasitasPenumpang),
           status: 'aktif',
@@ -102,6 +113,7 @@ export default function DataPesawatPage() {
         registrasi: '',
         tipe: '',
         customTipe: '',
+        customLuas: '',
         mtow: '',
         kapasitasPenumpang: '10',
         fotoPreview: ''
@@ -114,12 +126,13 @@ export default function DataPesawatPage() {
   const handleEdit = (item: Aircraft) => {
     setEditingId(item.id!);
     
-    const isCustomType = !aircraftTypes.includes(item.aircraft_type);
-
+    const isCustomType = item.custom_type_name || !aircraftTypes.find(t => t.id === item.aircraft_type_id);
+  
     setFormData({
       registrasi: item.registration_number,
-      tipe: isCustomType ? 'Lainnya' : item.aircraft_type,
-      customTipe: isCustomType ? item.aircraft_type : '',
+      tipe: isCustomType ? 'Lainnya' : (item.aircraft_type_id ? item.aircraft_type_id.toString() : 'Lainnya'),
+      customTipe: isCustomType ? (item.aircraft_types?.jenis_pesawat || '') : '',
+      customLuas: isCustomType ? (item.aircraft_types?.luas_efektif_m2?.toString() || '') : '',
       mtow: item.mtow ? item.mtow.toString() : '',
       kapasitasPenumpang: item.capacity ? item.capacity.toString() : '',
       fotoPreview: item.foto || ''
@@ -139,9 +152,17 @@ export default function DataPesawatPage() {
   };
 
   const filteredArmada = armadaList.filter(item => {
+    const typeName = item.aircraft_types?.jenis_pesawat || '';
     const matchesSearch = item.registration_number.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          item.aircraft_type.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || item.status === selectedCategory;
+                          typeName.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    let matchesCategory = true;
+    if (selectedCategory === 'hangar') {
+      matchesCategory = !!item.asset_id;
+    } else if (selectedCategory !== 'all') {
+      matchesCategory = !item.asset_id && item.status === selectedCategory;
+    }
+    
     return matchesSearch && matchesCategory;
   });
 
@@ -175,6 +196,7 @@ export default function DataPesawatPage() {
                   registrasi: '',
                   tipe: '',
                   customTipe: '',
+                  customLuas: '',
                   mtow: '',
                   kapasitasPenumpang: '10',
                   fotoPreview: ''
@@ -230,45 +252,63 @@ export default function DataPesawatPage() {
                   <label className="block mb-1 font-bold text-[#444]">Nomor Registrasi (Tail Number) <span className="text-[#dd4b39]">*</span></label>
                   <input 
                     type="text" 
+                    name="registrasi"
                     placeholder="Contoh: PK-JDE" 
                     value={formData.registrasi}
-                    onChange={(e) => setFormData({ ...formData, registrasi: e.target.value })}
+                    onChange={handleChange}
                     className="w-full p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none uppercase font-bold text-[#3c8dbc]" 
                   />
                 </div>
 
                 <div>
                   <label className="block mb-1 font-bold text-[#444]">Tipe Pesawat <span className="text-[#dd4b39]">*</span></label>
-                  <select
-                    value={formData.tipe}
-                    onChange={(e) => setFormData({ ...formData, tipe: e.target.value })}
-                    className="w-full p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none font-semibold"
-                    required
-                  >
-                    <option value="" disabled>-- Pilih Tipe Pesawat --</option>
-                    {aircraftTypes.map((type, idx) => (
-                      <option key={idx} value={type}>{type}</option>
+                  <select name="tipe" value={formData.tipe} onChange={handleChange} required className="w-full border border-[#d2d6de] px-4 py-2.5 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
+                    <option value="" disabled>Pilih Tipe Pesawat</option>
+                    {aircraftTypes.map(t => (
+                      <option key={t.id} value={t.id.toString()}>{t.jenis_pesawat} (Dimensi: {t.luas_efektif_m2} m²)</option>
                     ))}
-                    <option value="Lainnya">Lainnya (Ketik Manual)...</option>
+                    <option value="Lainnya">Lainnya (Kustom)</option>
                   </select>
-                  
-                  {formData.tipe === 'Lainnya' && (
-                    <input 
-                      type="text" 
-                      placeholder="Masukkan tipe pesawat..." 
-                      value={formData.customTipe}
-                      onChange={(e) => setFormData({ ...formData, customTipe: e.target.value })}
-                      className="w-full mt-2 p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none font-semibold bg-indigo-50" 
-                      required
-                    />
-                  )}
                 </div>
+
+                {formData.tipe === 'Lainnya' && (
+                  <>
+                    <div>
+                      <label className="block mb-1 font-bold text-[#444]">Nama Tipe Kustom <span className="text-[#dd4b39]">*</span></label>
+                      <input 
+                        type="text" 
+                        name="customTipe"
+                        placeholder="Contoh: Pilatus PC-6" 
+                        value={formData.customTipe}
+                        onChange={handleChange}
+                        required
+                        className="w-full p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-bold text-[#444]">Luas Efektif (m²) <span className="text-[#dd4b39]">*</span></label>
+                      <input 
+                        type="text" 
+                        name="customLuas"
+                        placeholder="Contoh: 150" 
+                        value={formData.customLuas}
+                        onChange={(e) => {
+                           const val = e.target.value.replace(/[^0-9.]/g, '');
+                           setFormData({ ...formData, customLuas: val });
+                        }}
+                        required
+                        className="w-full p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none font-mono" 
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label className="block mb-1 font-bold text-[#444]">Berat Maksimal (MTOW) <span className="text-[#dd4b39]">*</span></label>
                   <div className="flex">
                     <input 
                       type="text" 
+                      name="mtow"
                       placeholder="Contoh: 3629" 
                       value={formData.mtow}
                       onChange={(e) => {
@@ -281,13 +321,13 @@ export default function DataPesawatPage() {
                   </div>
                 </div>
 
-
                 <div>
                   <label className="block mb-1 font-bold text-[#444]">Kapasitas Penumpang</label>
                   <input 
                     type="number" 
+                    name="kapasitasPenumpang"
                     value={formData.kapasitasPenumpang}
-                    onChange={(e) => setFormData({ ...formData, kapasitasPenumpang: e.target.value })}
+                    onChange={handleChange}
                     className="w-full p-2 border border-[#d2d6de] focus:border-[#3c8dbc] focus:outline-none font-mono" 
                   />
                 </div>
@@ -305,6 +345,7 @@ export default function DataPesawatPage() {
                     registrasi: '',
                     tipe: '',
                     customTipe: '',
+                    customLuas: '',
                     mtow: '',
                     kapasitasPenumpang: '10',
                     fotoPreview: ''
@@ -325,11 +366,9 @@ export default function DataPesawatPage() {
         </div>
       )}
 
-      {/* Controls: Header Filter & Layout Switcher */}
       {!showForm && (
         <>
           <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm p-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            
             <div className="flex items-center gap-3 w-full md:w-auto">
               <span className="text-[14px] font-bold text-[#333] flex items-center">
                 <Plane className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Katalog Armada Terdaftar ({filteredArmada.length})
@@ -337,8 +376,6 @@ export default function DataPesawatPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center">
-              
-              {/* Status Filter */}
               <select 
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
@@ -347,9 +384,9 @@ export default function DataPesawatPage() {
                 <option value="all">Semua Status</option>
                 <option value="aktif">Aktif Operasional</option>
                 <option value="maintenance">Dalam Pemeliharaan</option>
+                <option value="hangar">Disewa di Hangar</option>
               </select>
 
-              {/* Search Bar */}
               <div className="flex w-full sm:w-auto">
                 <input 
                   type="text" 
@@ -363,21 +400,18 @@ export default function DataPesawatPage() {
                 </button>
               </div>
 
-              {/* Switcher Tampilan Grid / List */}
               <div className="flex border border-[#d2d6de] bg-slate-50 rounded-sm p-0.5">
                 <button 
                   onClick={() => setViewMode('grid')}
                   className={`p-1.5 text-[12px] flex items-center font-bold transition-colors ${viewMode === 'grid' ? 'bg-[#3c8dbc] text-white shadow-sm' : 'text-[#777] hover:text-[#333]'}`}
-                  title="Tampilan Kartu Visual (Grid)"
                 >
-                  <LayoutGrid className="w-4 h-4 mr-1" /> Grid Kartu
+                  <LayoutGrid className="w-4 h-4 mr-1" /> Grid
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
                   className={`p-1.5 text-[12px] flex items-center font-bold transition-colors ${viewMode === 'list' ? 'bg-[#3c8dbc] text-white shadow-sm' : 'text-[#777] hover:text-[#333]'}`}
-                  title="Tampilan Baris Ringkas"
                 >
-                  <List className="w-4 h-4 mr-1" /> Daftar Ringkas
+                  <List className="w-4 h-4 mr-1" /> Daftar
                 </button>
               </div>
 
@@ -385,35 +419,30 @@ export default function DataPesawatPage() {
                 onClick={() => setShowForm(true)}
                 className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white text-[13px] font-bold px-4 py-1.5 transition-colors flex items-center justify-center shadow-sm whitespace-nowrap w-full sm:w-auto"
               >
-                <Plus className="w-4 h-4 mr-1" /> Daftarkan Pesawat
+                <Plus className="w-4 h-4 mr-1" /> Daftarkan
               </button>
             </div>
           </div>
 
-          {/* TAMPILAN 1: GRID KARTU VISUAL DENGAN GAMBAR PESAWAT */}
           {viewMode === 'grid' && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in">
               {filteredArmada.map((item) => (
-                <div 
-                  key={item.id}
-                  className="bg-white shadow-sm border border-[#d2d6de] hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group"
-                >
-                  {/* Gambar Pesawat & Status Badge Overlay */}
+                <div key={item.id} className="bg-white shadow-sm border border-[#d2d6de] hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col group">
                   <div className="relative h-[200px] bg-slate-800 overflow-hidden">
                     <img 
                       src={item.foto || "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80"} 
-                      alt={item.aircraft_type} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      alt={item.aircraft_types?.jenis_pesawat || 'Aircraft'} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
-                    
-                    {/* Tail Number Badge Overlay */}
                     <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-sm text-white px-3 py-1 font-mono font-bold text-[16px] tracking-wider border border-white/20 shadow-md">
                       {item.registration_number}
                     </div>
-
-                    {/* Status Badge */}
                     <div className="absolute top-3 right-3">
-                      {item.status === 'aktif' ? (
+                      {item.asset_id ? (
+                        <span className="bg-[#3c8dbc] text-white font-bold text-[11px] px-3 py-1 shadow-sm flex items-center border border-white/20">
+                          <MapPin className="w-3 h-3 mr-1" /> {item.assets?.nama_aset || 'Hangar'}
+                        </span>
+                      ) : item.status === 'aktif' ? (
                         <span className="bg-[#00a65a] text-white font-bold text-[11px] px-3 py-1 uppercase tracking-wider shadow-sm flex items-center">
                           <CheckCircle2 className="w-3 h-3 mr-1" /> Aktif
                         </span>
@@ -423,17 +452,11 @@ export default function DataPesawatPage() {
                         </span>
                       )}
                     </div>
-
-                    {/* Category Bar Bottom Overlay */}
                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-3 text-white">
-                      <p className="text-[11px] text-slate-300 font-bold uppercase tracking-wider">{/* {item.kategori} */}</p>
-                      <h3 className="text-[16px] font-bold leading-tight">{item.aircraft_type}</h3>
+                      <h3 className="text-[16px] font-bold leading-tight">{item.aircraft_types?.jenis_pesawat || 'Unknown Type'}</h3>
                     </div>
                   </div>
-
-                  {/* Detail Spesifikasi Pesawat */}
                   <div className="p-4 flex-1 flex flex-col gap-3 bg-white text-[13px]">
-                    
                     <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 border border-[#f4f4f4]">
                       <div>
                         <span className="text-[11px] text-[#777] uppercase font-bold block">Berat (MTOW)</span>
@@ -444,26 +467,28 @@ export default function DataPesawatPage() {
                         <span className="font-bold text-[#333] text-[14px]">{item.capacity || '-'} Penumpang</span>
                       </div>
                     </div>
-
-
                   </div>
-
-                  {/* Action Footer */}
                   <div className="p-3 bg-slate-50 border-t border-[#f4f4f4] flex justify-end items-center gap-2">
-                    <button onClick={() => handleEdit(item)} className="bg-white border border-[#d2d6de] text-[#3c8dbc] hover:bg-[#3c8dbc] hover:text-white px-3 py-1.5 transition-colors shadow-sm flex items-center text-[12px] font-bold" title="Edit Data">
+                    <button 
+                      onClick={() => handleEdit(item)} 
+                      disabled={!!item.asset_id}
+                      className={`border px-3 py-1.5 shadow-sm flex items-center text-[12px] font-bold transition-colors ${item.asset_id ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white border-[#d2d6de] text-[#3c8dbc] hover:bg-[#3c8dbc] hover:text-white'}`} 
+                    >
                       <Edit className="w-4 h-4 mr-1.5" /> Edit
                     </button>
-                    <button onClick={() => handleDelete(item.id!)} className="bg-white border border-[#d2d6de] text-[#dd4b39] hover:bg-[#dd4b39] hover:text-white px-3 py-1.5 transition-colors shadow-sm flex items-center text-[12px] font-bold" title="Hapus">
+                    <button 
+                      onClick={() => handleDelete(item.id!)} 
+                      disabled={!!item.asset_id}
+                      className={`border px-3 py-1.5 shadow-sm flex items-center text-[12px] font-bold transition-colors ${item.asset_id ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white border-[#d2d6de] text-[#dd4b39] hover:bg-[#dd4b39] hover:text-white'}`} 
+                    >
                       <Trash2 className="w-4 h-4 mr-1.5" /> Hapus
                     </button>
                   </div>
-
                 </div>
               ))}
             </div>
           )}
 
-          {/* TAMPILAN 2: DAFTAR RINGKAS (COMPACT LIST VIEW) */}
           {viewMode === 'list' && (
             <div className="bg-white border border-[#d2d6de] shadow-sm animate-in fade-in">
               <div className="p-0 overflow-x-auto">
@@ -492,13 +517,18 @@ export default function DataPesawatPage() {
                           <span className="font-mono font-bold text-[#3c8dbc] text-[15px]">{item.registration_number}</span>
                         </td>
                         <td className="py-3 px-5">
-                          <div className="font-bold text-[#333]">{item.aircraft_type}</div>
+                          <div className="font-bold text-[#333]">{item.aircraft_types?.jenis_pesawat || 'Unknown'}</div>
+                          <div className="text-[12px] text-[#777]">MTOW: {item.mtow || '-'} Kg</div>
                         </td>
                         <td className="py-3 px-5 font-mono font-bold text-[#333]">
                           {item.mtow?.toLocaleString('id-ID')} Kg
                         </td>
                         <td className="py-3 px-5 text-center">
-                          {item.status === 'aktif' ? (
+                          {item.asset_id ? (
+                            <span className="bg-[#3c8dbc]/10 text-[#3c8dbc] border border-[#3c8dbc]/20 font-bold text-[11px] px-2.5 py-1 rounded-sm flex items-center justify-center">
+                              <MapPin className="w-3 h-3 mr-1" /> {item.assets?.nama_aset || 'Hangar'}
+                            </span>
+                          ) : item.status === 'aktif' ? (
                             <span className="bg-[#00a65a]/10 text-[#00a65a] border border-[#00a65a]/20 font-bold text-[11px] px-2.5 py-1 uppercase rounded-sm">
                               Aktif
                             </span>
@@ -510,10 +540,20 @@ export default function DataPesawatPage() {
                         </td>
                         <td className="py-3 px-5 text-center">
                           <div className="flex justify-center gap-1">
-                            <button onClick={() => handleEdit(item)} className="bg-white border border-[#d2d6de] text-[#3c8dbc] hover:bg-[#3c8dbc] hover:text-white p-1.5 transition-colors shadow-sm" title="Edit Data">
+                            <button 
+                              onClick={() => handleEdit(item)} 
+                              disabled={!!item.asset_id}
+                              className={`border p-1.5 shadow-sm transition-colors ${item.asset_id ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white border-[#d2d6de] text-[#3c8dbc] hover:bg-[#3c8dbc] hover:text-white'}`} 
+                              title={item.asset_id ? "Terkunci (Sedang disewa di Hangar)" : "Edit Data"}
+                            >
                               <Edit className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => handleDelete(item.id!)} className="bg-white border border-[#d2d6de] text-[#dd4b39] hover:bg-[#dd4b39] hover:text-white p-1.5 transition-colors shadow-sm" title="Hapus">
+                            <button 
+                              onClick={() => handleDelete(item.id!)} 
+                              disabled={!!item.asset_id}
+                              className={`border p-1.5 shadow-sm transition-colors ${item.asset_id ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white border-[#d2d6de] text-[#dd4b39] hover:bg-[#dd4b39] hover:text-white'}`} 
+                              title={item.asset_id ? "Terkunci (Sedang disewa di Hangar)" : "Hapus"}
+                            >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>

@@ -17,6 +17,8 @@ export interface Contract {
   denda?: string;
   total_amount?: number;
   file_url?: string;
+  signed_document_url?: string;
+  contract_type?: string;
   admin_signature?: string;
   tenant_signature?: string;
   created_at?: string;
@@ -24,4 +26,5 @@ export interface Contract {
   tenants?: any;
   assets?: any;
   rental_applications?: any;
+  invoices?: any[];
 }

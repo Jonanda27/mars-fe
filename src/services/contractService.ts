@@ -46,5 +46,17 @@ export const contractService = {
   extendContract: async (id: number, newEndDate: string): Promise<any> => {
     const response = await api.post(`/contracts/tenant/${id}/extend`, { new_end_date: newEndDate });
     return response.data;
+  },
+
+  uploadSignature: async (id: number, formData: FormData): Promise<any> => {
+    const response = await api.post(`/contracts/tenant/${id}/upload-signature`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  verifyContract: async (id: number): Promise<any> => {
+    const response = await api.put(`/contracts/${id}/verify`);
+    return response.data;
   }
 };

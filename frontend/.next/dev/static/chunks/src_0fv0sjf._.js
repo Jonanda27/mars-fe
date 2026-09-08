@@ -18,7 +18,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/triangle-alert.mjs [app-client] (ecmascript) <export default as AlertTriangle>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useWarningStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/store/useWarningStore.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/store/useAuthStore.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -26,16 +28,29 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
+;
 function TenantDashboard() {
     _s();
     const { tenantWarnings, fetchTenantWarnings } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useWarningStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWarningStore"])();
+    const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthStore"])();
+    const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "TenantDashboard.useEffect": ()=>{
-            fetchTenantWarnings();
+            if (user && user.status_verifikasi !== 'Verified') {
+                router.push('/tenant/profil');
+            } else {
+                fetchTenantWarnings();
+            }
         }
     }["TenantDashboard.useEffect"], [
-        fetchTenantWarnings
+        fetchTenantWarnings,
+        user,
+        router
     ]);
+    if (!user || user.status_verifikasi !== 'Verified') {
+        return null; // Don't render dashboard while redirecting
+    }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "p-4 bg-[#ecf0f5] min-h-full",
         children: [
@@ -47,7 +62,7 @@ function TenantDashboard() {
                         children: "Tenant Portal - Ringkasan Akun"
                     }, void 0, false, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 21,
+                        lineNumber: 33,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -58,29 +73,85 @@ function TenantDashboard() {
                                 children: "Dashboard"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 25,
+                                lineNumber: 37,
                                 columnNumber: 11
                             }, this),
                             " / ",
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "ml-1 font-medium",
-                                children: "PT. Jaya Dirgantara"
+                                children: user?.nama_perusahaan || 'Tenant'
                             }, void 0, false, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 25,
+                                lineNumber: 37,
                                 columnNumber: 53
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 24,
+                        lineNumber: 36,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/tenant/page.tsx",
-                lineNumber: 20,
+                lineNumber: 32,
                 columnNumber: 7
+            }, this),
+            user && user.status_verifikasi !== 'Verified' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg flex items-start shadow-sm",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__["AlertTriangle"], {
+                        className: "w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-yellow-600"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/tenant/page.tsx",
+                        lineNumber: 43,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                className: "font-bold text-sm",
+                                children: [
+                                    "Akun Belum Diverifikasi (Status: ",
+                                    user.status_verifikasi || 'Pending',
+                                    ")"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/tenant/page.tsx",
+                                lineNumber: 45,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "text-sm mt-1",
+                                children: [
+                                    "Silakan lengkapi Dokumen Legalitas Anda (NIB, NPWP, Akta) di menu ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                        href: "/tenant/profil",
+                                        className: "underline font-bold text-blue-600 hover:text-blue-800",
+                                        children: "Profil & Dokumen"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/tenant/page.tsx",
+                                        lineNumber: 47,
+                                        columnNumber: 81
+                                    }, this),
+                                    ". Anda tidak dapat menggunakan fitur transaksional seperti mengajukan permohonan kontrak sebelum dokumen disetujui oleh UPBU."
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/tenant/page.tsx",
+                                lineNumber: 46,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/tenant/page.tsx",
+                        lineNumber: 44,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/tenant/page.tsx",
+                lineNumber: 42,
+                columnNumber: 9
             }, this),
             tenantWarnings.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-800 rounded flex items-start shadow-sm",
@@ -89,7 +160,7 @@ function TenantDashboard() {
                         className: "w-5 h-5 mr-3 flex-shrink-0 mt-0.5"
                     }, void 0, false, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 31,
+                        lineNumber: 56,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -100,7 +171,7 @@ function TenantDashboard() {
                                 children: "Peringatan Penting"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 33,
+                                lineNumber: 58,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -108,13 +179,13 @@ function TenantDashboard() {
                                 children: "Anda memiliki Surat Peringatan aktif terkait tunggakan pembayaran. Segera selesaikan tagihan Anda untuk menghindari penghentian layanan."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 34,
+                                lineNumber: 59,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 32,
+                        lineNumber: 57,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -123,13 +194,13 @@ function TenantDashboard() {
                         children: "Lihat Surat"
                     }, void 0, false, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 36,
+                        lineNumber: 61,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/tenant/page.tsx",
-                lineNumber: 30,
+                lineNumber: 55,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -153,13 +224,13 @@ function TenantDashboard() {
                                                         children: "Jt"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 48,
+                                                        lineNumber: 73,
                                                         columnNumber: 75
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 48,
+                                                lineNumber: 73,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -167,13 +238,13 @@ function TenantDashboard() {
                                                 children: "Tagihan Belum Dibayar"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 49,
+                                                lineNumber: 74,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 47,
+                                        lineNumber: 72,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$wallet$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Wallet$3e$__["Wallet"], {
@@ -181,13 +252,13 @@ function TenantDashboard() {
                                         strokeWidth: 1.5
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 51,
+                                        lineNumber: 76,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 46,
+                                lineNumber: 71,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -198,19 +269,19 @@ function TenantDashboard() {
                                         className: "w-3 h-3 ml-1"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 54,
+                                        lineNumber: 79,
                                         columnNumber: 27
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 53,
+                                lineNumber: 78,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 45,
+                        lineNumber: 70,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -231,13 +302,13 @@ function TenantDashboard() {
                                                         children: "Aset"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 62,
+                                                        lineNumber: 87,
                                                         columnNumber: 73
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 62,
+                                                lineNumber: 87,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -245,13 +316,13 @@ function TenantDashboard() {
                                                 children: "Kontrak Sewa Aktif"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 63,
+                                                lineNumber: 88,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 61,
+                                        lineNumber: 86,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$building$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Building2$3e$__["Building2"], {
@@ -259,13 +330,13 @@ function TenantDashboard() {
                                         strokeWidth: 1.5
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 65,
+                                        lineNumber: 90,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 60,
+                                lineNumber: 85,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -276,19 +347,19 @@ function TenantDashboard() {
                                         className: "w-3 h-3 ml-1"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 68,
+                                        lineNumber: 93,
                                         columnNumber: 33
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 67,
+                                lineNumber: 92,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 59,
+                        lineNumber: 84,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -309,13 +380,13 @@ function TenantDashboard() {
                                                         children: "Hari"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 76,
+                                                        lineNumber: 101,
                                                         columnNumber: 74
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 76,
+                                                lineNumber: 101,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -323,13 +394,13 @@ function TenantDashboard() {
                                                 children: "Jatuh Tempo Terdekat"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 77,
+                                                lineNumber: 102,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 75,
+                                        lineNumber: 100,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2d$days$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CalendarDays$3e$__["CalendarDays"], {
@@ -337,13 +408,13 @@ function TenantDashboard() {
                                         strokeWidth: 1.5
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 79,
+                                        lineNumber: 104,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 74,
+                                lineNumber: 99,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -354,19 +425,19 @@ function TenantDashboard() {
                                         className: "w-3 h-3 ml-1"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 82,
+                                        lineNumber: 107,
                                         columnNumber: 28
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 81,
+                                lineNumber: 106,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 73,
+                        lineNumber: 98,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -383,7 +454,7 @@ function TenantDashboard() {
                                                 children: "5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 90,
+                                                lineNumber: 115,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -391,13 +462,13 @@ function TenantDashboard() {
                                                 children: "Armada Terdaftar"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 91,
+                                                lineNumber: 116,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 89,
+                                        lineNumber: 114,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plane$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plane$3e$__["Plane"], {
@@ -405,13 +476,13 @@ function TenantDashboard() {
                                         strokeWidth: 1.5
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 93,
+                                        lineNumber: 118,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 88,
+                                lineNumber: 113,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -422,25 +493,25 @@ function TenantDashboard() {
                                         className: "w-3 h-3 ml-1"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 96,
+                                        lineNumber: 121,
                                         columnNumber: 33
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 95,
+                                lineNumber: 120,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 87,
+                        lineNumber: 112,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/tenant/page.tsx",
-                lineNumber: 43,
+                lineNumber: 68,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -460,19 +531,19 @@ function TenantDashboard() {
                                                 className: "w-4 h-4 mr-2 text-slate-500"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 109,
+                                                lineNumber: 134,
                                                 columnNumber: 17
                                             }, this),
                                             " Tagihan Belum Dibayar (e-SKRD)"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 108,
+                                        lineNumber: 133,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                    lineNumber: 107,
+                                    lineNumber: 132,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -489,7 +560,7 @@ function TenantDashboard() {
                                                             children: "No. SKRD"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 117,
+                                                            lineNumber: 142,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -497,7 +568,7 @@ function TenantDashboard() {
                                                             children: "Objek Sewa"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 118,
+                                                            lineNumber: 143,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -505,7 +576,7 @@ function TenantDashboard() {
                                                             children: "Periode"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 119,
+                                                            lineNumber: 144,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -513,7 +584,7 @@ function TenantDashboard() {
                                                             children: "Jatuh Tempo"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 120,
+                                                            lineNumber: 145,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -521,7 +592,7 @@ function TenantDashboard() {
                                                             children: "Nilai Tagihan (Rp)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 121,
+                                                            lineNumber: 146,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -529,18 +600,18 @@ function TenantDashboard() {
                                                             children: "Aksi"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 122,
+                                                            lineNumber: 147,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                    lineNumber: 116,
+                                                    lineNumber: 141,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 115,
+                                                lineNumber: 140,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -553,7 +624,7 @@ function TenantDashboard() {
                                                                 children: "SKRD-26-0801"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 127,
+                                                                lineNumber: 152,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -561,7 +632,7 @@ function TenantDashboard() {
                                                                 children: "HGR-001 (Hanggar)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 128,
+                                                                lineNumber: 153,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -569,7 +640,7 @@ function TenantDashboard() {
                                                                 children: "Agustus 2026"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 129,
+                                                                lineNumber: 154,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -577,7 +648,7 @@ function TenantDashboard() {
                                                                 children: "10 Sep 2026"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 130,
+                                                                lineNumber: 155,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -585,7 +656,7 @@ function TenantDashboard() {
                                                                 children: "250.000.000"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 131,
+                                                                lineNumber: 156,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -595,18 +666,18 @@ function TenantDashboard() {
                                                                     children: "Bayar"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                                    lineNumber: 133,
+                                                                    lineNumber: 158,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 132,
+                                                                lineNumber: 157,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 126,
+                                                        lineNumber: 151,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -617,7 +688,7 @@ function TenantDashboard() {
                                                                 children: "SKRD-26-0802"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 137,
+                                                                lineNumber: 162,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -625,7 +696,7 @@ function TenantDashboard() {
                                                                 children: "OFF-01 (Kantor)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 138,
+                                                                lineNumber: 163,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -633,7 +704,7 @@ function TenantDashboard() {
                                                                 children: "Agustus 2026"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 139,
+                                                                lineNumber: 164,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -641,7 +712,7 @@ function TenantDashboard() {
                                                                 children: "10 Sep 2026"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 140,
+                                                                lineNumber: 165,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -649,7 +720,7 @@ function TenantDashboard() {
                                                                 children: "25.000.000"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 141,
+                                                                lineNumber: 166,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -659,18 +730,18 @@ function TenantDashboard() {
                                                                     children: "Bayar"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                                    lineNumber: 143,
+                                                                    lineNumber: 168,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 142,
+                                                                lineNumber: 167,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 136,
+                                                        lineNumber: 161,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -681,7 +752,7 @@ function TenantDashboard() {
                                                                 children: "SKRD-26-0701"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 147,
+                                                                lineNumber: 172,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -689,7 +760,7 @@ function TenantDashboard() {
                                                                 children: "HGR-001 (Hanggar)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 148,
+                                                                lineNumber: 173,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -697,7 +768,7 @@ function TenantDashboard() {
                                                                 children: "Juli 2026"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 149,
+                                                                lineNumber: 174,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -705,7 +776,7 @@ function TenantDashboard() {
                                                                 children: "10 Ags 2026"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 150,
+                                                                lineNumber: 175,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -713,7 +784,7 @@ function TenantDashboard() {
                                                                 children: "250.000.000"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 151,
+                                                                lineNumber: 176,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -723,35 +794,35 @@ function TenantDashboard() {
                                                                     children: "Tunggakan"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                                    lineNumber: 153,
+                                                                    lineNumber: 178,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 152,
+                                                                lineNumber: 177,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 146,
+                                                        lineNumber: 171,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 125,
+                                                lineNumber: 150,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 114,
+                                        lineNumber: 139,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                    lineNumber: 113,
+                                    lineNumber: 138,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -765,29 +836,29 @@ function TenantDashboard() {
                                                 children: "Rp 525.000.000"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 161,
+                                                lineNumber: 186,
                                                 columnNumber: 94
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 161,
+                                        lineNumber: 186,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                    lineNumber: 160,
+                                    lineNumber: 185,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/tenant/page.tsx",
-                            lineNumber: 106,
+                            lineNumber: 131,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 105,
+                        lineNumber: 130,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -804,15 +875,15 @@ function TenantDashboard() {
                                                 children: "JD"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 172,
+                                                lineNumber: 197,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
                                                 className: "text-[18px] font-bold text-[#333]",
-                                                children: "PT. Jaya Dirgantara"
+                                                children: "PT. Geo"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 175,
+                                                lineNumber: 200,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -820,7 +891,7 @@ function TenantDashboard() {
                                                 children: "Maskapai Charter Nasional"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 176,
+                                                lineNumber: 201,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -830,20 +901,20 @@ function TenantDashboard() {
                                                         className: "w-3 h-3 mr-1"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 178,
+                                                        lineNumber: 203,
                                                         columnNumber: 17
                                                     }, this),
                                                     " Terverifikasi"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 177,
+                                                lineNumber: 202,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 171,
+                                        lineNumber: 196,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -859,20 +930,20 @@ function TenantDashboard() {
                                                             children: "NIB"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 185,
+                                                            lineNumber: 210,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "812000000001"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 211,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                    lineNumber: 184,
+                                                    lineNumber: 209,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -883,20 +954,20 @@ function TenantDashboard() {
                                                             children: "NPWP"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 189,
+                                                            lineNumber: 214,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "01.234.567.8-900.000"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 190,
+                                                            lineNumber: 215,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                    lineNumber: 188,
+                                                    lineNumber: 213,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
@@ -907,7 +978,7 @@ function TenantDashboard() {
                                                             children: "Status"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 193,
+                                                            lineNumber: 218,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -915,30 +986,30 @@ function TenantDashboard() {
                                                             children: "Aktif (Good Standing)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                                            lineNumber: 194,
+                                                            lineNumber: 219,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/tenant/page.tsx",
-                                                    lineNumber: 192,
+                                                    lineNumber: 217,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                            lineNumber: 183,
+                                            lineNumber: 208,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 182,
+                                        lineNumber: 207,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 170,
+                                lineNumber: 195,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -951,12 +1022,12 @@ function TenantDashboard() {
                                             children: "Aset yang Disewa"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/tenant/page.tsx",
-                                            lineNumber: 203,
+                                            lineNumber: 228,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 202,
+                                        lineNumber: 227,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -973,7 +1044,7 @@ function TenantDashboard() {
                                                                 children: "HGR-001 (Hanggar A)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 209,
+                                                                lineNumber: 234,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -981,13 +1052,13 @@ function TenantDashboard() {
                                                                 children: "Aktif"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 210,
+                                                                lineNumber: 235,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 208,
+                                                        lineNumber: 233,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -995,7 +1066,7 @@ function TenantDashboard() {
                                                         children: "Luas: 2.000 m²"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 212,
+                                                        lineNumber: 237,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1005,20 +1076,20 @@ function TenantDashboard() {
                                                                 className: "w-3 h-3 mr-1"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 214,
+                                                                lineNumber: 239,
                                                                 columnNumber: 19
                                                             }, this),
                                                             " Kedaluwarsa: 31 Des 2026"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 213,
+                                                        lineNumber: 238,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 207,
+                                                lineNumber: 232,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1032,7 +1103,7 @@ function TenantDashboard() {
                                                                 children: "OFF-01 (Office)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 220,
+                                                                lineNumber: 245,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1040,13 +1111,13 @@ function TenantDashboard() {
                                                                 children: "Aktif"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                                lineNumber: 221,
+                                                                lineNumber: 246,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 219,
+                                                        lineNumber: 244,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1054,7 +1125,7 @@ function TenantDashboard() {
                                                         children: "Luas: 100 m²"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 223,
+                                                        lineNumber: 248,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1062,49 +1133,51 @@ function TenantDashboard() {
                                                         children: "Kedaluwarsa: 31 Des 2027"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                                        lineNumber: 224,
+                                                        lineNumber: 249,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                                lineNumber: 218,
+                                                lineNumber: 243,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/page.tsx",
-                                        lineNumber: 205,
+                                        lineNumber: 230,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/page.tsx",
-                                lineNumber: 201,
+                                lineNumber: 226,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/page.tsx",
-                        lineNumber: 167,
+                        lineNumber: 192,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/tenant/page.tsx",
-                lineNumber: 102,
+                lineNumber: 127,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/tenant/page.tsx",
-        lineNumber: 19,
+        lineNumber: 31,
         columnNumber: 5
     }, this);
 }
-_s(TenantDashboard, "aRXENOnACBqdNEaig0LOHAIcVp4=", false, function() {
+_s(TenantDashboard, "MJketCRjSRGam/bQ8mglKYqQjW4=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useWarningStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWarningStore"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useWarningStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useWarningStore"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthStore"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
 _c = TenantDashboard;

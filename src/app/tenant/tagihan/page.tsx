@@ -171,7 +171,7 @@ export default function TenantTagihanPage() {
                           
                           {isScheduled && (
                             <div className="absolute inset-0 bg-slate-50/50 z-10 flex items-center justify-center backdrop-blur-[1px] pointer-events-none">
-                              <div className="bg-slate-800/80 text-white px-4 py-2 rounded-full font-bold text-sm flex items-center shadow-lg transform rotate-[-5deg]">
+                              <div className="bg-slate-800/80 text-white px-4 py-2 rounded-full font-bold text-sm flex items-center shadow-lg">
                                 <Clock className="w-4 h-4 mr-2" /> Belum Waktunya
                               </div>
                             </div>

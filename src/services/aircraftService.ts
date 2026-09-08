@@ -7,7 +7,7 @@ export const aircraftService = {
     return response.data.data;
   },
 
-  getMasterTypes: async (): Promise<string[]> => {
+  getMasterTypes: async (): Promise<{id: number, jenis_pesawat: string, luas_efektif_m2: string}[]> => {
     const response = await api.get('/aircrafts/types/master');
     return response.data.data;
   },

@@ -4,26 +4,31 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { rentalService } from '@/services/rentalService';
 import { assetService } from '@/services/assetService';
-import { airportService } from '@/services/airportService';
 import { Asset } from '@/types/asset';
-import { Airport } from '@/types/airport';
 import { aircraftService } from '@/services/aircraftService';
 import { Aircraft } from '@/types/aircraft';
-import { FileText, Save, ArrowLeft, Loader2 } from 'lucide-react';
+import { contractService } from '@/services/contractService';
+import { FileText, Save, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function BuatPermohonanPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
-  const [fetchingAirports, setFetchingAirports] = useState(true);
-  const [airports, setAirports] = useState<Airport[]>([]);
   const [fetchingAssets, setFetchingAssets] = useState(true);
   const [allAvailableAssets, setAllAvailableAssets] = useState<Asset[]>([]);
   const [availableAssets, setAvailableAssets] = useState<Asset[]>([]);
   const [tenantAircrafts, setTenantAircrafts] = useState<Aircraft[]>([]);
   const [fetchingAircrafts, setFetchingAircrafts] = useState(true);
   
-  const [selectedAirportId, setSelectedAirportId] = useState('');
+  const [checkingContract, setCheckingContract] = useState(true);
+  const [hasActiveContract, setHasActiveContract] = useState(false);
+  const [activeContractId, setActiveContractId] = useState<number | null>(null);
+  
+  // Hangar Capacity State
+  const [assetCapacity, setAssetCapacity] = useState<{ isHangar: boolean, totalArea: number, usedArea: number, remainingArea: number } | null>(null);
+  const [fetchingCapacity, setFetchingCapacity] = useState(false);
   
   const [formData, setFormData] = useState({
     asset_id: '',
@@ -38,12 +43,19 @@ export default function BuatPermohonanPage() {
   });
 
   useEffect(() => {
-    airportService.getAll().then((data: any) => {
-      setAirports(data.data || data); // Just in case it returns {data: [...]} or directly the array
-      setFetchingAirports(false);
-    }).catch((err: any) => {
-      console.error(err);
-      setFetchingAirports(false);
+    // Check if tenant has an active contract
+    contractService.getTenantContracts().then((contracts) => {
+      const active = contracts.find(c => c.status === 'Active');
+      if (active && active.id !== undefined) {
+        setHasActiveContract(true);
+        setActiveContractId(active.id);
+      } else {
+        setHasActiveContract(false);
+      }
+      setCheckingContract(false);
+    }).catch(err => {
+      console.error("Error checking contracts:", err);
+      setCheckingContract(false);
     });
 
     // Ambil daftar aset yang Available
@@ -91,22 +103,25 @@ export default function BuatPermohonanPage() {
     });
   }, []);
 
-  const handleAirportChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const airportId = e.target.value;
-    setSelectedAirportId(airportId);
-    setFormData(prev => ({ ...prev, asset_id: '' })); // reset asset selection
-
-    if (airportId) {
-      const filtered = allAvailableAssets.filter(a => a.airport_id?.toString() === airportId);
-      setAvailableAssets(filtered);
-    } else {
-      setAvailableAssets(allAvailableAssets);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Fetch capacity if asset is changed
+    if (name === 'asset_id' && value) {
+      setFetchingCapacity(true);
+      try {
+        const capacity = await assetService.getAssetCapacity(parseInt(value));
+        setAssetCapacity(capacity);
+      } catch (err) {
+        console.error('Failed to fetch capacity', err);
+        setAssetCapacity(null);
+      } finally {
+        setFetchingCapacity(false);
+      }
+    } else if (name === 'asset_id' && !value) {
+      setAssetCapacity(null);
+    }
   };
 
   const handleNeedsChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -114,8 +129,25 @@ export default function BuatPermohonanPage() {
     setSpecificNeeds(prev => ({ ...prev, [name]: value }));
   };
 
+  // Calculate required area based on selected aircrafts
+  const calculateRequiredArea = () => {
+    let area = 0;
+    specificNeeds.aircraft_ids.forEach(idStr => {
+      const aircraft = tenantAircrafts.find(a => a.id.toString() === idStr);
+      if (aircraft && aircraft.aircraft_types && aircraft.aircraft_types.luas_efektif_m2) {
+        area += parseFloat(aircraft.aircraft_types.luas_efektif_m2.toString());
+      }
+    });
+    return area;
+  };
+  const requiredArea = calculateRequiredArea();
+  const isOverCapacity = assetCapacity?.isHangar && requiredArea > assetCapacity.remainingArea;
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isOverCapacity) return;
+    
     setLoading(true);
     try {
       const payload = {
@@ -130,6 +162,37 @@ export default function BuatPermohonanPage() {
       setLoading(false);
     }
   };
+
+  if (checkingContract) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#3c8dbc]" />
+      </div>
+    );
+  }
+
+  if (!hasActiveContract) {
+    return (
+      <div className="max-w-3xl mx-auto py-8">
+        <div className="bg-white border-t-4 border-yellow-500 shadow-md p-8 text-center rounded">
+          <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Kontrak Payung Diperlukan</h2>
+          <p className="text-gray-600 mb-6">
+            Anda belum memiliki Kontrak Pemanfaatan Aset (Kontrak Payung) yang berstatus Aktif. 
+            Sesuai prosedur operasional, Anda diwajibkan memiliki Kontrak Payung 1 Tahun sebelum dapat mengajukan permohonan jadwal kedatangan sewa.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Link 
+              href="/tenant" 
+              className="px-6 py-2 bg-gray-200 text-gray-700 font-bold rounded hover:bg-gray-300 transition-colors"
+            >
+              Kembali ke Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
@@ -156,31 +219,15 @@ export default function BuatPermohonanPage() {
               <h4 className="font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]">Pemilihan Aset & Periode</h4>
               
               <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-1">Pilih Bandara <span className="text-red-500">*</span></label>
-                <select required value={selectedAirportId} onChange={handleAirportChange} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white">
-                  <option value="">-- Semua Bandara --</option>
-                  {fetchingAirports ? (
-                    <option disabled>Memuat daftar bandara...</option>
-                  ) : (
-                    airports.map(airport => (
-                      <option key={airport.id} value={airport.id}>
-                        {airport.nama_bandara} ({airport.kode_bandara})
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-              
-              <div className="mb-4">
                 <label className="block text-[13px] font-bold text-[#333] mb-1">Objek Aset Utama yang Diminati <span className="text-red-500">*</span></label>
                 <p className="text-[11px] text-[#777] mb-2">Pilih aset yang statusnya sedang tersedia saat ini. (Penetapan akhir akan diputuskan oleh Admin)</p>
-                <select required name="asset_id" value={formData.asset_id} onChange={handleChange} disabled={!selectedAirportId && availableAssets.length > 0} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white disabled:bg-gray-100 disabled:text-gray-500">
+                <select required name="asset_id" value={formData.asset_id} onChange={handleChange} disabled={fetchingAssets} className="w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] bg-white disabled:bg-gray-100 disabled:text-gray-500">
                   <option value="">-- Pilih Aset --</option>
                   {fetchingAssets ? (
                     <option disabled>Memuat daftar aset...</option>
                   ) : (
-                    availableAssets.length === 0 && selectedAirportId ? (
-                      <option disabled>Tidak ada aset tersedia di bandara ini</option>
+                    availableAssets.length === 0 ? (
+                      <option disabled>Tidak ada aset tersedia</option>
                     ) : (
                       availableAssets.map(asset => (
                         <option key={asset.id} value={asset.id}>
@@ -190,6 +237,26 @@ export default function BuatPermohonanPage() {
                     )
                   )}
                 </select>
+                
+                {/* Hangar Capacity Display */}
+                {fetchingCapacity && <div className="mt-2 text-sm text-gray-500 flex items-center"><Loader2 className="w-4 h-4 mr-2 animate-spin"/> Mengecek kapasitas...</div>}
+                {assetCapacity?.isHangar && !fetchingCapacity && (
+                  <div className={`mt-3 p-3 border rounded-sm ${isOverCapacity ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[13px] font-bold text-gray-700">Kapasitas Hanggar:</span>
+                      <span className={`text-[13px] font-bold ${isOverCapacity ? 'text-red-600' : 'text-blue-600'}`}>
+                        Sisa: {Math.max(0, assetCapacity.remainingArea - requiredArea)} m²
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                      <div className={`h-2.5 rounded-full ${isOverCapacity ? 'bg-red-600' : 'bg-blue-600'}`} style={{ width: `${Math.min(100, ((assetCapacity.usedArea + requiredArea) / assetCapacity.totalArea) * 100)}%` }}></div>
+                    </div>
+                    <div className="text-[11px] text-gray-500 flex justify-between">
+                      <span>Terpakai: {assetCapacity.usedArea + requiredArea} m²</span>
+                      <span>Total: {assetCapacity.totalArea} m²</span>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Menampilkan Detail Aset & Bandara yang Terpilih */}
                 {formData.asset_id && (() => {
@@ -216,7 +283,7 @@ export default function BuatPermohonanPage() {
                           <div>
                             <h5 className="font-bold text-[#00a65a] mb-2 border-b border-green-200 pb-1">Data Aset Utama</h5>
                             <p><strong>Nama Aset:</strong> {selectedAsset.nama_aset}</p>
-                            <p><strong>Dimensi:</strong> {selectedAsset.luas} {selectedAsset.satuan}</p>
+                            {!isHangar && <p><strong>Dimensi:</strong> {selectedAsset.luas} {selectedAsset.satuan}</p>}
                             <p><strong>Kapasitas:</strong> {selectedAsset.kapasitas || '-'}</p>
                           </div>
                         </div>
@@ -287,47 +354,88 @@ export default function BuatPermohonanPage() {
             </div>
 
             <div>
-              <h4 className="font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]">Rincian Kebutuhan Spesifik (Opsional)</h4>
-              
-              <div className="mb-4">
-                <label className="block text-[13px] font-bold text-[#333] mb-2">Pilih Armada Pesawat</label>
-                <div className="border border-[#d2d6de] rounded-sm max-h-[200px] overflow-y-auto bg-white p-2">
-                  {fetchingAircrafts ? (
-                    <div className="text-sm text-gray-500 p-2">Memuat armada pesawat...</div>
-                  ) : tenantAircrafts.length === 0 ? (
-                    <div className="text-sm text-gray-500 p-2">Tidak ada armada pesawat tersedia yang belum terkait kontrak.</div>
-                  ) : (
-                    tenantAircrafts.map(aircraft => {
-                      const isSelected = specificNeeds.aircraft_ids.includes(aircraft.id.toString());
-                      return (
-                        <label key={aircraft.id} className="flex items-center p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0">
-                          <input 
-                            type="checkbox" 
-                            className="mr-3 w-4 h-4 text-[#00a65a] rounded focus:ring-[#00a65a]"
-                            checked={isSelected}
-                            onChange={(e) => {
-                               if (e.target.checked) {
-                                 setSpecificNeeds(prev => ({ ...prev, aircraft_ids: [...prev.aircraft_ids, aircraft.id.toString()] }));
-                               } else {
-                                 setSpecificNeeds(prev => ({ ...prev, aircraft_ids: prev.aircraft_ids.filter(id => id !== aircraft.id.toString()) }));
-                               }
-                            }}
-                          />
-                          <div>
-                            <div className="font-bold text-[#333] text-[13px]">{aircraft.registration_number}</div>
-                            <div className="text-[11px] text-[#777]">{aircraft.aircraft_type} - MTOW: {aircraft.mtow || '-'} Kg</div>
-                          </div>
-                        </label>
-                      );
-                    })
+              {user?.jenis_tenant === 'Maskapai' && (
+              <div>
+                <h4 className="font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]">Rincian Kebutuhan Spesifik (Opsional)</h4>
+                
+                <div className="mb-4">
+                  <label className="block text-[13px] font-bold text-[#333] mb-2">Pilih Armada Pesawat</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[250px] overflow-y-auto p-1">
+                    {fetchingAircrafts ? (
+                      <div className="text-sm text-gray-500 col-span-2">Memuat armada pesawat...</div>
+                    ) : tenantAircrafts.length === 0 ? (
+                      <div className="text-sm text-gray-500 col-span-2">Tidak ada armada pesawat tersedia yang belum terkait kontrak.</div>
+                    ) : (
+                      tenantAircrafts.map(aircraft => {
+                        const isSelected = specificNeeds.aircraft_ids.includes(aircraft.id.toString());
+                        return (
+                          <label 
+                            key={aircraft.id} 
+                            className={`flex items-start p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                              isSelected 
+                                ? 'border-[#00a65a] bg-[#00a65a]/10 shadow-sm' 
+                                : 'border-gray-200 bg-white hover:border-[#00a65a]/50 hover:bg-gray-50'
+                            }`}
+                          >
+                            <input 
+                              type="checkbox" 
+                              className="sr-only"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                 if (e.target.checked) {
+                                   setSpecificNeeds(prev => ({ ...prev, aircraft_ids: [...prev.aircraft_ids, aircraft.id.toString()] }));
+                                 } else {
+                                   setSpecificNeeds(prev => ({ ...prev, aircraft_ids: prev.aircraft_ids.filter(id => id !== aircraft.id.toString()) }));
+                                 }
+                              }}
+                            />
+                            <div className={`mt-0.5 p-1.5 rounded-md mr-3 flex-shrink-0 ${isSelected ? 'bg-[#00a65a] text-white' : 'bg-gray-100 text-gray-500'}`}>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.7l-1.2 3.6c-.1.4 0 .9.4 1.1l7.3 4.2-2.9 2.9-3.7-.7c-.4-.1-.9.2-1.1.6l-.6 1.8c-.1.4.1.8.4 1l4.2 1.4 1.4 4.2c.2.3.6.5 1 .4l1.8-.6c.4-.2.7-.7.6-1.1l-.7-3.7 2.9-2.9 4.2 7.3c.2.4.7.5 1.1.4l3.6-1.2c.5-.2.8-.6.7-1.1z"/></svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className={`font-bold text-[14px] leading-tight truncate ${isSelected ? 'text-[#00a65a]' : 'text-gray-800'}`}>
+                                {aircraft.registration_number}
+                              </div>
+                              <div className="text-[11px] text-gray-500 mt-1 line-clamp-2">
+                                {aircraft.aircraft_types?.jenis_pesawat}
+                              </div>
+                              <div className="flex items-center gap-2 mt-1.5 text-[10px] font-semibold">
+                                <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded border border-gray-200">
+                                  MTOW: {aircraft.mtow || '-'} Kg
+                                </span>
+                                {aircraft.aircraft_types?.luas_efektif_m2 && (
+                                  <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100">
+                                    Luas: {aircraft.aircraft_types.luas_efektif_m2} m²
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* Checkmark icon for selected state */}
+                            {isSelected && (
+                              <div className="ml-2 text-[#00a65a]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                              </div>
+                            )}
+                          </label>
+                        );
+                      })
+                    )}
+                  </div>
+                  {specificNeeds.aircraft_ids.length > 0 && (
+                     <div className="mt-2 text-[11px] text-[#00a65a] font-bold bg-[#e8f5e9] p-2 rounded flex justify-between">
+                       <span>{specificNeeds.aircraft_ids.length} armada dipilih. Tarif akan diakumulasikan.</span>
+                       <span>Luas dibutuhkan: {requiredArea} m²</span>
+                     </div>
+                  )}
+                  {isOverCapacity && (
+                    <div className="mt-2 text-[11px] text-red-600 font-bold bg-red-50 border border-red-200 p-2 rounded flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1"/> Kapasitas hanggar tidak mencukupi untuk jumlah pesawat yang dipilih!
+                    </div>
                   )}
                 </div>
-                {specificNeeds.aircraft_ids.length > 0 && (
-                   <div className="mt-2 text-[11px] text-[#00a65a] font-bold bg-[#e8f5e9] p-2 rounded">
-                     {specificNeeds.aircraft_ids.length} armada dipilih. Tarif akan diakumulasikan.
-                   </div>
-                )}
               </div>
+              )}
 
               <div className="mb-4">
                 <label className="block text-[13px] font-bold text-[#333] mb-1">Kebutuhan Ruang Pendukung Khusus</label>
@@ -339,7 +447,7 @@ export default function BuatPermohonanPage() {
           </div>
 
           <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-[#f4f4f4]">
-            <button type="submit" disabled={loading} className="bg-[#00a65a] text-white px-5 py-2 text-[14px] font-bold hover:bg-[#008d4c] transition-colors rounded-sm flex items-center shadow-sm disabled:opacity-70">
+            <button type="submit" disabled={loading || isOverCapacity} className={`px-5 py-2 text-[14px] font-bold transition-colors rounded-sm flex items-center shadow-sm disabled:opacity-70 ${isOverCapacity ? 'bg-gray-400 text-white cursor-not-allowed' : 'bg-[#00a65a] text-white hover:bg-[#008d4c]'}`}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
               Kirim Permohonan
             </button>

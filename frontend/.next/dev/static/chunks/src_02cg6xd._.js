@@ -18,6 +18,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$left$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowLeft$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/arrow-left.mjs [app-client] (ecmascript) <export default as ArrowLeft>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs [app-client] (ecmascript) <export default as Loader2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/store/useAuthStore.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -29,9 +30,11 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
 function BuatPermohonanPage() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
+    const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthStore"])();
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [fetchingAirports, setFetchingAirports] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [airports, setAirports] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -179,12 +182,12 @@ function BuatPermohonanPage() {
                     children: "Buat Permohonan Sewa Baru"
                 }, void 0, false, {
                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                    lineNumber: 137,
+                    lineNumber: 139,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                lineNumber: 136,
+                lineNumber: 138,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -200,14 +203,14 @@ function BuatPermohonanPage() {
                                         className: "w-5 h-5 mr-2 text-[#00a65a]"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                        lineNumber: 145,
+                                        lineNumber: 147,
                                         columnNumber: 13
                                     }, this),
                                     " Formulir Pengajuan"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                lineNumber: 144,
+                                lineNumber: 146,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -218,20 +221,20 @@ function BuatPermohonanPage() {
                                         className: "w-4 h-4 mr-1"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                        lineNumber: 148,
+                                        lineNumber: 150,
                                         columnNumber: 13
                                     }, this),
                                     " Kembali"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                lineNumber: 147,
+                                lineNumber: 149,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                        lineNumber: 143,
+                        lineNumber: 145,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -248,7 +251,7 @@ function BuatPermohonanPage() {
                                                 children: "Pemilihan Aset & Periode"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 156,
+                                                lineNumber: 158,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -263,13 +266,13 @@ function BuatPermohonanPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 159,
+                                                                lineNumber: 161,
                                                                 columnNumber: 95
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 159,
+                                                        lineNumber: 161,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -283,7 +286,7 @@ function BuatPermohonanPage() {
                                                                 children: "-- Semua Bandara --"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 161,
+                                                                lineNumber: 163,
                                                                 columnNumber: 19
                                                             }, this),
                                                             fetchingAirports ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -291,7 +294,7 @@ function BuatPermohonanPage() {
                                                                 children: "Memuat daftar bandara..."
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 163,
+                                                                lineNumber: 165,
                                                                 columnNumber: 21
                                                             }, this) : airports.map((airport)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                                     value: airport.id,
@@ -303,19 +306,19 @@ function BuatPermohonanPage() {
                                                                     ]
                                                                 }, airport.id, true, {
                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                    lineNumber: 166,
+                                                                    lineNumber: 168,
                                                                     columnNumber: 23
                                                                 }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 160,
+                                                        lineNumber: 162,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 158,
+                                                lineNumber: 160,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -330,13 +333,13 @@ function BuatPermohonanPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 175,
+                                                                lineNumber: 177,
                                                                 columnNumber: 112
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 175,
+                                                        lineNumber: 177,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -344,7 +347,7 @@ function BuatPermohonanPage() {
                                                         children: "Pilih aset yang statusnya sedang tersedia saat ini. (Penetapan akhir akan diputuskan oleh Admin)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 176,
+                                                        lineNumber: 178,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -360,7 +363,7 @@ function BuatPermohonanPage() {
                                                                 children: "-- Pilih Aset --"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 178,
+                                                                lineNumber: 180,
                                                                 columnNumber: 19
                                                             }, this),
                                                             fetchingAssets ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -368,14 +371,14 @@ function BuatPermohonanPage() {
                                                                 children: "Memuat daftar aset..."
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 180,
+                                                                lineNumber: 182,
                                                                 columnNumber: 21
                                                             }, this) : availableAssets.length === 0 && selectedAirportId ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                                 disabled: true,
                                                                 children: "Tidak ada aset tersedia di bandara ini"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 183,
+                                                                lineNumber: 185,
                                                                 columnNumber: 23
                                                             }, this) : availableAssets.map((asset)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                                     value: asset.id,
@@ -392,13 +395,13 @@ function BuatPermohonanPage() {
                                                                     ]
                                                                 }, asset.id, true, {
                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                    lineNumber: 186,
+                                                                    lineNumber: 188,
                                                                     columnNumber: 25
                                                                 }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 177,
+                                                        lineNumber: 179,
                                                         columnNumber: 17
                                                     }, this),
                                                     formData.asset_id && (()=>{
@@ -415,7 +418,7 @@ function BuatPermohonanPage() {
                                                                     children: "Rincian Objek Sewa"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                    lineNumber: 205,
+                                                                    lineNumber: 207,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -431,7 +434,7 @@ function BuatPermohonanPage() {
                                                                                             children: "Data Bandara"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 211,
+                                                                                            lineNumber: 213,
                                                                                             columnNumber: 29
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -440,7 +443,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Nama:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 212,
+                                                                                                    lineNumber: 214,
                                                                                                     columnNumber: 32
                                                                                                 }, this),
                                                                                                 " ",
@@ -448,7 +451,7 @@ function BuatPermohonanPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 212,
+                                                                                            lineNumber: 214,
                                                                                             columnNumber: 29
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -457,7 +460,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Kode:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 213,
+                                                                                                    lineNumber: 215,
                                                                                                     columnNumber: 32
                                                                                                 }, this),
                                                                                                 " ",
@@ -465,7 +468,7 @@ function BuatPermohonanPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 213,
+                                                                                            lineNumber: 215,
                                                                                             columnNumber: 29
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -474,7 +477,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Lokasi:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 214,
+                                                                                                    lineNumber: 216,
                                                                                                     columnNumber: 32
                                                                                                 }, this),
                                                                                                 " ",
@@ -482,13 +485,13 @@ function BuatPermohonanPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 214,
+                                                                                            lineNumber: 216,
                                                                                             columnNumber: 29
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                    lineNumber: 210,
+                                                                                    lineNumber: 212,
                                                                                     columnNumber: 27
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -498,7 +501,7 @@ function BuatPermohonanPage() {
                                                                                             children: "Data Aset Utama"
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 217,
+                                                                                            lineNumber: 219,
                                                                                             columnNumber: 29
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -507,7 +510,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Nama Aset:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 218,
+                                                                                                    lineNumber: 220,
                                                                                                     columnNumber: 32
                                                                                                 }, this),
                                                                                                 " ",
@@ -515,7 +518,7 @@ function BuatPermohonanPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 218,
+                                                                                            lineNumber: 220,
                                                                                             columnNumber: 29
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -524,7 +527,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Dimensi:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 219,
+                                                                                                    lineNumber: 221,
                                                                                                     columnNumber: 32
                                                                                                 }, this),
                                                                                                 " ",
@@ -534,7 +537,7 @@ function BuatPermohonanPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 219,
+                                                                                            lineNumber: 221,
                                                                                             columnNumber: 29
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -543,7 +546,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Kapasitas:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 220,
+                                                                                                    lineNumber: 222,
                                                                                                     columnNumber: 32
                                                                                                 }, this),
                                                                                                 " ",
@@ -551,19 +554,19 @@ function BuatPermohonanPage() {
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 220,
+                                                                                            lineNumber: 222,
                                                                                             columnNumber: 29
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                    lineNumber: 216,
+                                                                                    lineNumber: 218,
                                                                                     columnNumber: 27
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                            lineNumber: 209,
+                                                                            lineNumber: 211,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         isHangar && spec && Object.keys(spec).length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -574,7 +577,7 @@ function BuatPermohonanPage() {
                                                                                     children: "Spesifikasi Detail Hanggar"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                    lineNumber: 226,
+                                                                                    lineNumber: 228,
                                                                                     columnNumber: 29
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -587,7 +590,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Tinggi Bangunan:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 228,
+                                                                                                    lineNumber: 230,
                                                                                                     columnNumber: 36
                                                                                                 }, this),
                                                                                                 " ",
@@ -595,7 +598,7 @@ function BuatPermohonanPage() {
                                                                                                     className: "hidden sm:block"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 228,
+                                                                                                    lineNumber: 230,
                                                                                                     columnNumber: 92
                                                                                                 }, this),
                                                                                                 " ",
@@ -604,74 +607,8 @@ function BuatPermohonanPage() {
                                                                                                     children: spec.tinggi_bangunan || '-'
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 228,
+                                                                                                    lineNumber: 230,
                                                                                                     columnNumber: 126
-                                                                                                }, this)
-                                                                                            ]
-                                                                                        }, void 0, true, {
-                                                                                            fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 228,
-                                                                                            columnNumber: 31
-                                                                                        }, this),
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                            children: [
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                    className: "text-gray-500",
-                                                                                                    children: "Pintu Hanggar:"
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 229,
-                                                                                                    columnNumber: 36
-                                                                                                }, this),
-                                                                                                " ",
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {
-                                                                                                    className: "hidden sm:block"
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 229,
-                                                                                                    columnNumber: 90
-                                                                                                }, this),
-                                                                                                " ",
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                    className: "font-medium",
-                                                                                                    children: spec.pintu_hanggar || '-'
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 229,
-                                                                                                    columnNumber: 124
-                                                                                                }, this)
-                                                                                            ]
-                                                                                        }, void 0, true, {
-                                                                                            fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 229,
-                                                                                            columnNumber: 31
-                                                                                        }, this),
-                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                            children: [
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                    className: "text-gray-500",
-                                                                                                    children: "Listrik:"
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 230,
-                                                                                                    columnNumber: 36
-                                                                                                }, this),
-                                                                                                " ",
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {
-                                                                                                    className: "hidden sm:block"
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 230,
-                                                                                                    columnNumber: 84
-                                                                                                }, this),
-                                                                                                " ",
-                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                                    className: "font-medium",
-                                                                                                    children: spec.fasilitas_listrik || '-'
-                                                                                                }, void 0, false, {
-                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 230,
-                                                                                                    columnNumber: 118
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
@@ -683,7 +620,7 @@ function BuatPermohonanPage() {
                                                                                             children: [
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                                     className: "text-gray-500",
-                                                                                                    children: "Air:"
+                                                                                                    children: "Pintu Hanggar:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 231,
@@ -695,16 +632,16 @@ function BuatPermohonanPage() {
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 231,
-                                                                                                    columnNumber: 80
+                                                                                                    columnNumber: 90
                                                                                                 }, this),
                                                                                                 " ",
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                                     className: "font-medium",
-                                                                                                    children: spec.fasilitas_air || '-'
+                                                                                                    children: spec.pintu_hanggar || '-'
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 231,
-                                                                                                    columnNumber: 114
+                                                                                                    columnNumber: 124
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
@@ -716,7 +653,7 @@ function BuatPermohonanPage() {
                                                                                             children: [
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                                     className: "text-gray-500",
-                                                                                                    children: "Fire Safety:"
+                                                                                                    children: "Listrik:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 232,
@@ -728,16 +665,16 @@ function BuatPermohonanPage() {
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 232,
-                                                                                                    columnNumber: 88
+                                                                                                    columnNumber: 84
                                                                                                 }, this),
                                                                                                 " ",
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                                     className: "font-medium",
-                                                                                                    children: spec.fire_safety || '-'
+                                                                                                    children: spec.fasilitas_listrik || '-'
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 232,
-                                                                                                    columnNumber: 122
+                                                                                                    columnNumber: 118
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
@@ -749,7 +686,7 @@ function BuatPermohonanPage() {
                                                                                             children: [
                                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                                     className: "text-gray-500",
-                                                                                                    children: "Koneksi Apron:"
+                                                                                                    children: "Air:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 233,
@@ -761,6 +698,72 @@ function BuatPermohonanPage() {
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                                                                     lineNumber: 233,
+                                                                                                    columnNumber: 80
+                                                                                                }, this),
+                                                                                                " ",
+                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                    className: "font-medium",
+                                                                                                    children: spec.fasilitas_air || '-'
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                                    lineNumber: 233,
+                                                                                                    columnNumber: 114
+                                                                                                }, this)
+                                                                                            ]
+                                                                                        }, void 0, true, {
+                                                                                            fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                            lineNumber: 233,
+                                                                                            columnNumber: 31
+                                                                                        }, this),
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                            children: [
+                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                    className: "text-gray-500",
+                                                                                                    children: "Fire Safety:"
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                                    lineNumber: 234,
+                                                                                                    columnNumber: 36
+                                                                                                }, this),
+                                                                                                " ",
+                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {
+                                                                                                    className: "hidden sm:block"
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                                    lineNumber: 234,
+                                                                                                    columnNumber: 88
+                                                                                                }, this),
+                                                                                                " ",
+                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                    className: "font-medium",
+                                                                                                    children: spec.fire_safety || '-'
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                                    lineNumber: 234,
+                                                                                                    columnNumber: 122
+                                                                                                }, this)
+                                                                                            ]
+                                                                                        }, void 0, true, {
+                                                                                            fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                            lineNumber: 234,
+                                                                                            columnNumber: 31
+                                                                                        }, this),
+                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                            children: [
+                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                    className: "text-gray-500",
+                                                                                                    children: "Koneksi Apron:"
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                                    lineNumber: 235,
+                                                                                                    columnNumber: 36
+                                                                                                }, this),
+                                                                                                " ",
+                                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {
+                                                                                                    className: "hidden sm:block"
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                                    lineNumber: 235,
                                                                                                     columnNumber: 90
                                                                                                 }, this),
                                                                                                 " ",
@@ -769,13 +772,13 @@ function BuatPermohonanPage() {
                                                                                                     children: spec.apron_connection || '-'
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 233,
+                                                                                                    lineNumber: 235,
                                                                                                     columnNumber: 124
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 233,
+                                                                                            lineNumber: 235,
                                                                                             columnNumber: 31
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -786,7 +789,7 @@ function BuatPermohonanPage() {
                                                                                                     children: "Office & Toilet:"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 234,
+                                                                                                    lineNumber: 236,
                                                                                                     columnNumber: 59
                                                                                                 }, this),
                                                                                                 " ",
@@ -794,7 +797,7 @@ function BuatPermohonanPage() {
                                                                                                     className: "hidden sm:block"
                                                                                                 }, void 0, false, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 234,
+                                                                                                    lineNumber: 236,
                                                                                                     columnNumber: 115
                                                                                                 }, this),
                                                                                                 " ",
@@ -807,44 +810,44 @@ function BuatPermohonanPage() {
                                                                                                     ]
                                                                                                 }, void 0, true, {
                                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                                    lineNumber: 234,
+                                                                                                    lineNumber: 236,
                                                                                                     columnNumber: 149
                                                                                                 }, this)
                                                                                             ]
                                                                                         }, void 0, true, {
                                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                            lineNumber: 234,
+                                                                                            lineNumber: 236,
                                                                                             columnNumber: 31
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                    lineNumber: 227,
+                                                                                    lineNumber: 229,
                                                                                     columnNumber: 29
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                            lineNumber: 225,
+                                                                            lineNumber: 227,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                    lineNumber: 208,
+                                                                    lineNumber: 210,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                            lineNumber: 204,
+                                                            lineNumber: 206,
                                                             columnNumber: 21
                                                         }, this);
                                                     })()
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 174,
+                                                lineNumber: 176,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -859,13 +862,13 @@ function BuatPermohonanPage() {
                                                                 children: "*"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 245,
+                                                                lineNumber: 247,
                                                                 columnNumber: 102
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 245,
+                                                        lineNumber: 247,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -879,7 +882,7 @@ function BuatPermohonanPage() {
                                                                         children: "Tanggal Mulai"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 248,
+                                                                        lineNumber: 250,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -891,13 +894,13 @@ function BuatPermohonanPage() {
                                                                         className: "w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] transition-colors"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 249,
+                                                                        lineNumber: 251,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 247,
+                                                                lineNumber: 249,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -905,7 +908,7 @@ function BuatPermohonanPage() {
                                                                 children: "s/d"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 251,
+                                                                lineNumber: 253,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -916,7 +919,7 @@ function BuatPermohonanPage() {
                                                                         children: "Tanggal Selesai"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 253,
+                                                                        lineNumber: 255,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -928,13 +931,13 @@ function BuatPermohonanPage() {
                                                                         className: "w-full border border-[#d2d6de] px-3 py-2 text-[14px] outline-none focus:border-[#3c8dbc] transition-colors"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 254,
+                                                                        lineNumber: 256,
                                                                         columnNumber: 21
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 252,
+                                                                lineNumber: 254,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -945,7 +948,7 @@ function BuatPermohonanPage() {
                                                                         children: "Durasi"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 257,
+                                                                        lineNumber: 259,
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     (()=>{
@@ -964,7 +967,7 @@ function BuatPermohonanPage() {
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                    lineNumber: 267,
+                                                                                    lineNumber: 269,
                                                                                     columnNumber: 29
                                                                                 }, this);
                                                                             }
@@ -974,20 +977,20 @@ function BuatPermohonanPage() {
                                                                             children: "-"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                            lineNumber: 274,
+                                                                            lineNumber: 276,
                                                                             columnNumber: 25
                                                                         }, this);
                                                                     })()
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 256,
+                                                                lineNumber: 258,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 246,
+                                                        lineNumber: 248,
                                                         columnNumber: 17
                                                     }, this),
                                                     formData.start_date && formData.end_date && new Date(formData.end_date) < new Date(formData.start_date) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -995,144 +998,152 @@ function BuatPermohonanPage() {
                                                         children: "Tanggal selesai tidak boleh mendahului tanggal mulai."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 282,
+                                                        lineNumber: 284,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 244,
+                                                lineNumber: 246,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                        lineNumber: 155,
+                                        lineNumber: 157,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                                className: "font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]",
-                                                children: "Rincian Kebutuhan Spesifik (Opsional)"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 290,
-                                                columnNumber: 15
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "mb-4",
+                                            user?.jenis_tenant === 'Maskapai' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                        className: "block text-[13px] font-bold text-[#333] mb-2",
-                                                        children: "Pilih Armada Pesawat"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 293,
-                                                        columnNumber: 17
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "border border-[#d2d6de] rounded-sm max-h-[200px] overflow-y-auto bg-white p-2",
-                                                        children: fetchingAircrafts ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-sm text-gray-500 p-2",
-                                                            children: "Memuat armada pesawat..."
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                            lineNumber: 296,
-                                                            columnNumber: 21
-                                                        }, this) : tenantAircrafts.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "text-sm text-gray-500 p-2",
-                                                            children: "Tidak ada armada pesawat tersedia yang belum terkait kontrak."
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                            lineNumber: 298,
-                                                            columnNumber: 21
-                                                        }, this) : tenantAircrafts.map((aircraft)=>{
-                                                            const isSelected = specificNeeds.aircraft_ids.includes(aircraft.id.toString());
-                                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                                className: "flex items-center p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0",
-                                                                children: [
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                                        type: "checkbox",
-                                                                        className: "mr-3 w-4 h-4 text-[#00a65a] rounded focus:ring-[#00a65a]",
-                                                                        checked: isSelected,
-                                                                        onChange: (e)=>{
-                                                                            if (e.target.checked) {
-                                                                                setSpecificNeeds((prev)=>({
-                                                                                        ...prev,
-                                                                                        aircraft_ids: [
-                                                                                            ...prev.aircraft_ids,
-                                                                                            aircraft.id.toString()
-                                                                                        ]
-                                                                                    }));
-                                                                            } else {
-                                                                                setSpecificNeeds((prev)=>({
-                                                                                        ...prev,
-                                                                                        aircraft_ids: prev.aircraft_ids.filter((id)=>id !== aircraft.id.toString())
-                                                                                    }));
-                                                                            }
-                                                                        }
-                                                                    }, void 0, false, {
-                                                                        fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 304,
-                                                                        columnNumber: 27
-                                                                    }, this),
-                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                        children: [
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "font-bold text-[#333] text-[13px]",
-                                                                                children: aircraft.registration_number
-                                                                            }, void 0, false, {
-                                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                lineNumber: 317,
-                                                                                columnNumber: 29
-                                                                            }, this),
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                                className: "text-[11px] text-[#777]",
-                                                                                children: [
-                                                                                    aircraft.aircraft_type,
-                                                                                    " - MTOW: ",
-                                                                                    aircraft.mtow || '-',
-                                                                                    " Kg"
-                                                                                ]
-                                                                            }, void 0, true, {
-                                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                                lineNumber: 318,
-                                                                                columnNumber: 29
-                                                                            }, this)
-                                                                        ]
-                                                                    }, void 0, true, {
-                                                                        fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                        lineNumber: 316,
-                                                                        columnNumber: 27
-                                                                    }, this)
-                                                                ]
-                                                            }, aircraft.id, true, {
-                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                                lineNumber: 303,
-                                                                columnNumber: 25
-                                                            }, this);
-                                                        })
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                                        className: "font-bold text-[#333] mb-4 pb-2 border-b border-[#f4f4f4]",
+                                                        children: "Rincian Kebutuhan Spesifik (Opsional)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
                                                         lineNumber: 294,
                                                         columnNumber: 17
                                                     }, this),
-                                                    specificNeeds.aircraft_ids.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "mt-2 text-[11px] text-[#00a65a] font-bold bg-[#e8f5e9] p-2 rounded",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mb-4",
                                                         children: [
-                                                            specificNeeds.aircraft_ids.length,
-                                                            " armada dipilih. Tarif akan diakumulasikan."
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                className: "block text-[13px] font-bold text-[#333] mb-2",
+                                                                children: "Pilih Armada Pesawat"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                lineNumber: 297,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "border border-[#d2d6de] rounded-sm max-h-[200px] overflow-y-auto bg-white p-2",
+                                                                children: fetchingAircrafts ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-sm text-gray-500 p-2",
+                                                                    children: "Memuat armada pesawat..."
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                    lineNumber: 300,
+                                                                    columnNumber: 23
+                                                                }, this) : tenantAircrafts.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "text-sm text-gray-500 p-2",
+                                                                    children: "Tidak ada armada pesawat tersedia yang belum terkait kontrak."
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                    lineNumber: 302,
+                                                                    columnNumber: 23
+                                                                }, this) : tenantAircrafts.map((aircraft)=>{
+                                                                    const isSelected = specificNeeds.aircraft_ids.includes(aircraft.id.toString());
+                                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                                        className: "flex items-center p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0",
+                                                                        children: [
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                                                type: "checkbox",
+                                                                                className: "mr-3 w-4 h-4 text-[#00a65a] rounded focus:ring-[#00a65a]",
+                                                                                checked: isSelected,
+                                                                                onChange: (e)=>{
+                                                                                    if (e.target.checked) {
+                                                                                        setSpecificNeeds((prev)=>({
+                                                                                                ...prev,
+                                                                                                aircraft_ids: [
+                                                                                                    ...prev.aircraft_ids,
+                                                                                                    aircraft.id.toString()
+                                                                                                ]
+                                                                                            }));
+                                                                                    } else {
+                                                                                        setSpecificNeeds((prev)=>({
+                                                                                                ...prev,
+                                                                                                aircraft_ids: prev.aircraft_ids.filter((id)=>id !== aircraft.id.toString())
+                                                                                            }));
+                                                                                    }
+                                                                                }
+                                                                            }, void 0, false, {
+                                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                lineNumber: 308,
+                                                                                columnNumber: 29
+                                                                            }, this),
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "font-bold text-[#333] text-[13px]",
+                                                                                        children: aircraft.registration_number
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                        lineNumber: 321,
+                                                                                        columnNumber: 31
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "text-[11px] text-[#777]",
+                                                                                        children: [
+                                                                                            aircraft.aircraft_type,
+                                                                                            " - MTOW: ",
+                                                                                            aircraft.mtow || '-',
+                                                                                            " Kg"
+                                                                                        ]
+                                                                                    }, void 0, true, {
+                                                                                        fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                        lineNumber: 322,
+                                                                                        columnNumber: 31
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
+                                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                                lineNumber: 320,
+                                                                                columnNumber: 29
+                                                                            }, this)
+                                                                        ]
+                                                                    }, aircraft.id, true, {
+                                                                        fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                        lineNumber: 307,
+                                                                        columnNumber: 27
+                                                                    }, this);
+                                                                })
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                lineNumber: 298,
+                                                                columnNumber: 19
+                                                            }, this),
+                                                            specificNeeds.aircraft_ids.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "mt-2 text-[11px] text-[#00a65a] font-bold bg-[#e8f5e9] p-2 rounded",
+                                                                children: [
+                                                                    specificNeeds.aircraft_ids.length,
+                                                                    " armada dipilih. Tarif akan diakumulasikan."
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
+                                                                lineNumber: 330,
+                                                                columnNumber: 22
+                                                            }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 326,
-                                                        columnNumber: 20
+                                                        lineNumber: 296,
+                                                        columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 292,
+                                                lineNumber: 293,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1143,7 +1154,7 @@ function BuatPermohonanPage() {
                                                         children: "Kebutuhan Ruang Pendukung Khusus"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 333,
+                                                        lineNumber: 339,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -1155,25 +1166,25 @@ function BuatPermohonanPage() {
                                                         placeholder: "Misal: Membutuhkan apron connection luas, ruang office, atau daya listrik besar..."
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                        lineNumber: 334,
+                                                        lineNumber: 340,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                                lineNumber: 332,
+                                                lineNumber: 338,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                        lineNumber: 289,
+                                        lineNumber: 291,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                lineNumber: 153,
+                                lineNumber: 155,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1187,49 +1198,50 @@ function BuatPermohonanPage() {
                                             className: "w-4 h-4 animate-spin mr-2"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                            lineNumber: 343,
+                                            lineNumber: 349,
                                             columnNumber: 26
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$save$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Save$3e$__["Save"], {
                                             className: "w-4 h-4 mr-2"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                            lineNumber: 343,
+                                            lineNumber: 349,
                                             columnNumber: 78
                                         }, this),
                                         "Kirim Permohonan"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                    lineNumber: 342,
+                                    lineNumber: 348,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                                lineNumber: 341,
+                                lineNumber: 347,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                        lineNumber: 152,
+                        lineNumber: 154,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-                lineNumber: 142,
+                lineNumber: 144,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/tenant/permohonan/buat/page.tsx",
-        lineNumber: 135,
+        lineNumber: 137,
         columnNumber: 5
     }, this);
 }
-_s(BuatPermohonanPage, "f0V1yBubIE7fiMLH6sxg5M4QevU=", false, function() {
+_s(BuatPermohonanPage, "90fBn8eSlhL+0tbAMrbl/fOAIzw=", false, function() {
     return [
-        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$store$2f$useAuthStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuthStore"]
     ];
 });
 _c = BuatPermohonanPage;

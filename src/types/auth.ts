@@ -10,6 +10,7 @@ export interface UserData {
   tenant_id?: number | null;
   tenant_id_str?: string | null;
   nama_perusahaan?: string | null;
+  jenis_tenant?: string | null;
   status_verifikasi?: string | null;
 }
 
@@ -26,6 +27,7 @@ export interface RegisterTenantPayload {
   username: string;
   password?: string; // Optional depending on if we send it securely
   nama_perusahaan: string;
+  jenis_tenant?: string;
   nib?: string;
   npwp?: string;
   alamat?: string;

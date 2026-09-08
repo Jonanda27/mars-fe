@@ -22,6 +22,11 @@ export const assetService = {
     return response.data.data;
   },
 
+  getAssetCapacity: async (id: number): Promise<{ isHangar: boolean, totalArea: number, usedArea: number, remainingArea: number }> => {
+    const response = await api.get(`/assets/${id}/capacity`);
+    return response.data.data;
+  },
+
   deleteAsset: async (id: number): Promise<void> => {
     await api.delete(`/assets/${id}`);
   }

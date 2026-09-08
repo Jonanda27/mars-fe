@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useWarningStore } from '@/store/useWarningStore';
 import { AlertTriangle, Home, Search, Loader2, Info } from 'lucide-react';
-import formatRupiah from '@/utils/formatCurrency';
+import { formatRupiah } from '@/utils/formatCurrency';
 
 export default function AdminPeringatanPage() {
   const { warnings, isLoading, error, fetchAllWarnings } = useWarningStore();
@@ -75,7 +75,7 @@ export default function AdminPeringatanPage() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="font-semibold text-[#3c8dbc]">{warn.tenants?.nama_perusahaan}</div>
-                        <div className="text-xs text-gray-500">Status: {warn.tenants?.status_pembayaran}</div>
+                        <div className="text-xs text-gray-500">Status: {warn.tenants?.status_verifikasi}</div>
                       </td>
                       <td className="py-3 px-4">
                         {warn.invoices ? (

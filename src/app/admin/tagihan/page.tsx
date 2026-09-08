@@ -22,6 +22,21 @@ export default function AdminTagihanSKRDPage() {
     fetchInvoices();
   }, []);
 
+  const getBaseUrl = () => {
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  };
+
+  const getFileUrl = (path: string) => {
+    if (!path) return '#';
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    // Handle legacy local uploads that don't have the full path
+    const isLegacy = !path.includes('/') && !path.startsWith('http');
+    const fullPath = isLegacy ? `/uploads/receipts/${path}` : (path.startsWith('/') ? path : `/${path}`);
+    return `${getBaseUrl()}${fullPath}`;
+  };
+
   const fetchInvoices = async () => {
     try {
       const data = await invoiceService.getAllInvoices();
@@ -231,12 +246,12 @@ export default function AdminTagihanSKRDPage() {
                  <h3 className="font-bold text-gray-700 mb-4">Lampiran Bukti Bayar:</h3>
                  {verifyingInvoice.payment_receipt ? (
                     verifyingInvoice.payment_receipt.endsWith('.pdf') ? (
-                       <a href={`http://localhost:5000/uploads/receipts/${verifyingInvoice.payment_receipt}`} target="_blank" rel="noreferrer" className="text-blue-600 underline font-bold flex items-center">
+                       <a href={getFileUrl(verifyingInvoice.payment_receipt)} target="_blank" rel="noreferrer" className="text-blue-600 underline font-bold flex items-center">
                          <FileText className="w-5 h-5 mr-2" /> Buka Dokumen PDF
                        </a>
                     ) : (
                        <img 
-                         src={`http://localhost:5000/uploads/receipts/${verifyingInvoice.payment_receipt}`} 
+                         src={getFileUrl(verifyingInvoice.payment_receipt)} 
                          alt="Bukti Bayar"
                          className="max-w-full max-h-[400px] object-contain shadow-sm border border-gray-200"
                        />

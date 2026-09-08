@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import Sidebar from './Sidebar';
 import TenantSidebar from './TenantSidebar';
+import PetugasSidebar from './PetugasSidebar';
 import TopNavbar from './TopNavbar';
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -27,18 +28,21 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
   }, [user, pathname, router]);
 
-  // Jika di halaman awal (Login), register, atau portal Eksekutif, tampilkan full-screen tanpa sidebar
-  if (noSidebarRoutes.includes(pathname) || pathname.startsWith('/eksekutif') || pathname === '/admin/dashboard') {
+  // Jika di halaman awal (Login), register, atau portal Eksekutif, tampilkan full-screen tanpa sidebar utama
+  if (noSidebarRoutes.includes(pathname) || pathname.startsWith('/eksekutif') || pathname.startsWith('/cetak') || pathname === '/admin/dashboard') {
     return <>{children}</>;
   }
 
-  const isTenant = pathname.startsWith('/tenant');
+  const isTenant = user?.role === 'Tenant' || pathname.startsWith('/tenant');
+  const isPetugas = user?.role === 'Petugas' || pathname.startsWith('/petugas');
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#ecf0f5]">
-      {/* Sidebar (Admin or Tenant) */}
+      {/* Sidebar (Admin, Tenant, or Petugas) */}
       {isTenant ? (
         <TenantSidebar isOpen={isSidebarOpen} />
+      ) : isPetugas ? (
+        <PetugasSidebar isOpen={isSidebarOpen} />
       ) : (
         <Sidebar isOpen={isSidebarOpen} />
       )}
