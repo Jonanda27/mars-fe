@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { assetService } from '@/services/assetService';
 import { Asset } from '@/types/asset';
 import { Building, MapPin, Plus, Edit, Trash2, Home, Search, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function MasterAsetPage() {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -31,9 +32,10 @@ export default function MasterAsetPage() {
     if (confirm(`Apakah Anda yakin ingin menghapus aset ${kode}?`)) {
       try {
         await assetService.deleteAsset(id);
+        toast.success('Aset berhasil dihapus');
         fetchAssets();
       } catch (error) {
-        alert('Gagal menghapus aset');
+        toast.error('Gagal menghapus aset');
       }
     }
   };
@@ -66,17 +68,15 @@ export default function MasterAsetPage() {
         </div>
       </header>
 
-      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
-        <div className="p-3 border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <Building className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Daftar Aset & Fasilitas
-          </h3>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Daftar Aset & Fasilitas</h3>
           <Link href="/admin/aset/tambah" className="bg-[#3c8dbc] text-white px-3 py-1.5 text-[12px] font-medium hover:bg-[#367fa9] transition-colors flex items-center rounded-sm">
             <Plus className="w-4 h-4 mr-1" /> Tambah Aset
           </Link>
         </div>
         
-        <div className="p-4 border-b border-[#f4f4f4] bg-white flex flex-col sm:flex-row justify-between items-center gap-3">
+        <div className="p-4 border-b border-[#f4f4f4] flex flex-col sm:flex-row justify-between items-center gap-3">
           <div className="flex items-center gap-2 text-[13px] text-[#333]">
             <span>Filter Jenis:</span>
             <select 
@@ -91,8 +91,8 @@ export default function MasterAsetPage() {
             </select>
           </div>
           <div className="relative">
-            <input type="text" placeholder="Cari aset..." className="border border-[#d2d6de] pl-8 pr-3 py-1.5 text-[13px] outline-none focus:border-[#3c8dbc] w-full sm:w-64" />
-            <Search className="w-4 h-4 text-[#777] absolute left-2.5 top-2" />
+            <input type="text" placeholder="Cari aset..." className="border border-[#d2d6de] pl-8 pr-3 py-1 text-sm outline-none focus:border-[#3c8dbc] w-full sm:w-64" />
+            <Search className="w-4 h-4 text-[#777] absolute left-2.5 top-1.5" />
           </div>
         </div>
 
@@ -102,15 +102,15 @@ export default function MasterAsetPage() {
               <Loader2 className="w-6 h-6 animate-spin mr-2" /> Memuat data aset...
             </div>
           ) : (
-            <table className="w-full text-[14px] text-left">
+            <table className="w-full text-[14px] text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#f4f4f4] bg-slate-50 text-[#333]">
-                  <th className="py-3 px-4 font-bold w-[120px]">KODE ASET</th>
+                <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
+                  <th className="py-3 px-4 font-bold">KODE ASET</th>
                   <th className="py-3 px-4 font-bold">JENIS</th>
                   <th className="py-3 px-4 font-bold">NAMA ASET</th>
                   <th className="py-3 px-4 font-bold">LUAS / KAPASITAS</th>
                   <th className="py-3 px-4 font-bold">STATUS</th>
-                  <th className="py-3 px-4 font-bold text-center w-[150px]">AKSI</th>
+                  <th className="py-3 px-4 font-bold text-center">AKSI</th>
                 </tr>
               </thead>
               <tbody>

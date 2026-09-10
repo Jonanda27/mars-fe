@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { tenantService } from '@/services/tenantService';
+import { getBaseUrl } from '@/services/api';
 import { Tenant } from '@/types/tenant';
 import { ShieldCheck, XCircle, Clock, Search, ExternalLink, X, FileText, User, MapPin, Building2, Phone, Mail, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import toast from 'react-hot-toast';
 
 export default function VerifikasiTenantPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
@@ -16,9 +18,7 @@ export default function VerifikasiTenantPage() {
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   
-  const getBaseUrl = () => {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  };
+  // Using getBaseUrl from api.ts (imported above)
 
   const getFileUrl = (path: string) => {
     if (!path) return '#';
@@ -64,7 +64,7 @@ export default function VerifikasiTenantPage() {
         await tenantService.verifyTenant(id, 'Verified');
         fetchTenants();
       } catch (err: any) {
-        alert(err.message || 'Gagal memverifikasi tenant');
+        toast.error(err.message || 'Gagal memverifikasi tenant');
       }
     }
   };
@@ -78,7 +78,7 @@ export default function VerifikasiTenantPage() {
   const submitReject = async () => {
     if (!rejectTenantId) return;
     if (!rejectReason.trim()) {
-      alert('Alasan penolakan wajib diisi');
+      toast.error('Alasan penolakan wajib diisi');
       return;
     }
     
@@ -88,7 +88,7 @@ export default function VerifikasiTenantPage() {
       setShowRejectModal(false);
       setRejectTenantId(null);
     } catch (err: any) {
-      alert(err.message || 'Gagal menolak tenant');
+      toast.error(err.message || 'Gagal menolak tenant');
     }
   };
 

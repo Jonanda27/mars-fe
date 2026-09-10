@@ -25,5 +25,20 @@ export const rentalService = {
   updateApplicationStatus: async (id: number, status: string, asset_id?: number): Promise<RentalApplication> => {
     const response = await api.put(`/rentals/${id}/status`, { status, asset_id });
     return response.data.data;
+  },
+
+  verifyLetter: async (id: number, status: string): Promise<RentalApplication> => {
+    const response = await api.patch(`/rentals/${id}/verify-letter`, { status });
+    return response.data.data;
+  },
+
+  approveKadis: async (id: number): Promise<RentalApplication> => {
+    const response = await api.patch(`/rentals/${id}/approve-kadis`);
+    return response.data.data;
+  },
+
+  completeDetails: async (id: number, data: any): Promise<RentalApplication> => {
+    const response = await api.patch(`/rentals/${id}/complete-details`, data);
+    return response.data.data;
   }
 };

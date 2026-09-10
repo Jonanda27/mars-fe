@@ -36,23 +36,21 @@ export default function AdminPenyewaPage() {
   );
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Verifikasi & Manajemen Penyewa (Tenant)
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Penyewa <small className="text-[15px] font-light text-[#777] ml-2">Manajemen & Verifikasi (Tenant)</small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Penyewa</span>
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Penyewa</span>
         </div>
       </header>
 
       <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex-1 flex flex-col">
-        <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <Users className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Master Data Maskapai & Operator
-          </h3>
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Master Data Maskapai & Operator</h3>
           
-          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <div className="flex gap-2">
             {/* Search Box */}
             <div className="flex">
               <input 
@@ -60,9 +58,9 @@ export default function AdminPenyewaPage() {
                 placeholder="Cari Nama atau ID..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border border-[#d2d6de] border-r-0 px-3 py-1.5 text-[13px] focus:outline-none focus:border-[#3c8dbc] min-w-[250px]" 
+                className="border border-[#d2d6de] border-r-0 px-3 py-1 text-sm focus:outline-none focus:border-[#3c8dbc] min-w-[250px]" 
               />
-              <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1.5 hover:bg-[#e0e0e0] transition-colors">
+              <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1 hover:bg-[#e0e0e0] transition-colors">
                 <Search className="w-4 h-4 text-[#777]" />
               </button>
             </div>

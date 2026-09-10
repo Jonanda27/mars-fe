@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { 
+import toast from 'react-hot-toast';
   RefreshCcw, Search, Download, CheckCircle, 
   XCircle, Filter, FileSpreadsheet, ArrowRightLeft, DollarSign 
 } from 'lucide-react';
@@ -13,18 +14,18 @@ export default function AdminRekonsiliasiPage() {
     setIsSyncing(true);
     setTimeout(() => {
       setIsSyncing(false);
-      alert("Sinkronisasi Selesai! Menemukan 3 transaksi baru dari Bank Papua yang cocok dengan SKRD.");
+      toast.success("Sinkronisasi Selesai! Menemukan 3 transaksi baru dari Bank Papua yang cocok dengan SKRD.");
     }, 2000);
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Rekonsiliasi Pendapatan Daerah
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Rekonsiliasi <small className="text-[15px] font-light text-[#777] ml-2">Pendapatan Daerah</small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Rekonsiliasi</span>
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Rekonsiliasi</span>
         </div>
       </header>
 
@@ -77,23 +78,21 @@ export default function AdminRekonsiliasiPage() {
       </div>
 
       {/* Tabel Jurnal Mutasi & Pencocokan */}
-      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex-1 flex flex-col mt-2">
-        <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <DollarSign className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Jurnal Rekonsiliasi (Bank vs Sistem MARS)
-          </h3>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm mt-4">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Jurnal Rekonsiliasi (Bank vs Sistem MARS)</h3>
           
           <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             {/* Filter Date */}
             <div className="flex items-center border border-[#d2d6de] bg-white px-2">
               <Filter className="w-4 h-4 text-[#777] mr-2" />
-              <input type="date" className="py-1.5 text-[13px] focus:outline-none text-[#555] bg-transparent" defaultValue="2026-09-15" />
+              <input type="date" className="py-1 text-sm focus:outline-none text-[#555] bg-transparent" defaultValue="2026-09-15" />
             </div>
 
             {/* Search Box */}
             <div className="flex">
-              <input type="text" placeholder="Cari Kode VA atau Ref..." className="border border-[#d2d6de] border-r-0 px-3 py-1.5 text-[13px] focus:outline-none focus:border-[#3c8dbc] min-w-[200px]" />
-              <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1.5 hover:bg-[#e0e0e0] transition-colors">
+              <input type="text" placeholder="Cari Kode VA atau Ref..." className="border border-[#d2d6de] border-r-0 px-3 py-1 text-sm focus:outline-none focus:border-[#3c8dbc] min-w-[200px]" />
+              <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1 hover:bg-[#e0e0e0] transition-colors">
                 <Search className="w-4 h-4 text-[#777]" />
               </button>
             </div>
@@ -103,7 +102,7 @@ export default function AdminRekonsiliasiPage() {
         <div className="p-0 overflow-x-auto">
           <table className="w-full text-left border-collapse text-[14px]">
             <thead>
-              <tr className="border-b-2 border-[#f4f4f4] text-[#444] uppercase text-[12px] bg-white">
+              <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
                 <th className="py-4 px-5 font-bold">Waktu Transaksi (Bank)</th>
                 <th className="py-4 px-5 font-bold">Keterangan Mutasi Masuk</th>
                 <th className="py-4 px-5 font-bold text-right">Nominal Masuk (Rp)</th>

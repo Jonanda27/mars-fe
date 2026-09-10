@@ -11,13 +11,13 @@ export default function AdminPemakaianPage() {
   const [kategoriTab, setKategoriTab] = useState('pesawat'); // 'pesawat' | 'utilitas'
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Log Pemakaian Harian & Utilitas
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Pemakaian <small className="text-[15px] font-light text-[#777] ml-2">Log Harian & Utilitas</small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Pemakaian</span>
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Pemakaian</span>
         </div>
       </header>
 
@@ -116,10 +116,9 @@ export default function AdminPemakaianPage() {
       )}
 
       {/* Tabel Database Log */}
-      <div className={`bg-white border-t-[3px] shadow-sm flex-1 flex flex-col ${kategoriTab === 'pesawat' ? 'border-[#3c8dbc]' : 'border-[#f39c12]'}`}>
-        <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <Activity className={`w-5 h-5 mr-2 ${kategoriTab === 'pesawat' ? 'text-[#3c8dbc]' : 'text-[#f39c12]'}`} /> 
+      <div className={`bg-white border-t-[3px] shadow-sm flex-1 flex flex-col mt-4 ${kategoriTab === 'pesawat' ? 'border-[#3c8dbc]' : 'border-[#f39c12]'}`}>
+        <div className="p-[10px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4">
+          <h3 className="text-[16px] text-[#444] font-normal">
             Database Log {kategoriTab === 'pesawat' ? 'Aktivitas Pesawat' : 'Pemakaian Listrik/Air'}
           </h3>
           
@@ -127,13 +126,13 @@ export default function AdminPemakaianPage() {
             {/* Filter Date */}
             <div className="flex items-center border border-[#d2d6de] bg-white px-2">
               <Filter className="w-4 h-4 text-[#777] mr-2" />
-              <input type="month" className="py-1.5 text-[13px] focus:outline-none text-[#555] bg-transparent" defaultValue="2026-09" />
+              <input type="month" className="py-1 text-sm focus:outline-none text-[#555] bg-transparent" defaultValue="2026-09" />
             </div>
 
             {/* Search Box */}
             <div className="flex">
-              <input type="text" placeholder="Cari Nama Maskapai..." className="border border-[#d2d6de] border-r-0 px-3 py-1.5 text-[13px] focus:outline-none focus:border-[#3c8dbc] min-w-[200px]" />
-              <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1.5 hover:bg-[#e0e0e0] transition-colors">
+              <input type="text" placeholder="Cari Nama Maskapai..." className="border border-[#d2d6de] border-r-0 px-3 py-1 text-sm focus:outline-none focus:border-[#3c8dbc] min-w-[200px]" />
+              <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1 hover:bg-[#e0e0e0] transition-colors">
                 <Search className="w-4 h-4 text-[#777]" />
               </button>
             </div>
@@ -141,7 +140,7 @@ export default function AdminPemakaianPage() {
             {!showForm && (
               <button 
                 onClick={() => setShowForm(true)}
-                className={`${kategoriTab === 'pesawat' ? 'bg-[#3c8dbc] hover:bg-[#367fa9]' : 'bg-[#f39c12] hover:bg-[#e08e0b]'} text-white text-[13px] font-bold px-4 py-1.5 transition-colors flex items-center justify-center shadow-sm whitespace-nowrap`}
+                className={`${kategoriTab === 'pesawat' ? 'bg-[#3c8dbc] hover:bg-[#367fa9]' : 'bg-[#f39c12] hover:bg-[#e08e0b]'} text-white text-[13px] font-bold px-4 py-1 transition-colors flex items-center justify-center shadow-sm whitespace-nowrap`}
               >
                 <Plus className="w-4 h-4 mr-1" /> Catat Pemakaian
               </button>

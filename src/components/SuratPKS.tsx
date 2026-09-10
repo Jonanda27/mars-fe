@@ -26,116 +26,144 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
         border: '1px solid #e2e8f0'
       }}
     >
-      <div className="text-center mb-8 font-bold underline text-[14pt]">
-        SURAT PERJANJIAN KERJASAMA
-      </div>
-
-      <div className="mb-4">
-        Saya yang bertanda tangan di bawah ini :
-      </div>
-
-      <table className="w-full mb-4">
-        <tbody>
-          <tr>
-            <td className="w-48 align-top">Nama</td>
-            <td className="w-4 align-top">:</td>
-            <td>Admin UPBU Bandara Mimika</td>
-          </tr>
-          <tr>
-            <td className="align-top">Jabatan</td>
-            <td className="align-top">:</td>
-            <td>Kepala UPBU / Pejabat Berwenang</td>
-          </tr>
-          <tr>
-            <td className="align-top">Instansi</td>
-            <td className="align-top">:</td>
-            <td>Kantor UPBU Bandara Mimika</td>
-          </tr>
-        </tbody>
-      </table>
-      <div className="mb-4">Yang mana selanjutnya akan disebut sebagai <b>Pihak Pertama</b>.</div>
-
-      <table className="w-full mb-4">
-        <tbody>
-          <tr>
-            <td className="w-48 align-top">Nama / Perusahaan</td>
-            <td className="w-4 align-top">:</td>
-            <td>{contract.tenants?.nama_perusahaan || '-'}</td>
-          </tr>
-          <tr>
-            <td className="align-top">PIC / Penanggung Jawab</td>
-            <td className="align-top">:</td>
-            <td>{contract.tenants?.pic || '-'}</td>
-          </tr>
-          <tr>
-            <td className="align-top">Alamat</td>
-            <td className="align-top">:</td>
-            <td>{contract.tenants?.alamat || '-'}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div className="mb-8">Selanjutnya akan disebut dengan <b>Pihak Kedua</b>.</div>
-
-      <div className="mb-4 text-justify">
-        Kedua belah pihak telah sepakat untuk mengadakan perjanjian sewa/penggunaan barang milik negara berupa {contract.assets?.nama_aset} dengan ketentuan-ketentuan yang diatur sebagai berikut ini :
-      </div>
-
-      <div className="text-center font-bold mb-2 mt-6">PASAL 1</div>
-      <div className="text-justify mb-4">
-        Dalam perjanjian ini Pihak Pertama memberikan hak kepada Pihak Kedua untuk menggunakan/menyewa <b>{contract.assets?.nama_aset}</b> seluas <b>{contract.luas} {contract.assets?.satuan}</b> yang berlokasi di {contract.assets?.lokasi}.
-      </div>
-
-      <div className="text-center font-bold mb-2 mt-6">PASAL 2</div>
-      <div className="text-justify mb-4">
-        Atas penggunaan aset tersebut, Pihak Kedua wajib membayar retribusi sebesar <b>{formatRupiah(contract.total_amount || 0)}</b>. Pembayaran dilakukan secara {contract.periode_pembayaran} sesuai tagihan SKRD yang diterbitkan.
-      </div>
-
-      <div className="text-center font-bold mb-2 mt-6">PASAL 3</div>
-      <div className="text-justify mb-4">
-        Masa berlaku perjanjian ini adalah mulai tanggal <b>{dayjs(contract.start_date).format('DD MMMM YYYY')}</b> sampai dengan <b>{dayjs(contract.end_date).format('DD MMMM YYYY')}</b>, dan dapat diperpanjang atas kesepakatan kedua belah pihak.
-      </div>
-
-      <div className="text-center font-bold mb-2 mt-6">PASAL 4</div>
-      <div className="text-justify mb-8">
-        Demikian surat perjanjian ini kami buat sebenar-benarnya dalam rangkap dua yang mana masing-masing rangkap mempunyai kekuatan hukum yang sama. Dan dalam pembuatan perjanjian kerjasama ini tidak ada paksaan dari pihak manapun.
-      </div>
-
-      <div className="text-right mb-10">
-        Mimika, {tanggalHariIni}
-      </div>
-
-      <div className="flex justify-between text-center px-4">
-        <div className="w-1/3 flex flex-col items-center">
-          <div className="mb-2">Pihak Pertama,</div>
-          <div className="h-24 w-full flex items-center justify-center mb-2 relative" style={{ borderBottom: '1px dotted rgba(0,0,0,0.3)' }}>
-            {contract.admin_signature ? (
-              <img src={contract.admin_signature} alt="TTE Admin" className="h-20 object-contain mix-blend-multiply" />
-            ) : (
-              <span className="italic text-sm" style={{ color: '#d1d5db' }}>(Tanda Tangan TTE)</span>
-            )}
-          </div>
-          <div>Admin UPBU</div>
+        <div style={{ position: 'absolute', top: '20mm', left: '20mm' }}>
+          <img src="/images/logo dishub .png" alt="Logo" style={{ width: '80px', height: 'auto' }} />
         </div>
 
-        <div className="w-1/3 flex flex-col items-center justify-end">
-          <div className="text-sm">(Materai 10000)</div>
+        <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '20px' }}>
+          <h2 style={{ margin: 0, fontSize: '14pt', fontWeight: 'bold', textDecoration: 'underline' }}>
+            SURAT PERJANJIAN KERJASAMA
+          </h2>
+          <p style={{ margin: '5px 0 0', fontSize: '12pt' }}>
+            Nomor: {contract.contract_number}
+          </p>
         </div>
 
-        <div className="w-1/3 flex flex-col items-center">
-          <div className="mb-2">Pihak Kedua,</div>
-          <div className="h-24 w-full flex items-center justify-center mb-2 relative" style={{ borderBottom: '1px dotted rgba(0,0,0,0.3)' }}>
-            {contract.tenant_signature ? (
-              <img src={contract.tenant_signature} alt="TTE Tenant" className="h-20 object-contain mix-blend-multiply" />
-            ) : (
-              <span className="italic text-sm" style={{ color: '#d1d5db' }}>(Tanda Tangan TTE)</span>
-            )}
-          </div>
-          <div>{contract.tenants?.pic || 'Pimpinan Perusahaan'}</div>
+        <div style={{ textAlign: 'justify', marginBottom: '15px' }}>
+          <p style={{ marginBottom: '10px' }}>Saya yang bertanda tangan di bawah ini :</p>
+          <table style={{ width: '100%', borderCollapse: 'collapse', paddingLeft: '20px', marginBottom: '5px' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '200px', verticalAlign: 'top', paddingLeft: '20px' }}>Nama</td>
+                <td style={{ width: '20px', verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>..........................................</td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>Jabatan</td>
+                <td style={{ verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>Kepala UPBU</td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>Alamat Instansi</td>
+                <td style={{ verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>Kantor UPBU</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style={{ margin: '5px 0 15px' }}>Dalam hal ini bertindak untuk dan atas nama UPBU, yang mana selanjutnya disebut sebagai Pihak Pertama.</p>
+
+          <table style={{ width: '100%', borderCollapse: 'collapse', paddingLeft: '20px', marginBottom: '5px' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '200px', verticalAlign: 'top', paddingLeft: '20px' }}>Nama Perusahaan</td>
+                <td style={{ width: '20px', verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}><strong>{contract.tenants?.nama_perusahaan || '-'}</strong></td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>Diwakili Oleh (PIC)</td>
+                <td style={{ verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>{contract.tenants?.pic || '..........................................'}</td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>NIB</td>
+                <td style={{ verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>{contract.tenants?.nib || '..........................................'}</td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>NPWP</td>
+                <td style={{ verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>{contract.tenants?.npwp || '..........................................'}</td>
+              </tr>
+              <tr>
+                <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>Alamat Perusahaan</td>
+                <td style={{ verticalAlign: 'top' }}>:</td>
+                <td style={{ verticalAlign: 'top' }}>{contract.tenants?.alamat || '..........................................'}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style={{ margin: '5px 0 15px' }}>Dalam hal ini bertindak untuk dan atas nama perusahaan tersebut, selanjutnya disebut sebagai Pihak Kedua.</p>
+        </div>
+
+        <div style={{ textAlign: 'justify', marginBottom: '20px' }}>
+          <p>
+            Kedua belah pihak telah sepakat untuk mengadakan kerjasama penyewaan aset dengan ketentuan-ketentuan yang diatur sebagai berikut ini :
+          </p>
+        </div>
+
+        <div style={{ textAlign: 'justify', marginBottom: '20px' }}>
+          <h4 style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' }}>PASAL 1</h4>
+          <p>
+            Dalam kerjasama ini Pihak Pertama akan menyewakan aset berupa <strong>{contract.assets?.nama_aset} (Kode: {contract.assets?.kode_aset})</strong> seluas <strong>{contract.luas || contract.assets?.luas} m²</strong> kepada Pihak Kedua dengan tujuan untuk {contract.jenis_pemanfaatan || 'operasional penerbangan/bandara'}. Masa sewa berlaku selama periode yang dihitung mulai tanggal <strong>{dayjs(contract.start_date).format('DD MMMM YYYY')}</strong> sampai dengan tanggal <strong>{dayjs(contract.end_date).format('DD MMMM YYYY')}</strong>.
+          </p>
+        </div>
+
+        <div style={{ textAlign: 'justify', marginBottom: '30px' }}>
+          <h4 style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' }}>PASAL 2</h4>
+          <p>
+            Pihak Kedua wajib membayar biaya sewa sebesar <strong>{formatRupiah(contract.total_amount || 0)}</strong> kepada Pihak Pertama. Pembayaran tersebut akan ditagihkan sesuai dengan ketentuan tagihan (invoice) yang akan diterbitkan oleh Pihak Pertama selama masa sewa berlangsung.
+          </p>
+        </div>
+
+        <div style={{ textAlign: 'justify', marginBottom: '30px' }}>
+          <h4 style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 'bold' }}>PASAL 3</h4>
+          <p>
+            Apabila terjadi perselisihan antar kedua belah pihak akan diselesaikan secara kekeluargaan terlebih dahulu. Dan apabila tidak ditemui jalan keluar baru akan diselesaikan secara hukum.
+          </p>
+        </div>
+
+        <div style={{ textAlign: 'justify', marginBottom: '40px' }}>
+          <p>
+            Demikian surat perjanjian ini kami buat sebenar-benarnya dalam rangkap dua yang mana masing-masing rangkap mempunyai kekuatan hukum yang sama. Dan dalam pembuatan perjanjian kerjasama ini tidak ada paksaan dari pihak manapun.
+          </p>
+        </div>
+
+        <div style={{ textAlign: 'right', marginBottom: '20px', paddingRight: '20px' }}>
+          <p>................., {tanggalHariIni}</p>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <table style={{ width: '100%', textAlign: 'center' }}>
+            <tbody>
+              <tr>
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <p style={{ marginBottom: '10px' }}>Pihak Pertama,</p>
+                  <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
+                    {contract.admin_signature ? (
+                      <img src={contract.admin_signature} alt="TTE Admin" style={{ height: '80px', objectFit: 'contain' }} />
+                    ) : (
+                      <span style={{ fontStyle: 'italic', color: '#ccc', fontSize: '10pt' }}>(Tanda Tangan TTE)</span>
+                    )}
+                  </div>
+                  <p>(..........................................)<br/>Kepala UPBU</p>
+                </td>
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <p style={{ marginBottom: '10px' }}>Pihak Kedua,</p>
+                  <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', position: 'relative' }}>
+                    <div style={{ position: 'absolute', fontSize: '10pt', color: '#666', zIndex: 0 }}>(Materai 10000)</div>
+                    {contract.tenant_signature && (
+                      <img src={contract.tenant_signature} alt="TTE Tenant" style={{ height: '80px', objectFit: 'contain', zIndex: 1, position: 'relative', mixBlendMode: 'multiply' }} />
+                    )}
+                  </div>
+                  <p>({contract.tenants?.pic || contract.tenants?.nama_perusahaan})</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 SuratPKS.displayName = 'SuratPKS';
 export default SuratPKS;

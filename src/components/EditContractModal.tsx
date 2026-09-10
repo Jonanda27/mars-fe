@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Contract } from '@/types/contract';
 import { Save, X, Loader2 } from 'lucide-react';
 import { contractService } from '@/services/contractService';
+import toast from 'react-hot-toast';
 
 interface EditContractModalProps {
   contract: Contract;
@@ -47,11 +48,11 @@ export default function EditContractModal({ contract, onClose, onSuccess }: Edit
       };
 
       await contractService.updateContract(contract.id as number, payload);
-      alert('Draft kontrak berhasil diubah!');
+      toast.success('Draft kontrak berhasil diubah!');
       onSuccess();
     } catch (error: any) {
       console.error(error);
-      alert('Gagal menyimpan perubahan: ' + error.message);
+      toast.error('Gagal menyimpan perubahan: ' + error.message);
     } finally {
       setLoading(false);
     }

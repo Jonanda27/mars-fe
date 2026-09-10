@@ -3,11 +3,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { contractService } from '@/services/contractService';
 import { Contract } from '@/types/contract';
-import { Loader2, AlertCircle, FileText, Upload, CheckCircle, X } from 'lucide-react';
+import { Loader2, AlertCircle, FileText, Upload, CheckCircle, X, Download } from 'lucide-react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 import { formatRupiah } from '@/utils/formatCurrency';
 import ContractPDFViewer from '@/components/ContractPDFViewer';
+import toast from 'react-hot-toast';
 
 dayjs.locale('id');
 
@@ -68,9 +69,9 @@ export default function TenantKontrakPage() {
       setContractToUpload(null);
       setSelectedFile(null);
       await fetchContracts();
-      alert('Dokumen berhasil diunggah. Menunggu verifikasi Admin.');
+      toast.success('Dokumen berhasil diunggah. Menunggu verifikasi Admin.');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Gagal mengunggah dokumen');
+      toast.error(error.response?.data?.message || 'Gagal mengunggah dokumen');
     } finally {
       setIsUploading(false);
     }
@@ -167,37 +168,90 @@ export default function TenantKontrakPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-gray-50">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Manajemen Kontrak</h1>
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333] flex items-center">
+          Manajemen Kontrak <small className="text-[15px] text-[#777] ml-2 font-light">Dokumen & Pemanfaatan</small>
+        </h1>
+      </header>
       
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 mb-6">
-        <button
-          className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${
-            activeTab === 'Payung' 
-              ? 'border-blue-600 text-blue-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          }`}
-          onClick={() => setActiveTab('Payung')}
-        >
-          Kontrak Payung
-        </button>
-        <button
-          className={`py-3 px-6 font-medium text-sm border-b-2 transition-colors ${
-            activeTab === 'Sewa' 
-              ? 'border-blue-600 text-blue-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          }`}
-          onClick={() => setActiveTab('Sewa')}
-        >
-          Kontrak Sewa
-        </button>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
+        {/* Tabs */}
+        <div className="flex border-b border-[#f4f4f4] bg-slate-50">
+          <button
+            className={`py-3 px-6 font-bold text-sm border-b-[3px] transition-colors ${
+              activeTab === 'Payung' 
+                ? 'border-[#3c8dbc] text-[#3c8dbc] bg-white' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => setActiveTab('Payung')}
+          >
+            Kontrak Payung
+          </button>
+          <button
+            className={`py-3 px-6 font-bold text-sm border-b-[3px] transition-colors ${
+              activeTab === 'Sewa' 
+                ? 'border-[#3c8dbc] text-[#3c8dbc] bg-white' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+            }`}
+            onClick={() => setActiveTab('Sewa')}
+          >
+            Kontrak Sewa
+          </button>
+        </div>
+
+        <div className="p-5">
+          {activeTab === 'Payung' ? (
+            payungContracts.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                {payungContracts[0].status === 'Menunggu TTD Tenant' && (
+                  <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 flex flex-col md:flex-row justify-between items-start md:items-center rounded-r gap-4">
+                    <div>
+                      <h3 className="font-bold text-yellow-800">Menunggu Tanda Tangan</h3>
+                      <p className="text-yellow-700 text-sm mt-1">
+                        Silakan unduh dokumen kontrak di bawah, cetak, beri <strong>tanda tangan basah dan meterai</strong>, kemudian <em>scan</em> dan unggah kembali dokumen tersebut.
+                      </p>
+                    </div>
+                    <div className="flex gap-2 w-full md:w-auto flex-shrink-0">
+                      <button 
+                        onClick={() => document.getElementById('download-pdf-btn')?.click()} 
+                        className="bg-slate-800 flex-1 md:flex-none justify-center text-white font-bold px-4 py-2.5 rounded-none text-sm hover:bg-slate-900 transition flex items-center shadow-sm"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Unduh PDF
+                      </button>
+                      <button 
+                        onClick={() => handleOpenUploadModal(payungContracts[0])} 
+                        className="bg-blue-600 flex-1 md:flex-none justify-center text-white font-bold px-4 py-2.5 rounded-none text-sm hover:bg-blue-700 transition flex items-center shadow-sm"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload TTD Basah
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {payungContracts[0].status === 'Menunggu Verifikasi Admin' && (
+                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 flex justify-between items-center rounded-r">
+                    <div>
+                      <h3 className="font-bold text-blue-800">Verifikasi Berkas</h3>
+                      <p className="text-blue-700 text-sm mt-1">
+                        Dokumen tertanda tangan telah berhasil diunggah dan saat ini sedang menunggu proses verifikasi oleh Admin.
+                      </p>
+                    </div>
+                    <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-bold flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-1.5" /> Sedang Diproses
+                    </div>
+                  </div>
+                )}
+                <ContractPDFViewer contract={payungContracts[0]} onClose={() => {}} isInline={true} />
+              </div>
+            ) : renderContractList(payungContracts)
+          ) : renderContractList(sewaContracts)}
+        </div>
       </div>
 
-      {activeTab === 'Payung' ? renderContractList(payungContracts) : renderContractList(sewaContracts)}
-
-      {/* Contract PDF Viewer Modal Overlay */}
-      {selectedContract && (
+      {/* Contract PDF Viewer Modal Overlay (for Sewa Contracts) */}
+      {selectedContract && activeTab === 'Sewa' && (
         <ContractPDFViewer 
           contract={selectedContract} 
           onClose={() => setSelectedContract(null)} 
@@ -206,34 +260,65 @@ export default function TenantKontrakPage() {
 
       {/* Upload Signature Modal */}
       {isUploadModalOpen && contractToUpload && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
-            <button 
-              onClick={() => setIsUploadModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-xl font-bold mb-4">Upload Dokumen Tertanda Tangan</h3>
-            <p className="text-sm text-gray-600 mb-6">
-              Silakan unggah dokumen PDF Kontrak ({contractToUpload.contract_number}) yang sudah dicetak, ditandatangani basah, dan di-scan.
-            </p>
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4 bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all border border-slate-200">
             
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Pilih File PDF</label>
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                accept="application/pdf,image/*"
-                onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
-            </div>
-            
-            <div className="flex justify-end gap-3">
+            {/* Modal Header */}
+            <div className="bg-slate-800 px-6 py-4 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-white tracking-wide">Upload TTD Basah</h3>
               <button 
                 onClick={() => setIsUploadModalOpen(false)}
-                className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50"
+                className="text-slate-400 hover:text-white transition-colors p-1 rounded-full hover:bg-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 text-blue-800 mb-6">
+                <Upload className="w-6 h-6 flex-shrink-0 text-blue-500 mt-0.5" />
+                <div>
+                  <p className="text-sm leading-relaxed">
+                    Unggah dokumen PDF Kontrak <strong className="text-blue-900">({contractToUpload.contract_number})</strong> yang sudah dicetak, ditandatangani basah, dan di-scan.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-slate-800 mb-3">Pilih Dokumen PDF <span className="text-red-500">*</span></label>
+                <div className="border-2 border-slate-200 border-dashed rounded-xl p-6 text-center hover:bg-slate-50 transition-colors group">
+                  <input 
+                    type="file" 
+                    id="file-upload-modal"
+                    ref={fileInputRef}
+                    accept="application/pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <label htmlFor="file-upload-modal" className="cursor-pointer flex flex-col items-center">
+                    <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <span className="font-bold text-blue-600 hover:text-blue-700 mb-1">Pilih File PDF</span>
+                    <span className="text-xs text-slate-500">Maksimal ukuran file 5MB</span>
+                  </label>
+                  
+                  {selectedFile && (
+                    <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm font-bold flex items-center justify-center">
+                      <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <span className="truncate max-w-[200px]">{selectedFile.name}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+              <button 
+                onClick={() => setIsUploadModalOpen(false)}
+                className="px-5 py-2.5 rounded-lg font-bold text-slate-600 hover:bg-slate-200 transition-colors border border-transparent hover:border-slate-300"
                 disabled={isUploading}
               >
                 Batal
@@ -241,7 +326,7 @@ export default function TenantKontrakPage() {
               <button 
                 onClick={handleUploadSubmit}
                 disabled={!selectedFile || isUploading}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                className="flex items-center px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all"
               >
                 {isUploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
                 {isUploading ? 'Mengunggah...' : 'Unggah Dokumen'}

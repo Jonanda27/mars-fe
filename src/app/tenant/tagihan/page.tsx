@@ -7,13 +7,15 @@ import { FileText, Loader2, CheckCircle2, Clock, AlertCircle, Banknote, Download
 import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
 import SuratSKRD from '@/components/SuratSKRD';
+import api from '@/services/api';
+import toast from 'react-hot-toast';
 
 export default function TenantTagihanPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   
-  // SKRD Modal state
+  // Payment Modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadInvoice, setUploadInvoice] = useState<Invoice | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('Transfer Bank Papua');
@@ -23,6 +25,21 @@ export default function TenantTagihanPage() {
   const [showSkrdModal, setShowSkrdModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const skrdRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
+
+  const fetchInvoices = async () => {
+    try {
+      const data = await invoiceService.getTenantInvoices();
+      setInvoices(data);
+    } catch (error) {
+      console.error('Failed to fetch invoices', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDownloadPdf = async () => {
     if (!skrdRef.current || !selectedInvoice) return;
@@ -42,25 +59,10 @@ export default function TenantTagihanPage() {
     html2pdf().set(opt).from(element).save();
   };
 
-  useEffect(() => {
-    fetchInvoices();
-  }, []);
-
-  const fetchInvoices = async () => {
-    try {
-      const data = await invoiceService.getTenantInvoices();
-      setInvoices(data);
-    } catch (error) {
-      console.error('Failed to fetch invoices', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleUploadReceipt = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadInvoice || !receiptFile) {
-        alert('Pilih file bukti bayar terlebih dahulu');
+        toast.error('Pilih file bukti bayar terlebih dahulu');
         return;
     }
     
@@ -70,26 +72,22 @@ export default function TenantTagihanPage() {
       formData.append('receipt', receiptFile);
       formData.append('payment_method', paymentMethod);
 
-      const res = await fetch(`http://localhost:5000/api/invoices/${uploadInvoice.id}/upload-receipt`, {
-        method: 'POST',
+      const res = await api.post(`/invoices/${uploadInvoice.id}/upload-receipt`, formData, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      if (res.ok) {
-        alert('Bukti bayar berhasil diunggah! Menunggu verifikasi admin.');
+      if (res.data.success) {
+        toast.success('Bukti bayar berhasil diunggah! Menunggu verifikasi admin.');
         setShowUploadModal(false);
         setReceiptFile(null);
         fetchInvoices();
-      } else {
-        const data = await res.json();
-        alert(`Gagal mengunggah bukti bayar: ${data.message || 'Unknown error'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Terjadi kesalahan saat mengunggah');
+      const msg = error.response?.data?.message || 'Terjadi kesalahan saat mengunggah';
+      toast.error(`Gagal mengunggah bukti bayar: ${msg}`);
     } finally {
       setIsPaying(false);
     }
@@ -338,7 +336,7 @@ export default function TenantTagihanPage() {
                       const file = e.target.files ? e.target.files[0] : null;
                       if (file) {
                         if (file.size > 2 * 1024 * 1024) {
-                          alert('Ukuran file melebihi 2MB! Silakan unggah file yang lebih kecil.');
+                          toast.error('Ukuran file melebihi 2MB! Silakan unggah file yang lebih kecil.');
                           e.target.value = ''; // Reset input
                           setReceiptFile(null);
                           return;
@@ -346,7 +344,7 @@ export default function TenantTagihanPage() {
                         
                         const allowedTypes = ['application/pdf', 'image/jpeg'];
                         if (!allowedTypes.includes(file.type)) {
-                          alert('Hanya file PDF dan JPG yang diperbolehkan!');
+                          toast.error('Hanya file PDF dan JPG yang diperbolehkan!');
                           e.target.value = ''; // Reset input
                           setReceiptFile(null);
                           return;

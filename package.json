@@ -12,6 +12,7 @@
     "@types/react-signature-canvas": "^1.0.7",
     "axios": "^1.20.0",
     "dayjs": "^1.11.23",
+    "framer-motion": "^13.2.0",
     "html2pdf.js": "^0.14.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.33.0",

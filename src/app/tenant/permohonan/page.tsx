@@ -35,6 +35,10 @@ export default function PermohonanTenantPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pending': return 'bg-[#f39c12] text-white';
+      case 'Menunggu Persetujuan Kadis': return 'bg-purple-500 text-white';
+      case 'Disetujui': return 'bg-[#00a65a] text-white';
+      case 'Ditolak': return 'bg-[#dd4b39] text-white';
+      case 'Draft Kontrak': return 'bg-blue-500 text-white';
       case 'Approved': return 'bg-[#00a65a] text-white';
       case 'Rejected': return 'bg-[#dd4b39] text-white';
       case 'Reviewed': return 'bg-[#3c8dbc] text-white';
@@ -100,21 +104,22 @@ export default function PermohonanTenantPage() {
                       <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor Tiket</div>
                       <div className="font-bold text-lg text-blue-700 group-hover:text-blue-800 transition-colors">{app.application_number}</div>
                     </div>
-                    <span className={`${getStatusColor(app.status)} text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wide shadow-sm inline-flex items-center`}>
-                      {app.status === 'Pending' && <Clock className="w-3.5 h-3.5 mr-1" />}
+                    <span className={`${getStatusColor(app.status)} text-[11px] font-bold px-3 py-1.5 rounded-full tracking-wide shadow-sm inline-flex items-center text-center leading-tight`}>
+                      {app.status === 'Menunggu Persetujuan Kadis' && <Clock className="w-3.5 h-3.5 mr-1" />}
                       {app.status}
                     </span>
                   </div>
                   
                   <div className="p-5 flex-1 flex flex-col gap-4">
                     <div>
-                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Aset yang Diminati</div>
+                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Tipe & Aset yang Diminati</div>
                       {app.assets ? (
                         <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center">
                           <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                             <FileText className="w-5 h-5 text-blue-600" />
                           </div>
                           <div>
+                            <div className="text-[11px] font-bold text-blue-600 mb-0.5">{app.application_type || 'Sewa Baru'}</div>
                             <div className="font-bold text-slate-800 leading-tight">{app.assets.nama_aset}</div>
                             <div className="text-[12px] text-slate-500 mt-0.5 font-medium">{app.assets.kode_aset} • {app.assets.jenis_aset}</div>
                           </div>
@@ -139,11 +144,11 @@ export default function PermohonanTenantPage() {
                   </div>
                   
                   <div className="bg-slate-50 p-4 border-t border-slate-100 flex flex-col gap-3">
-                    <div className="text-[12px] text-slate-500 flex justify-between items-center">
-                      <span>Diajukan pada {dayjs(app.created_at).format('DD MMM YYYY')}</span>
-                      {app.status === 'Signed' && app.signed_document_url && (
-                        <a href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/${app.signed_document_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:underline">Lihat TTD &rarr;</a>
-                      )}
+                    <div className="text-[12px] text-slate-500 flex justify-between items-center w-full">
+                      <span>Diajukan {dayjs(app.created_at).format('DD MMM YYYY')}</span>
+                      <Link href={`/tenant/permohonan/${app.id}`} className="text-blue-600 font-bold hover:underline bg-blue-50 px-3 py-1.5 rounded text-xs border border-blue-100">
+                        Lihat Detail &rarr;
+                      </Link>
                     </div>
                   </div>
                 </div>

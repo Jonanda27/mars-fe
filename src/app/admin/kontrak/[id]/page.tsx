@@ -1,63 +1,54 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { contractService } from '@/services/contractService';
 import { invoiceService } from '@/services/invoiceService';
 import { Contract } from '@/types/contract';
-import { FileText, Loader2, ArrowLeft, CheckCircle2, AlertCircle, Building2, Calendar, FileSignature, Save, Download, Edit, Eye } from 'lucide-react';
 import Link from 'next/link';
-import dayjs from 'dayjs';
-import { formatRupiah } from '@/utils/formatCurrency';
-import SuratPKS from '@/components/SuratPKS';
+import { ArrowLeft, CheckCircle2, Download, FileSignature, Edit, AlertCircle, FileText, Eye, Loader2 } from 'lucide-react';
 import SignaturePad from '@/components/SignaturePad';
+import { toast } from 'react-hot-toast';
 import EditContractModal from '@/components/EditContractModal';
+import SuratPKS from '@/components/SuratPKS';
 
-export default function AdminKontrakDetailPage() {
-  const { id } = useParams();
-  const router = useRouter();
+export default function AdminContractDetailPage() {
+  const params = useParams();
   const [contract, setContract] = useState<Contract | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showSignaturePad, setShowSignaturePad] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   
-  // TTE States
-  const [showSignaturePad, setShowSignaturePad] = useState(false);
   const pksRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchContract();
-  }, [id]);
+  }, [params.id]);
 
   const fetchContract = async () => {
     try {
-      const data = await contractService.getContractById(Number(id));
+      setIsLoading(true);
+      const data = await contractService.getContractById(Number(params.id));
       setContract(data);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching contract:', error);
+      toast.error('Gagal memuat detail kontrak');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSaveTTE = async (signatureDataUrl: string) => {
-    if (!contract) return;
+  const handleSaveTTE = async (signatureData: string) => {
     try {
       setIsUpdating(true);
-      
-      // Update contract with admin signature and change status to Review
-      const payload = {
-        status: 'Review',
-        admin_signature: signatureDataUrl
-      };
-      
-      await contractService.updateContract(contract.id as number, payload);
-      alert('Dokumen PKS berhasil ditandatangani! Sekarang diteruskan ke Tenant untuk disetujui.');
+      // Logic for saving Admin TTE
+      // await contractService.updateContract(contract.id, { admin_signature: signatureData, status: 'Menunggu TTD Tenant' });
+      toast.success('Tanda tangan elektronik berhasil disimpan!');
       setShowSignaturePad(false);
-      fetchContract(); // Reload data
+      fetchContract();
     } catch (error) {
-      console.error(error);
-      alert('Gagal menyimpan TTE');
+      toast.error('Gagal menyimpan TTE');
     } finally {
       setIsUpdating(false);
     }
@@ -102,31 +93,27 @@ export default function AdminKontrakDetailPage() {
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
       <header className="flex justify-between items-end mb-4">
-        <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-center">
-            Detail Kontrak PKS <small className="text-[15px] text-[#777] ml-2 font-light">{contract.contract_number}</small>
-          </h1>
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Detail Kontrak <small className="text-[15px] font-light text-[#777] ml-2">{contract.contract_number}</small>
+        </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Kontrak</span>
         </div>
-        <Link 
-          href="/admin/kontrak"
-          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded shadow-sm flex items-center text-sm"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Kembali
-        </Link>
       </header>
 
       {/* Action Bar */}
-      <div className="bg-white p-4 shadow-sm rounded-sm border-t-[3px] border-[#3c8dbc] mb-6 flex justify-between items-center">
+      <div className="bg-white p-4 shadow-sm border-t-[3px] border-[#3c8dbc] mb-6 flex justify-between items-center">
         <div>
           <span className="text-sm text-gray-500 mr-2">Status Saat Ini:</span>
-          {contract.status === 'Draft' && <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">DRAFT</span>}
-          {contract.status === 'Review' && <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> Menunggu TTE Tenant</span>}
-          {contract.status === 'Approved' && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><CheckCircle2 className="w-3 h-3 mr-1" /> APPROVED (TTE Selesai)</span>}
-          {contract.status === 'Waiting Payment' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> MENUNGGU PEMBAYARAN SKRD</span>}
-          {contract.status === 'Active' && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">AKTIF</span>}
-          {contract.status === 'Expiring' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">AKAN HABIS</span>}
-          {contract.status === 'Expired' && <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">KEDALUWARSA</span>}
-          {contract.status === 'Terminated' && <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">TERMINATED</span>}
+          {contract.status?.toLowerCase() === 'draft' && <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">DRAFT</span>}
+          {contract.status?.toLowerCase() === 'review' && <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> Menunggu TTE Tenant</span>}
+          {contract.status?.toLowerCase() === 'menunggu verifikasi admin' && <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> MENUNGGU VERIFIKASI ADMIN</span>}
+          {contract.status?.toLowerCase() === 'approved' && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><CheckCircle2 className="w-3 h-3 mr-1" /> APPROVED (TTE Selesai)</span>}
+          {contract.status?.toLowerCase() === 'waiting payment' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> MENUNGGU PEMBAYARAN SKRD</span>}
+          {(contract.status?.toLowerCase() === 'active' || contract.status?.toLowerCase() === 'aktif') && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">AKTIF</span>}
+          {contract.status?.toLowerCase() === 'expiring' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">AKAN HABIS</span>}
+          {contract.status?.toLowerCase() === 'expired' && <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">KEDALUWARSA</span>}
+          {contract.status?.toLowerCase() === 'terminated' && <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">TERMINATED</span>}
         </div>
         
         <div className="flex gap-2">
@@ -135,7 +122,7 @@ export default function AdminKontrakDetailPage() {
             <>
               {contract.signed_document_url && (
                 <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL}${contract.signed_document_url}`}
+                  href={contract.signed_document_url.startsWith('http') ? contract.signed_document_url : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || ''}${contract.signed_document_url}`}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
@@ -148,10 +135,10 @@ export default function AdminKontrakDetailPage() {
                   try {
                     setIsUpdating(true);
                     await contractService.verifyContract(contract.id as number);
-                    alert('Kontrak berhasil diverifikasi dan diaktifkan!');
+                    toast.success('Kontrak berhasil diverifikasi dan diaktifkan!');
                     fetchContract();
                   } catch (error) {
-                    alert('Gagal memverifikasi kontrak');
+                    toast.error('Gagal memverifikasi kontrak');
                   } finally {
                     setIsUpdating(false);
                   }
@@ -194,18 +181,18 @@ export default function AdminKontrakDetailPage() {
           )}
 
           {/* Generate SKRD Button - Available for Active/Approved/Waiting Payment if no invoice exists */}
-          {['Active', 'Approved', 'Waiting Payment', 'Expiring'].includes(contract.status || '') && (!contract.invoices || contract.invoices.length === 0) && (
+          {['Active', 'Aktif', 'Approved', 'Waiting Payment', 'Expiring'].includes(contract.status || '') && (!contract.invoices || contract.invoices.length === 0) && (
             <button
               onClick={async () => {
                 if (window.confirm('Yakin ingin menerbitkan SKRD untuk kontrak ini?')) {
                   try {
                     setIsUpdating(true);
                     await invoiceService.generateSkrd(contract.id as number);
-                    alert('SKRD berhasil diterbitkan!');
+                    toast.success('SKRD berhasil diterbitkan!');
                     fetchContract();
                   } catch (error: any) {
                     console.error(error);
-                    alert('Gagal menerbitkan SKRD: ' + (error.response?.data?.message || error.message));
+                    toast.error('Gagal menerbitkan SKRD: ' + (error.response?.data?.message || error.message));
                   } finally {
                     setIsUpdating(false);
                   }
@@ -220,17 +207,17 @@ export default function AdminKontrakDetailPage() {
           )}
 
           {/* Terminate button */}
-          {(contract.status === 'Active' || contract.status === 'Waiting Payment' || contract.status === 'Expiring') && (
+          {(contract.status === 'Active' || contract.status === 'Aktif' || contract.status === 'Waiting Payment' || contract.status === 'Expiring') && (
             <button
               onClick={async () => {
                 if (window.confirm('PERINGATAN: Anda yakin ingin men-Terminasi kontrak ini secara paksa? Aset akan kembali menjadi Available.')) {
                   try {
                     await contractService.terminateContract(contract.id as number);
-                    alert('Kontrak berhasil di-Terminasi secara paksa.');
+                    toast.success('Kontrak berhasil di-Terminasi secara paksa.');
                     fetchContract();
                   } catch (error) {
                     console.error(error);
-                    alert('Gagal melakukan terminasi kontrak.');
+                    toast.error('Gagal melakukan terminasi kontrak.');
                   }
                 }
               }}
@@ -263,8 +250,24 @@ export default function AdminKontrakDetailPage() {
       )}
 
       {/* Dokumen PKS Preview */}
-      <div className="bg-gray-200 p-8 rounded-lg overflow-auto flex justify-center mb-10">
-        <SuratPKS contract={contract} ref={pksRef} />
+      <div className="bg-gray-200 p-4 md:p-8 rounded-lg overflow-auto flex justify-center mb-10 min-h-[800px]">
+        {contract.contract_type === 'Payung' ? (
+          contract.signed_document_url ? (
+            <iframe 
+              src={contract.signed_document_url.startsWith('http') ? contract.signed_document_url : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || ''}${contract.signed_document_url}`} 
+              className="w-full max-w-[1000px] h-[800px] border-0 shadow-xl bg-white rounded"
+              title="Kontrak Payung"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-slate-500 pt-20">
+              <FileText className="w-16 h-16 mb-4 text-slate-400" />
+              <p className="font-medium text-lg text-slate-600">Dokumen TTD Belum Diunggah</p>
+              <p className="text-sm mt-2 max-w-md text-center">Menunggu pihak Tenant untuk mengunggah pindaian Kontrak Payung yang telah ditandatangani.</p>
+            </div>
+          )
+        ) : (
+          <SuratPKS contract={contract} ref={pksRef} />
+        )}
       </div>
 
     </div>

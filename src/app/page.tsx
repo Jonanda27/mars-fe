@@ -33,7 +33,7 @@ export default function LandingPage() {
           </nav>
           <div className="flex gap-4 items-center">
             <Link href="/register" className={`hidden md:flex items-center text-xs font-bold uppercase tracking-widest transition-colors ${isScrolled ? 'text-gray-900 hover:text-[#3c8dbc]' : 'text-white hover:text-[#3c8dbc]/70'}`}>
-              Daftar Tenant
+              Pendaftaran Akun
             </Link>
             <Link href="/login" className={`text-xs font-bold uppercase tracking-widest px-5 py-2.5 transition-all hover:bg-[#367fa9] hover:text-white rounded-none ${isScrolled ? 'bg-[#3c8dbc] text-white' : 'bg-white text-blue-900'}`}>
               Login
@@ -173,7 +173,7 @@ export default function LandingPage() {
           <div className="flex flex-col gap-4">
             <h4 className="font-bold tracking-widest uppercase text-sm mb-2 text-gray-300">Tautan Akses</h4>
             <Link href="/login" className="text-gray-400 hover:text-white transition-colors text-sm">Login Portal</Link>
-            <Link href="/register" className="text-gray-400 hover:text-white transition-colors text-sm">Registrasi Tenant Baru</Link>
+            <Link href="/register" className="text-gray-400 hover:text-white transition-colors text-sm">Pendaftaran Akun</Link>
             <Link href="/eksekutif" className="text-gray-400 hover:text-white transition-colors text-sm">Portal Eksekutif (Dashboard)</Link>
           </div>
         </div>

@@ -8,9 +8,11 @@ import {
 } from 'lucide-react';
 import { tenantService } from '@/services/tenantService';
 import { Tenant } from '@/types/tenant';
+import api, { getBaseUrl } from '@/services/api';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah } from '@/utils/formatCurrency';
+import toast from 'react-hot-toast';
 
 export default function AdminPenyewaDetailPage() {
   const { id } = useParams();
@@ -25,9 +27,7 @@ export default function AdminPenyewaDetailPage() {
     fetchTenant();
   }, [id]);
 
-  const getBaseUrl = () => {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  };
+  // Using getBaseUrl from api.ts
 
   const getFileUrl = (path: string) => {
     if (!path) return '#';
@@ -43,7 +43,7 @@ export default function AdminPenyewaDetailPage() {
       setTenant(data);
     } catch (error) {
       console.error(error);
-      alert('Gagal mengambil data penyewa');
+      toast.error('Gagal mengambil data penyewa');
     } finally {
       setIsLoading(false);
     }
@@ -56,11 +56,11 @@ export default function AdminPenyewaDetailPage() {
     try {
       setIsUpdating(true);
       await tenantService.verifyTenant(tenant.id, status);
-      alert(`Penyewa berhasil di-${status}`);
+      toast.success(`Penyewa berhasil di-${status}`);
       fetchTenant(); // Refresh
     } catch (error: any) {
       console.error(error);
-      alert(error.response?.data?.message || 'Gagal memverifikasi penyewa.');
+      toast.error(error.response?.data?.message || 'Gagal memverifikasi penyewa.');
     } finally {
       setIsUpdating(false);
     }

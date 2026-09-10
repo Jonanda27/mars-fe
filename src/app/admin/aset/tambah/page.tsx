@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { assetService } from '@/services/assetService';
+import toast from 'react-hot-toast';
 import { Building, Save, ArrowLeft, Loader2, ChevronRight, ChevronLeft, MapPin, CheckCircle, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useAirportStore } from '@/store/useAirportStore';
@@ -82,7 +83,7 @@ export default function TambahAsetPage() {
       await assetService.createAsset(payload);
       router.push('/admin/aset');
     } catch (error: any) {
-      alert('Gagal menyimpan aset: ' + error.message);
+      toast.error('Gagal menyimpan aset: ' + (error.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }

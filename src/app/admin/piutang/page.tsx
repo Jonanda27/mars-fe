@@ -10,13 +10,13 @@ export default function AdminPiutangPage() {
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', '0-30', '31-60', '61-90', '>90'
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Laporan Umur Piutang Sewa (Aging Report)
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Piutang <small className="text-[15px] font-light text-[#777] ml-2">Laporan Umur Piutang Sewa (Aging Report)</small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Aging Piutang</span>
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Piutang</span>
         </div>
       </header>
 
@@ -95,10 +95,10 @@ export default function AdminPiutangPage() {
       </div>
 
       {/* Tabel Detail Piutang per Tenant */}
-      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex-1 flex flex-col mt-2">
-        <div className="p-[15px] border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <BarChart className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Rincian Tenant Penunggak 
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm mt-4">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">
+            Rincian Tenant Penunggak 
             {activeFilter !== 'all' && <span className="ml-2 text-[12px] font-normal bg-[#3c8dbc] text-white px-2 py-0.5 rounded-full">Filter: Umur {activeFilter} Hari</span>}
           </h3>
           
@@ -115,7 +115,7 @@ export default function AdminPiutangPage() {
         <div className="p-0 overflow-x-auto">
           <table className="w-full text-left border-collapse text-[14px]">
             <thead>
-              <tr className="border-b-2 border-[#f4f4f4] text-[#444] uppercase text-[12px] bg-white">
+              <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
                 <th className="py-4 px-5 font-bold">Data Penyewa (Tenant)</th>
                 <th className="py-4 px-5 font-bold">Nomor SKRD (Tagihan)</th>
                 <th className="py-4 px-5 font-bold text-center">Umur Piutang</th>

@@ -3,13 +3,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Receipt, Search, Filter, Mail, Download, 
-  CheckCircle2, Clock, AlertTriangle, PlayCircle, RotateCcw, X, Calculator, FileText
+  CheckCircle2, Clock, AlertTriangle, PlayCircle, RotateCcw, X, Calculator, FileText, Loader2
 } from 'lucide-react';
 import { invoiceService } from '@/services/invoiceService';
 import { Invoice } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
 import dayjs from 'dayjs';
 import SuratSKRD from '@/components/SuratSKRD';
+import api, { getBaseUrl } from '@/services/api';
+import toast from 'react-hot-toast';
 
 export default function AdminTagihanSKRDPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -22,9 +24,7 @@ export default function AdminTagihanSKRDPage() {
     fetchInvoices();
   }, []);
 
-  const getBaseUrl = () => {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  };
+  // Using getBaseUrl from api.ts
 
   const getFileUrl = (path: string) => {
     if (!path) return '#';
@@ -56,22 +56,16 @@ export default function AdminTagihanSKRDPage() {
     if (!confirm('Anda yakin ingin memverifikasi dan melunaskan tagihan ini?')) return;
     try {
       setIsVerifying(true);
-      const res = await fetch(`http://localhost:5000/api/invoices/${id}/verify`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (res.ok) {
-        alert('Verifikasi berhasil, status tagihan menjadi Lunas (Paid).');
+      const res = await api.post(`/invoices/${id}/verify`);
+      if (res.data.success) {
+        toast.success('Verifikasi berhasil, status tagihan menjadi Lunas (Paid).');
         setShowVerifyModal(false);
         fetchInvoices();
-      } else {
-        alert('Gagal melakukan verifikasi');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Terjadi kesalahan');
+      const msg = error.response?.data?.message || 'Terjadi kesalahan saat memverifikasi';
+      toast.error(`Gagal memverifikasi: ${msg}`);
     } finally {
       setIsVerifying(false);
     }
@@ -96,31 +90,30 @@ export default function AdminTagihanSKRDPage() {
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <div>
-          <h1 className="text-[20px] font-normal text-[#333] uppercase">
-            Manajemen Tagihan & e-SKRD
-          </h1>
-          <p className="text-[12px] text-[#777]">Monitoring Pembayaran e-SKRD</p>
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Tagihan e-SKRD <small className="text-[15px] font-light text-[#777] ml-2">Manajemen & Monitoring Pembayaran</small>
+        </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Tagihan e-SKRD</span>
         </div>
-
       </header>
 
-      <div className="bg-white shadow-sm flex-1 flex flex-col">
-        <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <Receipt className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Data e-SKRD Keseluruhan
-          </h3>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Data e-SKRD Keseluruhan</h3>
         </div>
         
         <div className="p-0 overflow-x-auto">
           {isLoading ? (
-             <div className="p-8 text-center text-gray-500">Memuat data tagihan...</div>
+             <div className="p-10 flex justify-center items-center text-[#777]">
+               <Loader2 className="w-6 h-6 animate-spin mr-2" /> Memuat data tagihan...
+             </div>
           ) : (
           <table className="w-full text-left border-collapse text-[14px]">
             <thead>
-              <tr className="border-b-2 border-[#f4f4f4] text-[#444] uppercase text-[12px] bg-white">
+              <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
                 <th className="py-4 px-5 font-bold">Tenant</th>
                 <th className="py-4 px-5 font-bold">Nomor e-SKRD</th>
                 <th className="py-4 px-5 font-bold text-right">Nominal</th>
@@ -269,7 +262,7 @@ export default function AdminTagihanSKRDPage() {
                  Tutup
                </button>
                <button 
-                 onClick={() => alert('Fitur penolakan segera hadir')}
+                 onClick={() => toast('Fitur penolakan segera hadir')}
                  className="px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 font-bold"
                >
                  Tolak

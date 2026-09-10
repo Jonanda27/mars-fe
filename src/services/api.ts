@@ -20,4 +20,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const getBaseUrl = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  return url.replace(/\/api$/, '');
+};
+
 export default api;

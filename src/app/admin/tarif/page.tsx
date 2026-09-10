@@ -6,6 +6,7 @@ import { Plus, Edit2, Trash2, Search, Loader2, FileText, Database } from 'lucide
 import { tariffService } from '@/services/tariffService';
 import { MasterTariff } from '@/types/tariff';
 import { formatRupiah } from '@/utils/formatCurrency';
+import toast from 'react-hot-toast';
 
 export default function MasterTarifPage() {
   const [tariffs, setTariffs] = useState<MasterTariff[]>([]);
@@ -39,7 +40,7 @@ export default function MasterTarifPage() {
       await fetchTariffs();
     } catch (error) {
       console.error("Error deleting tariff:", error);
-      alert('Gagal menghapus tarif. Pastikan tidak ada data yang terikat.');
+      toast.error('Gagal menghapus tarif. Pastikan tidak ada data yang terikat.');
     } finally {
       setDeleting(false);
       setDeleteId(null);
@@ -53,50 +54,52 @@ export default function MasterTarifPage() {
   );
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Master Tarif</h1>
-          <p className="text-slate-500 text-sm">Kelola data tarif dan layanan bandara.</p>
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Master Tarif <small className="text-[15px] font-light text-[#777] ml-2">Kelola data tarif dan layanan bandara.</small>
+        </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Master Tarif</span>
         </div>
+      </header>
+
+      <div className="mb-4">
         <Link 
           href="/admin/tarif/tambah" 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-semibold shadow-sm flex items-center gap-2 transition-colors"
+          className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 text-sm font-semibold shadow-sm inline-flex items-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Tambah Tarif</span>
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-800 flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-blue-600" />
-            Daftar Tarif ({filteredTariffs.length})
-          </h2>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Daftar Tarif ({filteredTariffs.length})</h3>
           <div className="relative">
             <input 
               type="text" 
               placeholder="Cari tarif..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 border rounded text-sm focus:outline-none focus:border-[#3c8dbc]"
+              className="pl-8 pr-3 py-1 border border-[#d2d6de] text-sm focus:outline-none focus:border-[#3c8dbc]"
             />
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-[#777] absolute left-2.5 top-1.5" />
           </div>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
-              <tr>
-                <th className="p-4 font-semibold">Kode Tarif</th>
-                <th className="p-4 font-semibold">Jenis Layanan</th>
-                <th className="p-4 font-semibold">Objek</th>
-                <th className="p-4 font-semibold">Tarif</th>
-                <th className="p-4 font-semibold text-center">Satuan</th>
-                <th className="p-4 font-semibold text-center">Status</th>
-                <th className="p-4 font-semibold text-center">Aksi</th>
+        <div className="p-0 overflow-x-auto">
+          <table className="w-full text-left border-collapse text-[14px]">
+            <thead>
+              <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
+                <th className="py-3 px-4 font-bold">Kode Tarif</th>
+                <th className="py-3 px-4 font-bold">Jenis Layanan</th>
+                <th className="py-3 px-4 font-bold">Objek</th>
+                <th className="py-3 px-4 font-bold">Tarif</th>
+                <th className="py-3 px-4 font-bold text-center">Satuan</th>
+                <th className="py-3 px-4 font-bold text-center">Status</th>
+                <th className="py-3 px-4 font-bold text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -115,35 +118,35 @@ export default function MasterTarifPage() {
                 </tr>
               ) : (
                 filteredTariffs.map((t, idx) => (
-                  <tr key={t.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <td className="p-4 text-blue-600 font-medium">{t.kode_tarif}</td>
-                    <td className="p-4 font-medium text-slate-800">{t.jenis_layanan}</td>
-                    <td className="p-4 text-slate-600">{t.objek}</td>
-                    <td className="p-4 font-semibold text-slate-800">
+                  <tr key={t.id} className="border-b border-[#f4f4f4] hover:bg-slate-50 transition-colors">
+                    <td className="py-3 px-4 text-[#3c8dbc] font-bold">{t.kode_tarif}</td>
+                    <td className="py-3 px-4 font-bold text-[#333]">{t.jenis_layanan}</td>
+                    <td className="py-3 px-4 text-[#555]">{t.objek}</td>
+                    <td className="py-3 px-4 font-mono font-bold text-[#333]">
                       {formatRupiah(t.tarif)}
                     </td>
-                    <td className="p-4 text-center text-slate-600">
+                    <td className="py-3 px-4 text-center text-[#555]">
                       {t.satuan}
                     </td>
-                    <td className="p-4 text-center">
-                      <span className={`px-2 py-1 text-xs rounded-full font-bold ${t.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`px-2 py-1 text-[11px] rounded-sm font-bold uppercase tracking-wide ${t.status === 'Active' ? 'bg-[#00a65a] text-white' : 'bg-[#dd4b39] text-white'}`}>
                         {t.status === 'Active' ? 'AKTIF' : 'INAKTIF'}
                       </span>
                     </td>
-                    <td className="p-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="py-3 px-4 text-center">
+                      <div className="flex items-center justify-center gap-1">
                         <Link 
                           href={`/admin/tarif/edit/${t.id}`}
-                          className="flex items-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded transition-colors text-xs font-semibold"
+                          className="bg-[#3c8dbc] text-white p-1.5 hover:bg-[#367fa9] shadow-sm rounded-sm" title="Edit Tarif"
                         >
-                          <Edit2 className="w-4 h-4 mr-1" /> Edit
+                          <Edit2 className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(t.id)}
                           disabled={deleting}
-                          className="flex items-center text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-1.5 rounded transition-colors text-xs font-semibold disabled:opacity-50"
+                          className="bg-[#dd4b39] text-white p-1.5 hover:bg-[#c9302c] shadow-sm rounded-sm disabled:opacity-50" title="Hapus Tarif"
                         >
-                          <Trash2 className="w-4 h-4 mr-1" /> Hapus
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

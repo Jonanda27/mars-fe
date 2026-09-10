@@ -10,18 +10,18 @@ export default function AdminParkirPage() {
   const [activeTab, setActiveTab] = useState('live'); // 'live' | 'langganan'
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Command Center: Smart Parking
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Smart Parking <small className="text-[15px] font-light text-[#777] ml-2">Command Center</small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Smart Parking</span>
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Smart Parking</span>
         </div>
       </header>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <div className="bg-white p-4 shadow-sm border-l-[4px] border-[#00c0ef]">
           <div className="flex justify-between items-start">
             <div>
@@ -64,7 +64,7 @@ export default function AdminParkirPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-white shadow-sm font-bold text-[14px] mt-2">
+      <div className="flex bg-white shadow-sm font-bold text-[14px]">
         <button 
           onClick={() => setActiveTab('live')}
           className={`flex-1 py-3 border-t-[3px] flex justify-center items-center ${activeTab === 'live' ? 'border-[#3c8dbc] bg-white text-[#3c8dbc]' : 'border-transparent bg-slate-50 text-[#777] hover:bg-slate-100'}`}
@@ -81,21 +81,20 @@ export default function AdminParkirPage() {
 
       {/* Tab 1: Live Parking Session */}
       {activeTab === 'live' && (
-        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex-1 flex flex-col animate-in fade-in">
-          <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-slate-50">
-            <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Monitor Kendaraan Masuk / Keluar (ANPR)
-            </h3>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm mt-4 animate-in fade-in">
+          <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+            <h3 className="text-[16px] text-[#444] font-normal">Monitor Kendaraan Masuk / Keluar (ANPR)</h3>
             
             <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <div className="flex">
-                <input type="text" placeholder="Cari Plat Nomor (ex: PA 1234)..." className="border border-[#d2d6de] border-r-0 px-3 py-1.5 text-[13px] focus:outline-none focus:border-[#3c8dbc] min-w-[250px] font-mono" />
-                <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1.5 hover:bg-[#e0e0e0] transition-colors">
+                <input type="text" placeholder="Cari Plat Nomor (ex: PA 1234)..." className="border border-[#d2d6de] border-r-0 px-3 py-1 text-sm focus:outline-none focus:border-[#3c8dbc] min-w-[250px] font-mono" />
+                <button className="bg-[#f4f4f4] border border-[#d2d6de] px-3 py-1 hover:bg-[#e0e0e0] transition-colors">
                   <Search className="w-4 h-4 text-[#777]" />
                 </button>
               </div>
             </div>
           </div>
+
           
           <div className="p-0 overflow-x-auto">
             <table className="w-full text-left border-collapse text-[14px]">
@@ -154,11 +153,9 @@ export default function AdminParkirPage() {
 
       {/* Tab 2: Parkir Langganan RFID */}
       {activeTab === 'langganan' && (
-        <div className="bg-white border-t-[3px] border-[#f39c12] shadow-sm flex-1 flex flex-col animate-in fade-in">
-          <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-slate-50">
-            <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-              <CreditCard className="w-5 h-5 mr-2 text-[#f39c12]" /> Manajemen Kartu Akses (RFID) Staf & Tenant
-            </h3>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm mt-4 animate-in fade-in">
+          <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+            <h3 className="text-[16px] text-[#444] font-normal">Manajemen Kartu Akses (RFID) Staf & Tenant</h3>
             
             <button className="bg-[#f39c12] hover:bg-[#e08e0b] text-white text-[13px] font-bold px-4 py-2 transition-colors flex items-center shadow-sm">
               <Activity className="w-4 h-4 mr-1" /> Daftarkan RFID Baru

@@ -1,9 +1,10 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { contractService } from '@/services/contractService';
 import { 
   FileText, Receipt, CreditCard, 
   Plane, User, Circle, ShieldCheck
@@ -13,6 +14,21 @@ export default function TenantSidebar({ isOpen }: { isOpen: boolean }) {
   const pathname = usePathname();
   const { user } = useAuthStore();
   const isVerified = user?.status_verifikasi === 'Verified';
+  const [hasActivePayung, setHasActivePayung] = useState(false);
+
+  useEffect(() => {
+    if (isVerified) {
+      contractService.getTenantContracts()
+        .then(contracts => {
+          const activePayung = contracts.some(c => 
+            c.contract_type?.toLowerCase().includes('payung') && 
+            (c.status?.toLowerCase() === 'active' || c.status?.toLowerCase() === 'aktif')
+          );
+          setHasActivePayung(activePayung);
+        })
+        .catch(err => console.error("Error fetching contracts for sidebar", err));
+    }
+  }, [isVerified]);
 
   const navItems = [
     { href: "/tenant", label: "Dashboard Tenant", icon: <Plane /> },
@@ -24,8 +40,15 @@ export default function TenantSidebar({ isOpen }: { isOpen: boolean }) {
     { href: "/tenant/profil", label: "Profil & Legalitas", icon: <ShieldCheck /> },
   ];
 
-  // Filter items if not verified (Pending or Rejected)
-  const visibleNavItems = isVerified ? navItems : navItems.filter(item => item.href === '/tenant/profil');
+  // Filter items based on verification and payung contract status
+  let visibleNavItems = [];
+  if (!isVerified) {
+    visibleNavItems = navItems.filter(item => item.href === '/tenant/profil');
+  } else if (!hasActivePayung) {
+    visibleNavItems = navItems.filter(item => item.href === '/tenant/profil' || item.href === '/tenant/kontrak');
+  } else {
+    visibleNavItems = navItems;
+  }
 
   return (
     <aside className={`${isOpen ? 'w-56' : 'w-16'} bg-[#222d32] text-white flex-shrink-0 flex flex-col h-full z-20 overflow-hidden transition-all duration-300`}>

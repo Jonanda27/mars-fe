@@ -11,6 +11,7 @@ import { formatRupiah } from '@/utils/formatCurrency';
 import SuratPKS from '@/components/SuratPKS';
 import SignaturePad from '@/components/SignaturePad';
 import html2pdf from 'html2pdf.js';
+import toast from 'react-hot-toast';
 
 export default function TenantKontrakDetailPage() {
   const { id } = useParams();
@@ -55,12 +56,12 @@ export default function TenantKontrakDetailPage() {
       };
       
       await contractService.updateTenantContractStatus(contract.id as number, payload);
-      alert('Dokumen PKS berhasil ditandatangani! Silakan lunasi Tagihan SKRD untuk mengaktifkan kontrak.');
+      toast.success('Dokumen PKS berhasil ditandatangani! Silakan lunasi Tagihan SKRD untuk mengaktifkan kontrak.');
       setShowSignaturePad(false);
       fetchContract(); // Reload data
     } catch (error) {
       console.error(error);
-      alert('Gagal menyimpan TTE');
+      toast.error('Gagal menyimpan TTE');
     } finally {
       setIsUpdating(false);
     }
@@ -72,13 +73,13 @@ export default function TenantKontrakDetailPage() {
     try {
       setIsExtending(true);
       await contractService.extendContract(contract.id as number, newEndDate);
-      alert('Pengajuan perpanjangan berhasil dikirim! Silakan cek di menu Permohonan Sewa.');
+      toast.success('Pengajuan perpanjangan berhasil dikirim! Silakan cek di menu Permohonan Sewa.');
       setShowExtendModal(false);
       setNewEndDate('');
       router.push('/tenant/permohonan');
     } catch (error: any) {
       console.error(error);
-      alert(error.response?.data?.message || error.message || 'Gagal mengajukan perpanjangan.');
+      toast.error(error.response?.data?.message || error.message || 'Gagal mengajukan perpanjangan.');
     } finally {
       setIsExtending(false);
     }

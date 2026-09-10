@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { 
+import toast from 'react-hot-toast';
   CreditCard, Search, CheckCircle2, Printer, 
   Banknote, ScanLine, FileText 
 } from 'lucide-react';
@@ -27,7 +28,7 @@ export default function AdminPembayaranKasirPage() {
 
   const handlePay = () => {
     if (paymentMethod === 'tunai' && Number(uangDiterima) < totalTagihan) {
-      alert("Uang yang diterima kurang dari total tagihan!");
+      toast.error("Uang yang diterima kurang dari total tagihan!");
       return;
     }
     setIsPaid(true);
@@ -42,13 +43,13 @@ export default function AdminPembayaranKasirPage() {
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Loket Pembayaran Retribusi (POS)
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Pembayaran <small className="text-[15px] font-light text-[#777] ml-2">Loket Kasir (POS)</small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Loket Kasir</span>
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Pembayaran</span>
         </div>
       </header>
 
@@ -58,10 +59,11 @@ export default function AdminPembayaranKasirPage() {
         <div className="flex-1 lg:w-[60%] flex flex-col gap-4">
           
           {/* Panel Pencarian */}
-          <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm p-6">
-            <h3 className="text-[16px] text-[#444] font-bold mb-4 flex items-center">
-              <ScanLine className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Scan / Cari Nomor Tagihan SKRD
-            </h3>
+          <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+            <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+              <h3 className="text-[16px] text-[#444] font-normal">Scan / Cari Nomor Tagihan SKRD</h3>
+            </div>
+            <div className="p-4">
             
             <form onSubmit={handleSearch} className="flex gap-2">
               <input 

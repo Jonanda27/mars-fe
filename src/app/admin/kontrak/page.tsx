@@ -48,33 +48,32 @@ export default function KontrakPage() {
   };
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Manajemen Kontrak</h1>
-          <p className="text-slate-500 text-sm">Kelola draft, verifikasi TTD basah, dan status kontrak penyewa.</p>
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Manajemen Kontrak <small className="text-[15px] font-light text-[#777] ml-2">Kelola draft, verifikasi TTD basah, dan status kontrak penyewa.</small>
+        </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Manajemen Kontrak</span>
         </div>
-      </div>
+      </header>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-800 flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-blue-600" />
-            Daftar Kontrak ({contracts.length})
-          </h2>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Daftar Kontrak ({contracts.length})</h3>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
-              <tr>
-                <th className="p-4 font-semibold">Nomor Kontrak</th>
-                <th className="p-4 font-semibold">Tipe</th>
-                <th className="p-4 font-semibold">Tenant</th>
-                <th className="p-4 font-semibold">Aset</th>
-                <th className="p-4 font-semibold">Masa Berlaku</th>
-                <th className="p-4 font-semibold">Status</th>
-                <th className="p-4 font-semibold text-center">Aksi</th>
+        <div className="p-0 overflow-x-auto">
+          <table className="w-full text-left border-collapse text-[14px]">
+            <thead>
+              <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
+                <th className="py-3 px-4 font-bold">Nomor Kontrak</th>
+                <th className="py-3 px-4 font-bold">Tipe</th>
+                <th className="py-3 px-4 font-bold">Tenant</th>
+                <th className="py-3 px-4 font-bold">Aset</th>
+                <th className="py-3 px-4 font-bold">Masa Berlaku</th>
+                <th className="py-3 px-4 font-bold">Status</th>
+                <th className="py-3 px-4 font-bold text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>

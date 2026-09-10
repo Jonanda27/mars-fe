@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { assetService } from '@/services/assetService';
 import { Building, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 export default function EditAsetPage() {
   const router = useRouter();
@@ -101,7 +102,7 @@ export default function EditAsetPage() {
       await assetService.updateAsset(parseInt(id), payload);
       router.push('/admin/aset');
     } catch (error: any) {
-      alert('Gagal mengupdate aset: ' + error.message);
+      toast.error('Gagal mengupdate aset: ' + (error.message || 'Unknown error'));
     } finally {
       setSaving(false);
     }

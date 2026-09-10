@@ -6,15 +6,17 @@ import { Loader2, Download, X } from 'lucide-react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 import { formatRupiah } from '@/utils/formatCurrency';
+import toast from 'react-hot-toast';
 
 dayjs.locale('id');
 
 interface Props {
   contract: Contract;
   onClose: () => void;
+  isInline?: boolean;
 }
 
-export default function ContractPDFViewer({ contract, onClose }: Props) {
+export default function ContractPDFViewer({ contract, onClose, isInline = false }: Props) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const masterTariffs = Array.isArray(contract.fasilitas) ? contract.fasilitas : [];
@@ -81,7 +83,7 @@ export default function ContractPDFViewer({ contract, onClose }: Props) {
     const element = document.getElementById('contract-document');
     if (!element) {
       setIsDownloading(false);
-      alert("Dokumen tidak ditemukan.");
+      toast("Dokumen tidak ditemukan.");
       return;
     }
 
@@ -110,7 +112,7 @@ export default function ContractPDFViewer({ contract, onClose }: Props) {
       await html2pdf().set(opt).from(element).save();
     } catch (error) {
       console.error("Gagal membuat PDF", error);
-      alert("Gagal mengunduh PDF.");
+      toast.error("Gagal mengunduh PDF.");
     } finally {
       element.style.gap = originalGap;
       pages.forEach(p => p.classList.add('shadow-xl'));
@@ -119,17 +121,20 @@ export default function ContractPDFViewer({ contract, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex flex-col items-center p-4 md:p-8">
+    <div className={isInline ? "bg-slate-100 flex flex-col items-center p-4 md:p-8 rounded border border-slate-200 mt-4 overflow-auto max-h-[800px]" : "fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex flex-col items-center p-4 md:p-8"}>
       
       {/* Header Actions */}
-      <div className="w-full max-w-[794px] mb-4 flex justify-between print:hidden">
+      <div className={`w-full max-w-[794px] mb-4 flex justify-end print:hidden gap-3 ${isInline ? 'hidden' : ''}`}>
+        {!isInline && (
+          <button 
+            onClick={onClose}
+            className="flex items-center px-4 py-2 font-bold text-sm rounded transition bg-white text-gray-800 hover:bg-gray-100"
+          >
+            <X className="w-4 h-4 mr-2" /> Tutup
+          </button>
+        )}
         <button 
-          onClick={onClose}
-          className="flex items-center px-4 py-2 font-bold text-sm rounded transition bg-white text-gray-800 hover:bg-gray-100"
-        >
-          <X className="w-4 h-4 mr-2" /> Tutup
-        </button>
-        <button 
+          id="download-pdf-btn"
           onClick={handleDownloadPdf}
           disabled={isDownloading}
           className="flex items-center px-4 py-2 font-bold text-sm rounded shadow transition"
@@ -282,7 +287,7 @@ export default function ContractPDFViewer({ contract, onClose }: Props) {
                 <div className="text-[13px] leading-relaxed text-justify mb-10">
                   <h3 className="font-bold text-center m-0 p-0 mt-6">PASAL 3<br/>SKEMA PENAGIHAN</h3>
                   <p className="m-0 p-0 mt-1">
-                    Penagihan atas pemanfaatan yang diajukan oleh Pihak Kedua akan ditagihkan dengan periode <strong>{contract.periode_pembayaran || 'Sesuai Pemakaian'}</strong>. Pembayaran harus dilakukan sebelum batas waktu yang tertera pada dokumen Tagihan (*Invoice*).
+                    Penagihan atas pemanfaatan yang diajukan oleh Pihak Kedua akan ditagihkan dengan periode <strong>{contract.periode_pembayaran || 'Sesuai Pemakaian'}</strong>. Pembayaran harus dilakukan sebelum batas waktu yang tertera pada dokumen Tagihan.
                   </p>
                 </div>
 
@@ -297,7 +302,7 @@ export default function ContractPDFViewer({ contract, onClose }: Props) {
                     <div className="text-center">
                       <p>Timika, {dayjs(contract.start_date).format('DD MMMM YYYY')}</p>
                       <p className="mb-14"><strong>PIHAK PERTAMA</strong></p>
-                      <p className="font-bold inline-block min-w-[150px]" style={{ borderBottom: '1px solid #000000' }}>Kepala UPBU Mozes Kilangin</p>
+                      <p className="font-bold inline-block min-w-[150px]" style={{ borderBottom: '1px solid #000000' }}>Kepala Mozes Kilangin</p>
                     </div>
                   </div>
                 </div>

@@ -8,6 +8,7 @@ import {
 import api from '@/services/api';
 import { formatRupiah } from '@/utils/formatCurrency';
 import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 
 export default function AdminTagihanOverstayPage() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -35,41 +36,39 @@ export default function AdminTagihanOverstayPage() {
     try {
       setIsProcessing(logId);
       await api.post(`/invoices/generate-skrd-overstay/${logId}`);
-      alert('SKRD Tambahan berhasil diterbitkan! Silakan cek di menu Manajemen Tagihan.');
+      toast.success('SKRD Tambahan berhasil diterbitkan! Silakan cek di menu Manajemen Tagihan.');
       fetchOverstayLogs();
     } catch (error: any) {
       console.error(error);
-      alert('Gagal menerbitkan SKRD: ' + (error.response?.data?.message || error.message));
+      toast.error('Gagal menerbitkan SKRD: ' + (error.response?.data?.message || error.message));
     } finally {
       setIsProcessing(null);
     }
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <div>
-          <h1 className="text-[20px] font-normal text-[#333] uppercase">
-            Laporan Overstay Pesawat
-          </h1>
-          <p className="text-[12px] text-[#777]">Monitoring Keterlambatan Keluar Hanggar & SKRD Tambahan</p>
+    <div className="p-4 bg-[#ecf0f5] min-h-full">
+      <header className="flex justify-between items-end mb-4">
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Tagihan Overstay <small className="text-[15px] font-light text-[#777] ml-2">Laporan Overstay Pesawat</small>
+        </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Tagihan Overstay</span>
         </div>
       </header>
 
-      <div className="bg-white shadow-sm flex-1 flex flex-col">
-        <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-center gap-4 bg-orange-50">
-          <h3 className="text-[16px] text-orange-800 font-bold flex items-center">
-            <AlertTriangle className="w-5 h-5 mr-2 text-orange-500" /> Daftar Pesawat Overstay (Belum Ditagih)
-          </h3>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Daftar Pesawat Overstay (Belum Ditagih)</h3>
         </div>
         
         <div className="p-0 overflow-x-auto">
           {isLoading ? (
-             <div className="p-8 text-center text-gray-500 flex justify-center items-center"><Loader2 className="animate-spin w-5 h-5 mr-2" /> Memuat data...</div>
+             <div className="p-10 flex justify-center items-center text-[#777]"><Loader2 className="animate-spin w-5 h-5 mr-2" /> Memuat data...</div>
           ) : (
           <table className="w-full text-left border-collapse text-[14px]">
             <thead>
-              <tr className="border-b-2 border-[#f4f4f4] text-[#444] uppercase text-[12px] bg-white">
+              <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
                 <th className="py-4 px-5 font-bold">Tenant / Pesawat</th>
                 <th className="py-4 px-5 font-bold">No. Kontrak Asal</th>
                 <th className="py-4 px-5 font-bold">Jadwal Keluar</th>

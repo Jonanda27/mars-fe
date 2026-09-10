@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import api from '@/services/api';
 import dayjs from 'dayjs';
+import toast from 'react-hot-toast';
 
 export default function PetugasDashboardPage() {
   const [activeLogs, setActiveLogs] = useState<any[]>([]);
@@ -57,7 +58,7 @@ export default function PetugasDashboardPage() {
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedApplication || !registrationNumber || !evidencePhoto) {
-      alert('Mohon lengkapi semua data dan foto bukti');
+      toast.error('Mohon lengkapi semua data dan foto bukti');
       return;
     }
 
@@ -86,7 +87,7 @@ export default function PetugasDashboardPage() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      alert('Check-In Pesawat Berhasil!');
+      toast.success('Check-In Pesawat Berhasil!');
       setShowCheckInModal(false);
       setRegistrationNumber('');
       setEvidencePhoto(null);
@@ -95,7 +96,7 @@ export default function PetugasDashboardPage() {
       fetchActiveLogs();
     } catch (error) {
       console.error(error);
-      alert('Gagal check-in pesawat');
+      toast.error('Gagal check-in pesawat');
     } finally {
       setIsSubmitting(false);
     }
@@ -123,7 +124,7 @@ export default function PetugasDashboardPage() {
       setShowCheckOutModal(false);
     } catch (error) {
       console.error(error);
-      alert('Gagal melakukan check-out');
+      toast.error('Gagal melakukan check-out');
     } finally {
       setIsCheckingOut(null);
       setCheckOutLogId(null);

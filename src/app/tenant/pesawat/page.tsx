@@ -8,6 +8,7 @@ import {
 
 import { aircraftService } from '@/services/aircraftService';
 import { Aircraft } from '@/types/aircraft';
+import toast from 'react-hot-toast';
 
 export default function DataPesawatPage() {
   const [showForm, setShowForm] = useState(false);
@@ -74,7 +75,7 @@ export default function DataPesawatPage() {
     const finalTipe = isCustom ? formData.customTipe : formData.tipe;
 
     if (!formData.registrasi || !finalTipe || !formData.mtow || (isCustom && !formData.customLuas)) {
-      alert("Mohon lengkapi Nomor Registrasi, Tipe Pesawat, Luas, dan Berat MTOW!");
+      toast.error("Mohon lengkapi Nomor Registrasi, Tipe Pesawat, Luas, dan Berat MTOW!");
       return;
     }
 
@@ -91,7 +92,7 @@ export default function DataPesawatPage() {
         });
 
         setArmadaList(armadaList.map(item => item.id === editingId ? updatedPesawat : item));
-        alert(`Data pesawat ${updatedPesawat.registration_number} berhasil diperbarui!`);
+        toast.success(`Data pesawat ${updatedPesawat.registration_number} berhasil diperbarui!`);
       } else {
         const newPesawat = await aircraftService.createTenantAircraft({
           registration_number: formData.registrasi.toUpperCase(),
@@ -104,7 +105,7 @@ export default function DataPesawatPage() {
           foto: formData.fotoPreview || "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80"
         });
         setArmadaList([newPesawat, ...armadaList]);
-        alert(`Pesawat ${newPesawat.registration_number} berhasil terdaftar di sistem!`);
+        toast.success(`Pesawat ${newPesawat.registration_number} berhasil terdaftar di sistem!`);
       }
 
       setShowForm(false);
@@ -119,7 +120,7 @@ export default function DataPesawatPage() {
         fotoPreview: ''
       });
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Gagal menyimpan pesawat');
+      toast.error(error.response?.data?.message || 'Gagal menyimpan pesawat');
     }
   };
 
@@ -145,9 +146,9 @@ export default function DataPesawatPage() {
     try {
       await aircraftService.deleteTenantAircraft(id);
       setArmadaList(armadaList.filter(item => item.id !== id));
-      alert('Pesawat berhasil dihapus!');
+      toast.success('Pesawat berhasil dihapus!');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Gagal menghapus pesawat');
+      toast.error(error.response?.data?.message || 'Gagal menghapus pesawat');
     }
   };
 

@@ -30,6 +30,10 @@ export default function PermohonanAdminPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pending': return 'bg-[#f39c12] text-white';
+      case 'Menunggu Persetujuan Kadis': return 'bg-purple-500 text-white';
+      case 'Disetujui Kadis': return 'bg-[#00a65a] text-white';
+      case 'Ditolak': return 'bg-[#dd4b39] text-white';
+      case 'Draft Kontrak': return 'bg-blue-500 text-white';
       case 'Approved': return 'bg-[#00a65a] text-white';
       case 'Rejected': return 'bg-[#dd4b39] text-white';
       case 'Reviewed': return 'bg-[#3c8dbc] text-white';
@@ -40,16 +44,17 @@ export default function PermohonanAdminPage() {
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
       <header className="flex justify-between items-end mb-4">
-        <h1 className="text-[24px] font-normal text-[#333] flex items-center">
-          Permohonan Sewa <small className="text-[15px] text-[#777] ml-2 font-light">Daftar permohonan masuk</small>
+        <h1 className="text-[24px] font-normal text-[#333]">
+          Permohonan Sewa <small className="text-[15px] font-light text-[#777] ml-2">Daftar permohonan masuk</small>
         </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
+          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Permohonan Sewa</span>
+        </div>
       </header>
 
-      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
-        <div className="p-3 border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Semua Permohonan
-          </h3>
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
+        <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
+          <h3 className="text-[16px] text-[#444] font-normal">Semua Permohonan</h3>
         </div>
 
         <div className="p-0 overflow-x-auto">
@@ -58,15 +63,15 @@ export default function PermohonanAdminPage() {
               <Loader2 className="w-6 h-6 animate-spin mr-2" /> Memuat data permohonan...
             </div>
           ) : (
-            <table className="w-full text-[14px] text-left">
+            <table className="w-full text-left border-collapse text-[14px]">
               <thead>
-                <tr className="border-b border-[#f4f4f4] bg-slate-50 text-[#333]">
-                  <th className="py-3 px-4 font-bold w-[150px]">NOMOR TIKET</th>
+                <tr className="border-b-2 border-[#f4f4f4] text-[#444] bg-[#f9fafb]">
+                  <th className="py-3 px-4 font-bold">NOMOR TIKET</th>
                   <th className="py-3 px-4 font-bold">TENANT</th>
                   <th className="py-3 px-4 font-bold">ASET DIMINATI</th>
                   <th className="py-3 px-4 font-bold">RENCANA PERIODE</th>
                   <th className="py-3 px-4 font-bold text-center">STATUS</th>
-                  <th className="py-3 px-4 font-bold text-center w-[120px]">AKSI</th>
+                  <th className="py-3 px-4 font-bold text-center">AKSI</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,6 +93,7 @@ export default function PermohonanAdminPage() {
                         <div className="text-[12px] text-[#777]">PIC: {app.tenants?.pic || '-'}</div>
                       </td>
                       <td className="py-3 px-4">
+                        <div className="text-[11px] font-bold text-[#3c8dbc] mb-1 uppercase tracking-wider">{app.application_type || 'Sewa Baru'}</div>
                         {app.assets ? (
                           <>
                             <div className="font-medium text-[#333]">{app.assets.nama_aset}</div>
@@ -103,8 +109,8 @@ export default function PermohonanAdminPage() {
                         {app.end_date ? dayjs(app.end_date).format('DD MMM YYYY') : '-'}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <span className={`${getStatusColor(app.status)} text-[11px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide shadow-sm inline-flex items-center`}>
-                          {app.status === 'Pending' && <Clock className="w-3 h-3 mr-1" />}
+                        <span className={`${getStatusColor(app.status)} text-[11px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide shadow-sm inline-flex items-center text-center leading-tight`}>
+                          {(app.status === 'Pending' || app.status === 'Menunggu Persetujuan Kadis') && <Clock className="w-3 h-3 mr-1" />}
                           {app.status}
                         </span>
                       </td>
