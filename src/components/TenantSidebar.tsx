@@ -1,104 +1,62 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import React from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { contractService } from '@/services/contractService';
+import BaseSidebar, { NavItem } from './BaseSidebar';
 import { 
-  FileText, Receipt, CreditCard, 
-  Plane, User, Circle, ShieldCheck
+  FileText, 
+  CreditCard, 
+  Plane, 
+  User, 
+  Circle, 
+  ShieldCheck,
+  LayoutDashboard,
+  FileSignature,
+  Building2,
+  Calendar
 } from 'lucide-react';
+import RupiahIcon from './icons/RupiahIcon';
 
-export default function TenantSidebar({ isOpen }: { isOpen: boolean }) {
-  const pathname = usePathname();
+export default function TenantSidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
   const { user } = useAuthStore();
   const isVerified = user?.status_verifikasi === 'Verified';
-  const [hasActivePayung, setHasActivePayung] = useState(false);
 
-  useEffect(() => {
-    if (isVerified) {
-      contractService.getTenantContracts()
-        .then(contracts => {
-          const activePayung = contracts.some(c => 
-            c.contract_type?.toLowerCase().includes('payung') && 
-            (c.status?.toLowerCase() === 'active' || c.status?.toLowerCase() === 'aktif')
-          );
-          setHasActivePayung(activePayung);
-        })
-        .catch(err => console.error("Error fetching contracts for sidebar", err));
-    }
-  }, [isVerified]);
-
-  const navItems = [
-    { href: "/tenant", label: "Dashboard Tenant", icon: <Plane /> },
+  const navItems: NavItem[] = [
+    { href: "/tenant", label: "Dashboard", icon: <LayoutDashboard /> },
     { href: "/tenant/permohonan", label: "Permohonan Sewa", icon: <FileText /> },
-    { href: "/tenant/kontrak", label: "Kontrak & Aset", icon: <FileText /> },
-    ...(user?.jenis_tenant !== 'Umum' ? [{ href: "/tenant/pesawat", label: "Data Pesawat", icon: <Plane /> }] : []),
-    { href: "/tenant/tagihan", label: "e-SKRD & Tagihan", icon: <Receipt /> },
+    { href: "/tenant/jadwal-hanggar", label: "Jadwal Hanggar", icon: <Calendar /> },
+    { href: "/tenant/kontrak-payung", label: "Kontrak Payung", icon: <FileSignature /> },
+    { href: "/tenant/kontrak-sewa", label: "Kontrak Sewa", icon: <Building2 /> },
+    { href: "/tenant/pesawat", label: "Data Pesawat", icon: <Plane /> },
+    { href: "/tenant/tagihan", label: "SKRD dan Tagihan", icon: <RupiahIcon /> },
     { href: "/tenant/pembayaran", label: "Riwayat Pembayaran", icon: <CreditCard /> },
-    { href: "/tenant/profil", label: "Profil & Legalitas", icon: <ShieldCheck /> },
+    { href: "/tenant/profil", label: "Profil dan Legalitas", icon: <ShieldCheck /> },
   ];
 
-  // Filter items based on verification and payung contract status
-  let visibleNavItems = [];
-  if (!isVerified) {
-    visibleNavItems = navItems.filter(item => item.href === '/tenant/profil');
-  } else if (!hasActivePayung) {
-    visibleNavItems = navItems.filter(item => item.href === '/tenant/profil' || item.href === '/tenant/kontrak');
-  } else {
-    visibleNavItems = navItems;
-  }
+
+  // Filter items based on verification: pending accounts must complete profile first
+  const visibleNavItems: NavItem[] = !isVerified
+    ? navItems.filter(item => item.href === '/tenant/profil')
+    : navItems;
 
   return (
-    <aside className={`${isOpen ? 'w-56' : 'w-16'} bg-[#222d32] text-white flex-shrink-0 flex flex-col h-full z-20 overflow-hidden transition-all duration-300`}>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4">
-        
-        {/* User Panel */}
-        <div className={`flex items-center pb-4 whitespace-nowrap ${isOpen ? 'px-4' : 'justify-center'}`}>
-          <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-700 flex-shrink-0 overflow-hidden">
-            <User className="w-5 h-5" />
-          </div>
-          {isOpen && (
-            <div className="ml-3">
-              <p className="font-semibold text-[14px] truncate max-w-[130px]">{user?.nama_perusahaan || 'Tenant'}</p>
-              <p className="text-[11px] text-slate-300 flex items-center mt-1">
-                {!isVerified ? (
-                  <><Circle className="w-[10px] h-[10px] mr-1 fill-yellow-500 text-yellow-500" /> Pending/Unverified</>
-                ) : (
-                  <><Circle className="w-[10px] h-[10px] mr-1 fill-[#3c8dbc] text-[#3c8dbc]" /> Verified Tenant</>
-                )}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation Header */}
-        {isOpen && (
-          <div className="text-[12px] text-[#4b646f] bg-[#1a2226] px-4 py-3 uppercase whitespace-nowrap">
-            Tenant Portal
-          </div>
-        )}
-        
-        <ul className="text-[14px] mt-2">
-          {visibleNavItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link 
-                  href={item.href} 
-                  title={!isOpen ? item.label : undefined}
-                  className={`flex items-center py-3 ${isOpen ? 'px-4' : 'justify-center'} transition-colors duration-200 border-l-[3px] 
-                    ${isActive ? 'bg-[#1e282c] border-[#3c8dbc] text-white' : 'border-transparent text-[#b8c7ce] hover:bg-[#1e282c] hover:text-white'}`}
-                >
-                  {React.cloneElement(item.icon as React.ReactElement<any>, { className: `w-4 h-4 flex-shrink-0 ${isOpen ? 'mr-3' : ''} ${isActive ? 'text-[#3c8dbc]' : ''}` })}
-                  {isOpen && <span className="whitespace-nowrap">{item.label}</span>}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </aside>
+    <BaseSidebar
+      isOpen={isOpen}
+      userName={user?.nama_perusahaan || 'Tenant'}
+      userAvatar={<User className="w-5 h-5" />}
+      userStatus={
+        !isVerified ? (
+          <>
+            <Circle className="w-[10px] h-[10px] mr-1 fill-yellow-500 text-yellow-500" /> Pending/Unverified
+          </>
+        ) : (
+          <>
+            <Circle className="w-[10px] h-[10px] mr-1 fill-[#3c8dbc] text-[#3c8dbc]" /> Verified Tenant
+          </>
+        )
+      }
+      headerTitle="Tenant Portal"
+      navItems={visibleNavItems}
+    />
   );
 }

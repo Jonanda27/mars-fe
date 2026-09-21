@@ -16,7 +16,7 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
   return (
     <div 
       ref={ref} 
-      className="p-12 mx-auto w-full max-w-[210mm] min-h-[297mm] shadow-sm print:shadow-none print:border-none"
+      className="p-12 mx-auto w-full max-w-[210mm] min-h-[297mm] shadow-sm print:shadow-none print:border-none relative"
       style={{ 
         fontFamily: '"Times New Roman", Times, serif', 
         fontSize: '12pt', 
@@ -30,7 +30,7 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
           <img src="/images/logo dishub .png" alt="Logo" style={{ width: '80px', height: 'auto' }} />
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '20px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '10px' }}>
           <h2 style={{ margin: 0, fontSize: '14pt', fontWeight: 'bold', textDecoration: 'underline' }}>
             SURAT PERJANJIAN KERJASAMA
           </h2>
@@ -46,21 +46,21 @@ const SuratPKS = forwardRef<HTMLDivElement, SuratPKSProps>(({ contract }, ref) =
               <tr>
                 <td style={{ width: '200px', verticalAlign: 'top', paddingLeft: '20px' }}>Nama</td>
                 <td style={{ width: '20px', verticalAlign: 'top' }}>:</td>
-                <td style={{ verticalAlign: 'top' }}>..........................................</td>
+                <td style={{ verticalAlign: 'top' }}>Asep Soekarna, S.Si.T.</td>
               </tr>
               <tr>
                 <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>Jabatan</td>
                 <td style={{ verticalAlign: 'top' }}>:</td>
-                <td style={{ verticalAlign: 'top' }}>Kepala UPBU</td>
+                <td style={{ verticalAlign: 'top' }}>Kepala Kantor UPBU Mozes Kilangin</td>
               </tr>
               <tr>
                 <td style={{ verticalAlign: 'top', paddingLeft: '20px' }}>Alamat Instansi</td>
                 <td style={{ verticalAlign: 'top' }}>:</td>
-                <td style={{ verticalAlign: 'top' }}>Kantor UPBU</td>
+                <td style={{ verticalAlign: 'top' }}>Jl. Bandara Mozes Kilangin, Timika, Papua Tengah</td>
               </tr>
             </tbody>
           </table>
-          <p style={{ margin: '5px 0 15px' }}>Dalam hal ini bertindak untuk dan atas nama UPBU, yang mana selanjutnya disebut sebagai Pihak Pertama.</p>
+          <p style={{ margin: '5px 0 15px' }}>Dalam hal ini bertindak untuk dan atas nama UPBU Bandara Mozes Kilangin, yang mana selanjutnya disebut sebagai Pihak Pertama.</p>
 
           <table style={{ width: '100%', borderCollapse: 'collapse', paddingLeft: '20px', marginBottom: '5px' }}>
             <tbody>

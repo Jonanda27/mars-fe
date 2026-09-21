@@ -1,18 +1,22 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, FileText, ArrowLeft, Loader2, Info, Download } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import api from '@/services/api';
+import { getErrorMessage } from '@/services/api';
+import { rentalService } from '@/services/rentalService';
 import { Stepper } from '@/components/Stepper';
 import { useAuthStore } from '@/store/useAuthStore';
 import SuratPermohonanTemplate from '@/components/SuratPermohonanTemplate';
-import { useRef } from 'react';
+import { contractService } from '@/services/contractService';
+import { Contract } from '@/types/contract';
 
-export default function BuatPermohonanPage() {
+function BuatPermohonanForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const extendFromId = searchParams.get('extend_from');
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
   const templateRef = useRef<HTMLDivElement>(null);
@@ -21,8 +25,45 @@ export default function BuatPermohonanPage() {
     purpose: '',
     application_type: 'Sewa Hanggar',
   });
+  const [extendFromContractId, setExtendFromContractId] = useState<number | null>(null);
 
   const [officialLetter, setOfficialLetter] = useState<File | null>(null);
+  const [requiresPayung, setRequiresPayung] = useState(true);
+
+  useEffect(() => {
+    const checkPayung = async () => {
+      try {
+        const contracts = await contractService.getTenantContracts();
+        const hasActivePayung = contracts?.some(
+          (c: Contract) => c.contract_type === 'Payung' && (c.status === 'Aktif' || c.status === 'Active')
+        );
+        setRequiresPayung(!hasActivePayung);
+      } catch (err) {
+        console.error("Gagal mengecek kontrak payung", err);
+      }
+    };
+    checkPayung();
+  }, []);
+
+  useEffect(() => {
+    if (extendFromId) {
+      const fetchContract = async () => {
+        try {
+          const contract = await contractService.getTenantContractById(Number.parseInt(extendFromId));
+          const isHangar = contract.assets?.jenis_aset?.toLowerCase().includes('hanggar') || false;
+          setFormData(prev => ({
+            ...prev,
+            application_type: isHangar ? 'Perpanjangan Sewa Hanggar' : 'Perpanjangan Sewa Ruangan',
+            purpose: `Permohonan Perpanjangan Sewa ${isHangar ? 'Hanggar' : 'Ruangan'} (Ref: ${contract.contract_number})`
+          }));
+          if (contract.id) setExtendFromContractId(contract.id);
+        } catch (error) {
+          console.error("Gagal memuat kontrak lama", error);
+        }
+      };
+      fetchContract();
+    }
+  }, [extendFromId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -53,7 +94,7 @@ export default function BuatPermohonanPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!officialLetter) {
       toast.error('Harap unggah Surat Permohonan Resmi!');
@@ -67,18 +108,17 @@ export default function BuatPermohonanPage() {
       payload.append('purpose', formData.purpose);
       payload.append('application_type', formData.application_type);
       payload.append('official_letter', officialLetter);
+      if (extendFromContractId) {
+        payload.append('extend_from_contract_id', extendFromContractId.toString());
+      }
       
-      const response = await api.post('/rentals', payload, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const newApp = await rentalService.createApplication(payload);
       
       toast.success('Surat permohonan berhasil diajukan! Menunggu verifikasi Kadis.');
       // After success, navigate to the detail page (or back to list)
-      router.push(`/tenant/permohonan/${response.data.data.id}`);
+      router.push(`/tenant/permohonan/${newApp.id}`);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Terjadi kesalahan saat mengajukan permohonan');
+      toast.error(getErrorMessage(error) || 'Terjadi kesalahan saat mengajukan permohonan');
       setLoading(false);
     }
   };
@@ -98,9 +138,18 @@ export default function BuatPermohonanPage() {
       </header>
 
       {/* Stepper Component */}
-      <div className="mb-6">
-        <Stepper currentStep={1} />
-      </div>
+      {(() => {
+        const isHangar = formData.application_type.toLowerCase().includes('hanggar');
+        return (
+          <div className="mb-6">
+            <Stepper 
+              currentStep={1} 
+              requiresPayung={isHangar && requiresPayung} 
+              isHangar={isHangar} 
+            />
+          </div>
+        );
+      })()}
 
       <form onSubmit={handleSubmit} className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
         <div className="p-3 border-b border-[#f4f4f4] bg-slate-50 flex items-center">
@@ -116,8 +165,14 @@ export default function BuatPermohonanPage() {
               <div>
                 <h4 className="font-semibold text-[15px] mb-1">Alur Permohonan</h4>
                 <p className="text-[14px] text-blue-800/80 leading-relaxed">
-                  Pilih layanan yang Anda butuhkan, lalu unggah <strong>Surat Permohonan Resmi</strong> (ber-Kop Surat, ditandatangani, dan distempel). 
-                  Setelah mendapat persetujuan Kepala Dinas, Anda dapat memilih detail aset pada tahap selanjutnya.
+                  Pilih layanan yang Anda butuhkan, lalu unggah <strong>Surat Permohonan Resmi</strong> (ber-Kop Surat, ditandatangani, dan distempel).{' '}
+                  {formData.application_type.toLowerCase().includes('hanggar') ? (
+                    requiresPayung
+                      ? "Setelah mendapat persetujuan Kepala Dinas, draf Kontrak Payung (PKS Induk) otomatis diterbitkan untuk Anda tanda tangani sebelum memilih detail aset hanggar."
+                      : "Setelah mendapat persetujuan Kepala Dinas, Anda dapat langsung memilih detail hanggar dan armada pesawat di bawah Kontrak Payung aktif Anda."
+                  ) : (
+                    "Untuk Sewa Ruangan, permohonan menggunakan Kontrak Sewa (Surat PKS). Setelah permohonan disetujui Kepala Dinas, Anda akan memilih spesifikasi ruangan dan draf Kontrak Sewa (Surat PKS) otomatis diterbitkan untuk ditandatangani."
+                  )}
                 </p>
               </div>
             </div>
@@ -127,23 +182,35 @@ export default function BuatPermohonanPage() {
               <div className="lg:col-span-7 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[14px] font-semibold text-slate-700 mb-2">Jenis Layanan Sewa <span className="text-red-500">*</span></label>
+                    <label htmlFor="application_type" className="block text-[14px] font-semibold text-slate-700 mb-2">Jenis Layanan Sewa <span className="text-red-500">*</span></label>
                     <select 
+                      id="application_type"
                       name="application_type" 
                       value={formData.application_type} 
                       onChange={handleChange} 
                       required
-                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all bg-white shadow-sm"
+                      disabled={!!extendFromId}
+                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     >
-                      <option value="Sewa Hanggar">Sewa Hanggar</option>
-                      <option value="Sewa Apron">Sewa Apron</option>
-                      <option value="Sewa Ruangan">Sewa Ruangan</option>
+                      {extendFromId ? (
+                        <>
+                          <option value="Perpanjangan Sewa Hanggar">Perpanjangan Sewa Hanggar</option>
+                          <option value="Perpanjangan Sewa Ruangan">Perpanjangan Sewa Ruangan</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="Sewa Hanggar">Sewa Hanggar</option>
+                          <option value="Sewa Apron">Sewa Apron</option>
+                          <option value="Sewa Ruangan">Sewa Ruangan</option>
+                        </>
+                      )}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-[14px] font-semibold text-slate-700 mb-2">Perihal Surat <span className="text-red-500">*</span></label>
+                    <label htmlFor="purpose" className="block text-[14px] font-semibold text-slate-700 mb-2">Perihal Surat <span className="text-red-500">*</span></label>
                     <input 
+                      id="purpose"
                       type="text" 
                       name="purpose" 
                       value={formData.purpose} 
@@ -175,7 +242,7 @@ export default function BuatPermohonanPage() {
 
               {/* Upload Kolom Kanan */}
               <div className="lg:col-span-5">
-                <label className="block text-[14px] font-semibold text-slate-700 mb-2">Dokumen Surat Resmi <span className="text-red-500">*</span></label>
+                <label htmlFor="file-upload" className="block text-[14px] font-semibold text-slate-700 mb-2">Dokumen Surat Resmi <span className="text-red-500">*</span></label>
                 
                 {!officialLetter ? (
                   <div className="mt-1 flex justify-center px-6 pt-10 pb-10 border-2 border-slate-300 border-dashed rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all group relative">
@@ -186,7 +253,7 @@ export default function BuatPermohonanPage() {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
                       accept=".pdf"
                       onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
+                        if (e.target.files?.[0]) {
                           setOfficialLetter(e.target.files[0]);
                         }
                       }}
@@ -248,5 +315,13 @@ export default function BuatPermohonanPage() {
           />
         </div>
     </div>
+  );
+}
+
+export default function BuatPermohonanPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-500" /></div>}>
+      <BuatPermohonanForm />
+    </Suspense>
   );
 }

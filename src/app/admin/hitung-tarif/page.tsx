@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Calculator, AlertCircle, PlayCircle, Receipt } from 'lucide-react';
+import { Calculator, AlertCircle, PlayCircle } from 'lucide-react';
+import RupiahIcon from '@/components/icons/RupiahIcon';
 
 // Data Tarif Berdasarkan Perbup Nomor 25 Tahun 2024
 const tarifHanggar: Record<string, { nama: string, harga: number }> = {
@@ -278,7 +279,7 @@ export default function KalkulatorTarifPage() {
           <div className="bg-white border-t-[3px] border-[#00a65a] shadow-sm h-full flex flex-col">
             <div className="p-[15px] border-b border-[#f4f4f4] bg-slate-50">
               <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-                <Receipt className="w-5 h-5 mr-2 text-[#00a65a]" /> Rincian Tagihan Resmi (Simulasi)
+                <RupiahIcon className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Rincian Tagihan Resmi (Simulasi)
               </h3>
             </div>
             

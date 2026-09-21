@@ -12,7 +12,9 @@ export interface RentalApplication {
   signed_document_url?: string;
   official_letter_url?: string;
   created_at?: string;
+  updated_at?: string;
   assets?: any;
   tenants?: any;
   contracts?: any;
+  requires_payung?: boolean;
 }

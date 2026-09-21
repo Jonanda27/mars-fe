@@ -1,10 +1,47 @@
 import { Contract } from './contract';
 
+export interface InvoiceDetailItem {
+  log_id?: number;
+  registration_number: string;
+  aircraft_type: string;
+  tariff_code?: string;
+  parking_location: string;
+  entry_time: string;
+  exit_time?: string | null;
+  is_overnight?: boolean;
+  verified_nights?: number;
+  total_nights: number;
+  rate_per_night: number;
+  subtotal: number;
+  evidence_photos?: string[];
+  tenant_id?: number;
+  tenant_name?: string;
+}
+
+export interface UnbilledHanggarLog {
+  log_id: number;
+  registration_number: string;
+  aircraft_type: string;
+  tariff_code: string;
+  parking_location: string;
+  entry_time: string;
+  exit_time?: string | null;
+  is_overnight: boolean;
+  verified_nights: number;
+  total_nights: number;
+  rate_per_night: number;
+  subtotal: number;
+  evidence_photos: string[];
+  tenant_id: number;
+  tenant_name: string;
+}
+
 export interface Invoice {
   id: number;
   invoice_number: string;
-  contract_id: number;
+  contract_id?: number | null;
   tenant_id: number;
+  invoice_type?: string | null; // 'Sewa Ruangan' | 'Sewa Hanggar' | 'SKRD Denda' | 'SKRD Overstay'
   amount: number | string;
   due_date: string;
   status: string;
@@ -12,7 +49,9 @@ export interface Invoice {
   payment_receipt?: string | null;
   payment_date?: string | null;
   penalty_amount?: string | number | null;
+  details?: any;
   created_at: string;
-  contracts?: Contract;
+  contracts?: Contract | null;
   tenants?: any;
+  operational_logs?: any[];
 }

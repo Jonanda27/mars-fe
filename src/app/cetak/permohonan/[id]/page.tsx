@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import api from '@/services/api';
+import { rentalService } from '@/services/rentalService';
+import { RentalApplication } from '@/types/rental';
 
 export default function CetakPermohonan() {
   const { id } = useParams() as { id: string };
-  const [app, setApp] = useState<any>(null);
+  const [app, setApp] = useState<RentalApplication | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -15,8 +16,8 @@ export default function CetakPermohonan() {
 
   const fetchData = async () => {
     try {
-      const res = await api.get(`/rentals/${id}`);
-      setApp(res.data.data);
+      const data = await rentalService.getApplicationById(Number(id));
+      setApp(data);
     } catch (error) {
       console.error(error);
     }

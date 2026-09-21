@@ -6,11 +6,12 @@ import { contractService } from '@/services/contractService';
 import { invoiceService } from '@/services/invoiceService';
 import { Contract } from '@/types/contract';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Download, FileSignature, Edit, AlertCircle, FileText, Eye, Loader2 } from 'lucide-react';
+import { CheckCircle2, Download, FileSignature, Edit, AlertCircle, FileText, Eye, Loader2 } from 'lucide-react';
 import SignaturePad from '@/components/SignaturePad';
 import { toast } from 'react-hot-toast';
 import EditContractModal from '@/components/EditContractModal';
 import SuratPKS from '@/components/SuratPKS';
+import { getFileUrl } from '@/utils/url';
 
 export default function AdminContractDetailPage() {
   const params = useParams();
@@ -48,6 +49,7 @@ export default function AdminContractDetailPage() {
       setShowSignaturePad(false);
       fetchContract();
     } catch (error) {
+      console.error('Error saving TTE:', error);
       toast.error('Gagal menyimpan TTE');
     } finally {
       setIsUpdating(false);
@@ -122,7 +124,7 @@ export default function AdminContractDetailPage() {
             <>
               {contract.signed_document_url && (
                 <a
-                  href={contract.signed_document_url.startsWith('http') ? contract.signed_document_url : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || ''}${contract.signed_document_url}`}
+                  href={getFileUrl(contract.signed_document_url)}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
@@ -138,6 +140,7 @@ export default function AdminContractDetailPage() {
                     toast.success('Kontrak berhasil diverifikasi dan diaktifkan!');
                     fetchContract();
                   } catch (error) {
+                    console.error('Error verifying contract:', error);
                     toast.error('Gagal memverifikasi kontrak');
                   } finally {
                     setIsUpdating(false);
@@ -251,21 +254,21 @@ export default function AdminContractDetailPage() {
 
       {/* Dokumen PKS Preview */}
       <div className="bg-gray-200 p-4 md:p-8 rounded-lg overflow-auto flex justify-center mb-10 min-h-[800px]">
-        {contract.contract_type === 'Payung' ? (
-          contract.signed_document_url ? (
-            <iframe 
-              src={contract.signed_document_url.startsWith('http') ? contract.signed_document_url : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || ''}${contract.signed_document_url}`} 
-              className="w-full max-w-[1000px] h-[800px] border-0 shadow-xl bg-white rounded"
-              title="Kontrak Payung"
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-slate-500 pt-20">
-              <FileText className="w-16 h-16 mb-4 text-slate-400" />
-              <p className="font-medium text-lg text-slate-600">Dokumen TTD Belum Diunggah</p>
-              <p className="text-sm mt-2 max-w-md text-center">Menunggu pihak Tenant untuk mengunggah pindaian Kontrak Payung yang telah ditandatangani.</p>
-            </div>
-          )
-        ) : (
+        {contract.contract_type === 'Payung' && contract.signed_document_url && (
+          <iframe 
+            src={getFileUrl(contract.signed_document_url)} 
+            className="w-full max-w-[1000px] h-[800px] border-0 shadow-xl bg-white rounded"
+            title="Kontrak Payung"
+          />
+        )}
+        {contract.contract_type === 'Payung' && !contract.signed_document_url && (
+          <div className="flex flex-col items-center justify-center h-full text-slate-500 pt-20">
+            <FileText className="w-16 h-16 mb-4 text-slate-400" />
+            <p className="font-medium text-lg text-slate-600">Dokumen TTD Belum Diunggah</p>
+            <p className="text-sm mt-2 max-w-md text-center">Menunggu pihak Tenant untuk mengunggah pindaian Kontrak Payung yang telah ditandatangani.</p>
+          </div>
+        )}
+        {contract.contract_type !== 'Payung' && (
           <SuratPKS contract={contract} ref={pksRef} />
         )}
       </div>

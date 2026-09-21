@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Edit2, Trash2, Search, Loader2, FileText, Database } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Loader2 } from 'lucide-react';
 import { tariffService } from '@/services/tariffService';
 import { MasterTariff } from '@/types/tariff';
 import { formatRupiah } from '@/utils/formatCurrency';
 import toast from 'react-hot-toast';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function MasterTarifPage() {
   const [tariffs, setTariffs] = useState<MasterTariff[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -43,7 +43,6 @@ export default function MasterTarifPage() {
       toast.error('Gagal menghapus tarif. Pastikan tidak ada data yang terikat.');
     } finally {
       setDeleting(false);
-      setDeleteId(null);
     }
   };
 
@@ -52,6 +51,63 @@ export default function MasterTarifPage() {
     t.jenis_layanan.toLowerCase().includes(searchTerm.toLowerCase()) ||
     t.objek.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const renderTableBody = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan={7} className="p-8 text-center text-slate-500">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto mb-2" />
+            <p>Memuat data tarif...</p>
+          </td>
+        </tr>
+      );
+    }
+
+    if (filteredTariffs.length === 0) {
+      return (
+        <tr>
+          <td colSpan={7} className="p-8 text-center text-slate-500">
+            Tidak ada data tarif ditemukan
+          </td>
+        </tr>
+      );
+    }
+
+    return filteredTariffs.map((t) => (
+      <tr key={t.id} className="border-b border-[#f4f4f4] hover:bg-slate-50 transition-colors">
+        <td className="py-3 px-4 text-[#3c8dbc] font-bold">{t.kode_tarif}</td>
+        <td className="py-3 px-4 font-bold text-[#333]">{t.jenis_layanan}</td>
+        <td className="py-3 px-4 text-[#555]">{t.objek}</td>
+        <td className="py-3 px-4 font-mono font-bold text-[#333]">
+          {formatRupiah(t.tarif)}
+        </td>
+        <td className="py-3 px-4 text-center text-[#555]">
+          {t.satuan}
+        </td>
+        <td className="py-3 px-4 text-center">
+          <StatusBadge status={t.status === 'Active' ? 'Aktif' : 'Inaktif'} />
+        </td>
+        <td className="py-3 px-4 text-center">
+          <div className="flex items-center justify-center gap-1">
+            <Link 
+              href={`/admin/tarif/edit/${t.id}`}
+              className="bg-[#3c8dbc] text-white p-1.5 hover:bg-[#367fa9] shadow-sm rounded-sm" title="Edit Tarif"
+            >
+              <Edit2 className="w-4 h-4" />
+            </Link>
+            <button
+              onClick={() => handleDelete(t.id)}
+              disabled={deleting}
+              className="bg-[#dd4b39] text-white p-1.5 hover:bg-[#c9302c] shadow-sm rounded-sm disabled:opacity-50" title="Hapus Tarif"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ));
+  };
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
@@ -103,56 +159,7 @@ export default function MasterTarifPage() {
               </tr>
             </thead>
             <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-500">
-                    <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto mb-2" />
-                    <p>Memuat data tarif...</p>
-                  </td>
-                </tr>
-              ) : filteredTariffs.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-500">
-                    Tidak ada data tarif ditemukan
-                  </td>
-                </tr>
-              ) : (
-                filteredTariffs.map((t, idx) => (
-                  <tr key={t.id} className="border-b border-[#f4f4f4] hover:bg-slate-50 transition-colors">
-                    <td className="py-3 px-4 text-[#3c8dbc] font-bold">{t.kode_tarif}</td>
-                    <td className="py-3 px-4 font-bold text-[#333]">{t.jenis_layanan}</td>
-                    <td className="py-3 px-4 text-[#555]">{t.objek}</td>
-                    <td className="py-3 px-4 font-mono font-bold text-[#333]">
-                      {formatRupiah(t.tarif)}
-                    </td>
-                    <td className="py-3 px-4 text-center text-[#555]">
-                      {t.satuan}
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`px-2 py-1 text-[11px] rounded-sm font-bold uppercase tracking-wide ${t.status === 'Active' ? 'bg-[#00a65a] text-white' : 'bg-[#dd4b39] text-white'}`}>
-                        {t.status === 'Active' ? 'AKTIF' : 'INAKTIF'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Link 
-                          href={`/admin/tarif/edit/${t.id}`}
-                          className="bg-[#3c8dbc] text-white p-1.5 hover:bg-[#367fa9] shadow-sm rounded-sm" title="Edit Tarif"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(t.id)}
-                          disabled={deleting}
-                          className="bg-[#dd4b39] text-white p-1.5 hover:bg-[#c9302c] shadow-sm rounded-sm disabled:opacity-50" title="Hapus Tarif"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
+              {renderTableBody()}
             </tbody>
           </table>
         </div>

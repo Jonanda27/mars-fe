@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { rentalService } from '@/services/rentalService';
 import { RentalApplication } from '@/types/rental';
-import { FileText, Eye, Loader2, CheckCircle2 } from 'lucide-react';
+import { Eye, Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function EksekutifPermohonanPage() {
   const [applications, setApplications] = useState<RentalApplication[]>([]);
@@ -29,22 +30,6 @@ export default function EksekutifPermohonanPage() {
       console.error('Error fetching applications:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Menunggu Verifikasi Kadis': 
-        return <span className="bg-[#f39c12] text-white px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">Butuh Persetujuan Surat</span>;
-      case 'Draft Kontrak': 
-        return <span className="bg-purple-500 text-white px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">Butuh Persetujuan Kontrak</span>;
-      case 'Surat Disetujui': 
-      case 'Aktif': 
-        return <span className="bg-[#00a65a] text-white px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">{status}</span>;
-      case 'Ditolak': 
-        return <span className="bg-[#dd4b39] text-white px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">Ditolak</span>;
-      default: 
-        return <span className="bg-gray-500 text-white px-2 py-1 rounded text-xs font-bold uppercase tracking-wide">{status}</span>;
     }
   };
 
@@ -107,7 +92,7 @@ export default function EksekutifPermohonanPage() {
                         )}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {getStatusBadge(app.status)}
+                        <StatusBadge status={app.status} />
                       </td>
                       <td className="py-3 px-4 text-center">
                         <Link 

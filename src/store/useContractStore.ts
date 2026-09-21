@@ -14,7 +14,7 @@ interface ContractState {
   fetchTenantContracts: () => Promise<void>;
   fetchTenantContractById: (id: number) => Promise<void>;
   updateTenantContractStatus: (id: number, status: string, signature?: string) => Promise<void>;
-  extendContract: (id: number, durationMonths: number) => Promise<void>;
+  extendContract: (id: number, newEndDate: string) => Promise<void>;
 }
 
 export const useContractStore = create<ContractState>((set, get) => ({
@@ -96,10 +96,10 @@ export const useContractStore = create<ContractState>((set, get) => ({
     }
   },
 
-  extendContract: async (id: number, durationMonths: number) => {
+  extendContract: async (id: number, newEndDate: string) => {
     set({ isLoading: true, error: null });
     try {
-      await contractService.extendContract(id, durationMonths);
+      await contractService.extendContract(id, newEndDate);
       set({ isLoading: false });
     } catch (err: any) {
       set({ error: err.message || 'Failed to extend contract', isLoading: false });

@@ -58,5 +58,15 @@ export const contractService = {
   verifyContract: async (id: number): Promise<any> => {
     const response = await api.put(`/contracts/${id}/verify`);
     return response.data;
+  },
+
+  approveContractByKadis: async (id: number): Promise<any> => {
+    const response = await api.patch(`/contracts/${id}/approve-kadis`);
+    return response.data;
+  },
+
+  rejectContractByKadis: async (id: number, reason: string): Promise<any> => {
+    const response = await api.patch(`/contracts/${id}/reject-kadis`, { reason });
+    return response.data;
   }
 };

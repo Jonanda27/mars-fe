@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { rentalService } from '@/services/rentalService';
 import { RentalApplication } from '@/types/rental';
-import { FileText, Eye, Clock, Loader2 } from 'lucide-react';
+import { Eye, Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function PermohonanAdminPage() {
   const [applications, setApplications] = useState<RentalApplication[]>([]);
@@ -24,20 +25,6 @@ export default function PermohonanAdminPage() {
       console.error('Error fetching applications:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Pending': return 'bg-[#f39c12] text-white';
-      case 'Menunggu Persetujuan Kadis': return 'bg-purple-500 text-white';
-      case 'Disetujui Kadis': return 'bg-[#00a65a] text-white';
-      case 'Ditolak': return 'bg-[#dd4b39] text-white';
-      case 'Draft Kontrak': return 'bg-blue-500 text-white';
-      case 'Approved': return 'bg-[#00a65a] text-white';
-      case 'Rejected': return 'bg-[#dd4b39] text-white';
-      case 'Reviewed': return 'bg-[#3c8dbc] text-white';
-      default: return 'bg-gray-500 text-white';
     }
   };
 
@@ -109,10 +96,7 @@ export default function PermohonanAdminPage() {
                         {app.end_date ? dayjs(app.end_date).format('DD MMM YYYY') : '-'}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <span className={`${getStatusColor(app.status)} text-[11px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide shadow-sm inline-flex items-center text-center leading-tight`}>
-                          {(app.status === 'Pending' || app.status === 'Menunggu Persetujuan Kadis') && <Clock className="w-3 h-3 mr-1" />}
-                          {app.status}
-                        </span>
+                        <StatusBadge status={app.status} />
                       </td>
                       <td className="py-3 px-4 text-center">
                         <div className="flex justify-center gap-1">

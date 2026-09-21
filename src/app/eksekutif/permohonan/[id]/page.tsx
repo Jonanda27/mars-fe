@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { rentalService } from '@/services/rentalService';
-import { getBaseUrl } from '@/services/api';
+import { resolveUrl } from '@/utils/url';
+import { getErrorMessage } from '@/services/api';
 import { RentalApplication } from '@/types/rental';
 import { FileText, ArrowLeft, Loader2, CheckCircle2, XCircle } from 'lucide-react';
-import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function EksekutifPermohonanDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const { id } = params as { id: string };
   
   const [app, setApp] = useState<RentalApplication | null>(null);
@@ -36,23 +36,15 @@ export default function EksekutifPermohonanDetailPage() {
     }
   };
 
-  const resolveUrl = (path: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    const base = getBaseUrl();
-    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
-  };
-
   const handleVerifyLetter = async (newStatus: 'Surat Disetujui' | 'Ditolak') => {
     try {
       setProcessing(true);
-      // Calls PATCH /api/rentals/:id/verify-letter
       await rentalService.verifyLetter(Number(id), newStatus);
       toast.success(`Permohonan berhasil ${newStatus === 'Surat Disetujui' ? 'disetujui' : 'ditolak'}`);
-      fetchApplicationDetails(); // Reload data
-    } catch (error) {
+      fetchApplicationDetails();
+    } catch (error: any) {
       console.error('Error verifying letter:', error);
-      toast.error('Gagal memperbarui status permohonan.');
+      toast.error(getErrorMessage(error) || 'Gagal memperbarui status permohonan.');
     } finally {
       setProcessing(false);
     }
@@ -61,13 +53,12 @@ export default function EksekutifPermohonanDetailPage() {
   const handleApproveContract = async () => {
     try {
       setProcessing(true);
-      // Calls PATCH /api/rentals/:id/approve-kadis
       await rentalService.approveKadis(Number(id));
       toast.success('Kontrak berhasil disetujui');
-      fetchApplicationDetails(); // Reload data
-    } catch (error) {
+      fetchApplicationDetails();
+    } catch (error: any) {
       console.error('Error approving contract:', error);
-      toast.error('Gagal menyetujui kontrak.');
+      toast.error(getErrorMessage(error) || 'Gagal menyetujui kontrak.');
     } finally {
       setProcessing(false);
     }
@@ -142,12 +133,10 @@ export default function EksekutifPermohonanDetailPage() {
 
       {/* Basic Info Card */}
       <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm mb-8">
-         <div className="p-4 border-b border-[#f4f4f4] bg-slate-50 flex justify-between items-center">
-           <h3 className="text-[16px] text-[#444] font-bold">Informasi Dasar & Dokumen</h3>
-           <div className="bg-[#3c8dbc] px-3 py-1 rounded-sm text-[12px] font-bold text-white uppercase tracking-wide">
-             {app.status}
-           </div>
-         </div>
+          <div className="p-4 border-b border-[#f4f4f4] bg-slate-50 flex justify-between items-center">
+            <h3 className="text-[16px] text-[#444] font-bold">Informasi Dasar & Dokumen</h3>
+            <StatusBadge status={app.status} />
+          </div>
          <div className="p-6 md:p-8 space-y-8">
            {/* Text Information Section */}
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { LoginPayload } from '@/types/auth';
 import { Eye, EyeOff } from 'lucide-react';
+import { isTenantRole, isAdminRole, isEksekutifRole, isPetugasRole } from '@/utils/routeGuard';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,21 +28,19 @@ export default function LoginPage() {
     
     if (success) {
       const { user } = useAuthStore.getState();
+      const role = user?.role;
       
-      // Routing logic based on roles/verification status
-      const userRole = user?.role?.toLowerCase();
-      
-      if (userRole === 'tenant') {
+      if (isTenantRole(role)) {
         if (user?.status_verifikasi === 'Pending') {
           router.push('/tenant/profil');
         } else {
           router.push('/tenant');
         }
-      } else if (userRole === 'admin' || userRole === 'superadmin') {
+      } else if (isAdminRole(role)) {
         router.push('/admin');
-      } else if (userRole === 'kepala dinas') {
+      } else if (isEksekutifRole(role)) {
         router.push('/eksekutif');
-      } else if (userRole === 'petugas lapangan') {
+      } else if (isPetugasRole(role)) {
         router.push('/petugas');
       } else {
         router.push('/');

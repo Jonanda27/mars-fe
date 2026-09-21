@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2, RefreshCw } from 'lucide-react';
-import api from '@/services/api';
+import { authService } from '@/services/authService';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function RegisterPage() {
@@ -94,7 +94,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await api.post('/auth/request-otp', { email: formData.email });
+      await authService.requestOtp(formData.email);
       setSuccess('Kode OTP telah dikirim ke email Anda.');
       setCountdown(60);
       setStep(2);
@@ -116,7 +116,7 @@ export default function RegisterPage() {
         throw new Error('Kode OTP harus 6 digit');
       }
 
-      await api.post('/auth/register', formData);
+      await authService.register(formData);
       setSuccess('Pendaftaran berhasil! Mengalihkan ke halaman profil...');
       
       const loggedIn = await loginUser({ username: formData.username, password: formData.password });

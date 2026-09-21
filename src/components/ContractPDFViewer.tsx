@@ -11,28 +11,30 @@ import toast from 'react-hot-toast';
 dayjs.locale('id');
 
 interface Props {
-  contract: Contract;
-  onClose: () => void;
-  isInline?: boolean;
+  readonly contract: Contract;
+  readonly tenant?: any;
+  readonly onClose: () => void;
+  readonly isInline?: boolean;
 }
 
-export default function ContractPDFViewer({ contract, onClose, isInline = false }: Props) {
-  const [isDownloading, setIsDownloading] = useState(false);
+interface ContractPageData {
+  id: number;
+  isFirstPage: boolean;
+  tariffs: any[];
+  hasSignature: boolean;
+}
 
-  const masterTariffs = Array.isArray(contract.fasilitas) ? contract.fasilitas : [];
-
-  const pages: any[] = [];
+function computeContractPages(masterTariffs: any[]): ContractPageData[] {
+  const pages: ContractPageData[] = [];
   const remainingTariffs = [...masterTariffs];
   
   const page1Capacity = 8;
   const page1Tariffs = remainingTariffs.splice(0, page1Capacity);
   
-  let isSignatureOnPage1 = false;
-  if (remainingTariffs.length === 0 && page1Tariffs.length <= 5) {
-    isSignatureOnPage1 = true;
-  }
+  const isSignatureOnPage1 = remainingTariffs.length === 0 && page1Tariffs.length <= 5;
 
   pages.push({
+    id: 1,
     isFirstPage: true,
     tariffs: page1Tariffs,
     hasSignature: isSignatureOnPage1,
@@ -40,12 +42,14 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
 
   if (remainingTariffs.length === 0 && !isSignatureOnPage1) {
     pages.push({
+      id: 2,
       isFirstPage: false,
       tariffs: [],
       hasSignature: true,
     });
   }
 
+  let pageCounter = pages.length + 1;
   while (remainingTariffs.length > 0) {
     const pageCapacity = 20; 
     const isLastChunk = remainingTariffs.length <= pageCapacity;
@@ -58,25 +62,36 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
         hasSignature = true;
       } else {
         currentChunkCapacity = pageCapacity;
-        hasSignature = false;
       }
     }
 
     const chunk = remainingTariffs.splice(0, currentChunkCapacity);
     pages.push({
+      id: pageCounter++,
       isFirstPage: false,
       tariffs: chunk,
-      hasSignature: hasSignature,
+      hasSignature,
     });
 
     if (isLastChunk && !hasSignature) {
       pages.push({
+        id: pageCounter++,
         isFirstPage: false,
         tariffs: [],
         hasSignature: true,
       });
     }
   }
+
+  return pages;
+}
+
+export default function ContractPDFViewer({ contract, tenant, onClose, isInline = false }: Props) {
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const tenantData = contract.tenants || tenant;
+  const masterTariffs = Array.isArray(contract.fasilitas) ? contract.fasilitas : [];
+  const pages = computeContractPages(masterTariffs);
 
   const handleDownloadPdf = async () => {
     setIsDownloading(true);
@@ -121,14 +136,14 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
   };
 
   return (
-    <div className={isInline ? "bg-slate-100 flex flex-col items-center p-4 md:p-8 rounded border border-slate-200 mt-4 overflow-auto max-h-[800px]" : "fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-75 flex flex-col items-center p-4 md:p-8"}>
+    <div className={isInline ? "bg-slate-100 flex flex-col items-center p-4 md:p-8 rounded border border-slate-200 mt-4 overflow-auto max-h-[800px]" : "fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm transition-all duration-300 flex flex-col items-center p-4 md:p-8"}>
       
       {/* Header Actions */}
       <div className={`w-full max-w-[794px] mb-4 flex justify-end print:hidden gap-3 ${isInline ? 'hidden' : ''}`}>
         {!isInline && (
           <button 
             onClick={onClose}
-            className="flex items-center px-4 py-2 font-bold text-sm rounded transition bg-white text-gray-800 hover:bg-gray-100"
+            className="flex items-center px-4 py-2 font-bold text-sm rounded-none transition bg-white text-gray-800 hover:bg-gray-100"
           >
             <X className="w-4 h-4 mr-2" /> Tutup
           </button>
@@ -137,7 +152,7 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
           id="download-pdf-btn"
           onClick={handleDownloadPdf}
           disabled={isDownloading}
-          className="flex items-center px-4 py-2 font-bold text-sm rounded shadow transition"
+          className="flex items-center px-4 py-2 font-bold text-sm rounded-none shadow transition"
           style={{ backgroundColor: '#1f2937', color: '#ffffff', opacity: isDownloading ? 0.7 : 1 }}
         >
           {isDownloading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
@@ -148,9 +163,9 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
       {/* Kontainer Utama Pengikat Lembaran Kertas */}
       <div id="contract-document" style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', paddingBottom: '40px' }}>
         
-        {pages.map((page, index) => (
+        {pages.map((page) => (
           <div 
-            key={index}
+            key={`page-${page.id}`}
             className="page-a4 shadow-xl box-border relative"
             style={{ 
               width: '794px', 
@@ -207,10 +222,10 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
                       <span className="w-8">II.</span>
                       <span className="w-32 font-bold">Pihak Kedua</span>
                       <span className="flex-1 space-y-1">
-                        <div className="flex"><span className="w-32">Nama Perusahaan</span><span className="mr-2">:</span><span className="flex-1"><strong>{contract.tenants?.nama_perusahaan || '-'}</strong></span></div>
-                        <div className="flex"><span className="w-32">Alamat</span><span className="mr-2">:</span><span className="flex-1">{contract.tenants?.alamat || '-'}</span></div>
-                        <div className="flex"><span className="w-32">Diwakili Oleh</span><span className="mr-2">:</span><span className="flex-1">{contract.tenants?.pic || '-'}</span></div>
-                        <div className="flex"><span className="w-32">NIB / NPWP</span><span className="mr-2">:</span><span className="flex-1">{contract.tenants?.nib || '-'} / {contract.tenants?.npwp || '-'}</span></div>
+                        <div className="flex"><span className="w-32">Nama Perusahaan</span><span className="mr-2">:</span><span className="flex-1"><strong>{tenantData?.nama_perusahaan || '-'}</strong></span></div>
+                        <div className="flex"><span className="w-32">Alamat</span><span className="mr-2">:</span><span className="flex-1">{tenantData?.alamat || '-'}</span></div>
+                        <div className="flex"><span className="w-32">Diwakili Oleh</span><span className="mr-2">:</span><span className="flex-1">{tenantData?.pic || '-'}</span></div>
+                        <div className="flex"><span className="w-32">NIB / NPWP</span><span className="mr-2">:</span><span className="flex-1">{tenantData?.nib || '-'} / {tenantData?.npwp || '-'}</span></div>
                       </span>
                     </div>
                     
@@ -267,7 +282,7 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
                   </thead>
                   <tbody>
                     {page.tariffs.map((tarif: any, tIndex: number) => (
-                      <tr key={tIndex}>
+                      <tr key={tarif.id || `${tarif.kode_tarif}-${tIndex}`}>
                         <td className="p-1.5 text-center text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.kode_tarif}</td>
                         <td className="p-1.5 text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.objek}</td>
                         <td className="p-1.5 text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.jenis_layanan}</td>
@@ -296,8 +311,8 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
                   <div className="flex justify-between px-10">
                     <div className="text-center">
                       <p className="mb-20"><strong>PIHAK KEDUA</strong></p>
-                      <p className="font-bold inline-block min-w-[150px]" style={{ borderBottom: '1px solid #000000' }}>{contract.tenants?.pic || 'Nama Perwakilan'}</p>
-                      <p className="mt-1 text-[11px]">{contract.tenants?.nama_perusahaan || 'Direktur Perusahaan'}</p>
+                      <p className="font-bold inline-block min-w-[150px]" style={{ borderBottom: '1px solid #000000' }}>{tenantData?.pic || 'Nama Perwakilan'}</p>
+                      <p className="mt-1 text-[11px]">{tenantData?.nama_perusahaan || 'Direktur Perusahaan'}</p>
                     </div>
                     <div className="text-center">
                       <p>Timika, {dayjs(contract.start_date).format('DD MMMM YYYY')}</p>
@@ -311,7 +326,7 @@ export default function ContractPDFViewer({ contract, onClose, isInline = false 
             
             {/* Indikator Halaman */}
             <div className="absolute bottom-[20px] w-full text-center left-0 text-[10px]" style={{ color: '#666666' }}>
-              - Halaman {index + 1} dari {pages.length} -
+              - Halaman {page.id} dari {pages.length} -
             </div>
             
           </div>

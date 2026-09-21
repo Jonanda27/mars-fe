@@ -7,6 +7,19 @@ export const authService = {
     return response.data;
   },
 
+  requestOtp: async (email: string): Promise<{ message: string }> => {
+    const response = await api.post('/auth/request-otp', { email });
+    return response.data;
+  },
+
+  register: async (data: FormData | Record<string, unknown>): Promise<AuthResponse> => {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    const response = await api.post('/auth/register', data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : undefined);
+    return response.data;
+  },
+
   registerTenant: async (payload: RegisterTenantPayload): Promise<AuthResponse> => {
     try {
       const response = await api.post<AuthResponse>('/auth/register', payload);

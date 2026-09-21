@@ -2,16 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  AlertTriangle, Receipt, Search, Filter, 
+  AlertTriangle, Search, Filter, 
   Clock, CheckCircle2, X, Loader2, Plane
 } from 'lucide-react';
-import api from '@/services/api';
+import RupiahIcon from '@/components/icons/RupiahIcon';
+import { logService } from '@/services/logService';
+import { invoiceService } from '@/services/invoiceService';
+import { OverstayLogItem } from '@/types/log';
 import { formatRupiah } from '@/utils/formatCurrency';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
 export default function AdminTagihanOverstayPage() {
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<OverstayLogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState<number | null>(null);
 
@@ -21,8 +24,8 @@ export default function AdminTagihanOverstayPage() {
 
   const fetchOverstayLogs = async () => {
     try {
-      const res = await api.get('/logs/overstay');
-      setLogs(res.data.data);
+      const data = await logService.getOverstayLogs();
+      setLogs(data || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -35,7 +38,7 @@ export default function AdminTagihanOverstayPage() {
     
     try {
       setIsProcessing(logId);
-      await api.post(`/invoices/generate-skrd-overstay/${logId}`);
+      await invoiceService.generateOverstaySkrd(logId);
       toast.success('SKRD Tambahan berhasil diterbitkan! Silakan cek di menu Manajemen Tagihan.');
       fetchOverstayLogs();
     } catch (error: any) {
@@ -106,7 +109,7 @@ export default function AdminTagihanOverstayPage() {
                        disabled={isProcessing === log.id}
                        className="bg-[#00a65a] border border-[#008d4c] text-white hover:bg-[#008d4c] px-3 py-1.5 text-[12px] font-bold inline-flex items-center justify-center shadow-sm rounded disabled:opacity-70"
                      >
-                       {isProcessing === log.id ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Receipt className="w-4 h-4 mr-1" />}
+                       {isProcessing === log.id ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <RupiahIcon className="w-4 h-4 mr-1" />}
                        Terbitkan SKRD
                      </button>
                   </td>

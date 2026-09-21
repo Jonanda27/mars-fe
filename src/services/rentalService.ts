@@ -2,8 +2,18 @@ import api from './api';
 import { RentalApplication } from '../types/rental';
 
 export const rentalService = {
-  createApplication: async (data: any): Promise<RentalApplication> => {
-    const response = await api.post('/rentals', data);
+  createApplication: async (data: FormData | Record<string, unknown>): Promise<RentalApplication> => {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    const response = await api.post('/rentals', data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : undefined);
+    return response.data.data;
+  },
+
+  uploadOfficialLetter: async (id: number, formData: FormData): Promise<RentalApplication> => {
+    const response = await api.post(`/rentals/${id}/upload-letter`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return response.data.data;
   },
 
@@ -39,6 +49,25 @@ export const rentalService = {
 
   completeDetails: async (id: number, data: any): Promise<RentalApplication> => {
     const response = await api.patch(`/rentals/${id}/complete-details`, data);
+    return response.data.data;
+  },
+
+  uploadPayungSignature: async (id: number, formData: FormData): Promise<RentalApplication> => {
+    const response = await api.post(`/rentals/${id}/upload-payung-signature`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data.data;
+  },
+
+  uploadSignature: async (id: number, formData: FormData): Promise<RentalApplication> => {
+    const response = await api.post(`/rentals/${id}/upload-signature`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data.data;
+  },
+
+  getApprovedRentals: async (): Promise<RentalApplication[]> => {
+    const response = await api.get('/rentals/approved');
     return response.data.data;
   }
 };

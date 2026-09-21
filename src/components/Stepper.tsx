@@ -2,18 +2,49 @@ import React from 'react';
 import { Upload, FileCheck, MapPin, CheckCircle, PenTool, CheckCircle2 } from 'lucide-react';
 
 interface StepperProps {
-  currentStep: number; // 1 to 6
+  readonly currentStep: number;
+  readonly requiresPayung?: boolean;
+  readonly isHangar?: boolean;
 }
 
-export const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
-  const steps = [
-    { id: 1, title: 'Upload Surat', description: 'Surat Permohonan', icon: <Upload size={24} />, color: 'bg-amber-400', borderColor: 'border-amber-400' },
-    { id: 2, title: 'Verifikasi Kadis', description: 'Persetujuan Surat', icon: <FileCheck size={24} />, color: 'bg-lime-500', borderColor: 'border-lime-500' },
-    { id: 3, title: 'Pilih Layanan', description: 'Detail Aset', icon: <MapPin size={24} />, color: 'bg-emerald-500', borderColor: 'border-emerald-500' },
-    { id: 4, title: 'Validasi Admin', description: 'Cek Kapasitas', icon: <CheckCircle size={24} />, color: 'bg-cyan-500', borderColor: 'border-cyan-500' },
-    { id: 5, title: 'Draft Kontrak', description: 'Pembuatan PKS', icon: <PenTool size={24} />, color: 'bg-blue-500', borderColor: 'border-blue-500' },
-    { id: 6, title: 'Selesai', description: 'Kontrak Aktif', icon: <CheckCircle2 size={24} />, color: 'bg-purple-500', borderColor: 'border-purple-500' },
-  ];
+export const Stepper: React.FC<StepperProps> = ({ 
+  currentStep, 
+  requiresPayung = false,
+  isHangar = true 
+}) => {
+  const getSteps = () => {
+    if (!isHangar) {
+      return [
+        { id: 1, title: 'Upload Surat', description: 'Surat Permohonan', icon: <Upload size={20} /> },
+        { id: 2, title: 'Verifikasi Kadis', description: 'Persetujuan Surat', icon: <FileCheck size={20} /> },
+        { id: 3, title: 'Pilih Layanan', description: 'Detail Ruangan', icon: <MapPin size={20} /> },
+        { id: 4, title: 'Validasi Admin', description: 'Alokasi Ruangan', icon: <CheckCircle size={20} /> },
+        { id: 5, title: 'Kontrak Sewa', description: 'TTD Surat PKS', icon: <PenTool size={20} /> },
+        { id: 6, title: 'Selesai', description: 'Kontrak Sewa Aktif', icon: <CheckCircle2 size={20} /> },
+      ];
+    }
+
+    if (requiresPayung) {
+      return [
+        { id: 1, title: 'Upload Surat', description: 'Surat Permohonan', icon: <Upload size={20} /> },
+        { id: 2, title: 'Verifikasi Kadis', description: 'Persetujuan Surat', icon: <FileCheck size={20} /> },
+        { id: 3, title: 'Kontrak Payung', description: 'TTD PKS Induk', icon: <PenTool size={20} /> },
+        { id: 4, title: 'Pilih Layanan', description: 'Detail Hanggar', icon: <MapPin size={20} /> },
+        { id: 5, title: 'Validasi Admin', description: 'Alokasi Slot', icon: <CheckCircle size={20} /> },
+        { id: 6, title: 'Selesai', description: 'Sewa Hanggar Aktif', icon: <CheckCircle2 size={20} /> },
+      ];
+    }
+
+    return [
+      { id: 1, title: 'Upload Surat', description: 'Surat Permohonan', icon: <Upload size={20} /> },
+      { id: 2, title: 'Verifikasi Kadis', description: 'Persetujuan Surat', icon: <FileCheck size={20} /> },
+      { id: 3, title: 'Pilih Layanan', description: 'Detail Hanggar', icon: <MapPin size={20} /> },
+      { id: 4, title: 'Validasi Admin', description: 'Alokasi Slot', icon: <CheckCircle size={20} /> },
+      { id: 5, title: 'Selesai', description: 'Sewa Hanggar Aktif', icon: <CheckCircle2 size={20} /> },
+    ];
+  };
+
+  const steps = getSteps();
 
   return (
     <div className="w-full py-4 mb-4">
@@ -25,13 +56,13 @@ export const Stepper: React.FC<StepperProps> = ({ currentStep }) => {
         <div className="absolute top-[20px] left-[10%] h-[2px] bg-[#3c8dbc] z-0 transition-all duration-500" 
              style={{ width: `${(Math.min(currentStep, steps.length) - 1) / (steps.length - 1) * 80}%` }}></div>
         
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const isCompleted = currentStep > step.id;
           const isCurrent = currentStep === step.id;
           const isActive = isCompleted || isCurrent;
 
           return (
-            <div key={step.id} className="flex flex-col items-center relative z-10 w-1/6">
+            <div key={step.id} className="flex flex-col items-center relative z-10 flex-1">
               
               {/* Circle */}
               <div className={`w-[40px] h-[40px] rounded-full flex items-center justify-center transition-all duration-300 border-[3px] bg-white

@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { X, ExternalLink, Building, Info, AlertTriangle } from "lucide-react";
-import { useGisStore, GisPanelType } from "@/store/useGisStore";
+import { useGisStore } from "@/store/useGisStore";
 import { Asset } from "@/types/asset";
 import { assetService } from "@/services/assetService";
 import { formatRupiah } from "@/utils/formatCurrency";
 import Link from "next/link";
+import StatusBadge from "@/components/StatusBadge";
 
 export default function PanelOrchestrator() {
-    const { activePanels, closePanel, closePanelsToTheRight, selectedAsset } = useGisStore();
+    const { activePanels, closePanelsToTheRight, selectedAsset } = useGisStore();
 
     if (activePanels.length === 0) return null;
 
@@ -22,7 +23,7 @@ export default function PanelOrchestrator() {
                         key={panel.type}
                         className="h-full bg-white/95 backdrop-blur-md border-r border-slate-200 shadow-[10px_0_15px_-3px_rgba(0,0,0,0.1)] pointer-events-auto flex flex-col transition-all duration-300 w-80 animate-in slide-in-from-left-4"
                         style={{ zIndex }}
-                        onClick={() => closePanelsToTheRight(index)}
+                        onMouseDown={() => closePanelsToTheRight(index)}
                     >
                         {/* Header Panel */}
                         <div className="h-16 px-5 flex items-center justify-between border-b border-slate-200 bg-slate-50/50 flex-shrink-0">
@@ -30,6 +31,8 @@ export default function PanelOrchestrator() {
                                 {panel.title}
                             </h2>
                             <button
+                                type="button"
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     closePanelsToTheRight(index - 1);
@@ -74,8 +77,8 @@ function KatalogAsetPanel() {
             {assets.map(asset => {
                 let status = asset.status || 'Available';
                 if (asset.contracts && asset.contracts.length > 0) {
-                    const activeContract = asset.contracts.find(c => c.status === 'Active' || c.status === 'Approved');
-                    if (activeContract) status = 'Occupied';
+                    const isOccupied = asset.contracts.some(c => c.status === 'Active' || c.status === 'Approved');
+                    if (isOccupied) status = 'Occupied';
                 }
 
                 let color = "bg-green-500";
@@ -84,9 +87,10 @@ function KatalogAsetPanel() {
                 if (status === 'Maintenance' || status === 'Problem') color = "bg-red-600";
 
                 return (
-                    <div 
+                    <button 
                         key={asset.id} 
-                        className="group p-3 rounded-lg border border-slate-200 bg-white hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                        type="button"
+                        className="group p-3 rounded-lg border border-slate-200 bg-white hover:border-blue-300 hover:shadow-md transition-all cursor-pointer text-left w-full"
                         onClick={() => {
                             setSelectedAsset(asset);
                             openPanel("detail-aset", `Detail Aset: ${asset.kode_aset}`);
@@ -101,14 +105,14 @@ function KatalogAsetPanel() {
                             <span>{asset.jenis_aset}</span>
                             <span>{asset.luas} {asset.satuan}</span>
                         </div>
-                    </div>
+                    </button>
                 );
             })}
         </div>
     );
 }
 
-function DetailAsetPanel({ asset }: { asset: Asset }) {
+function DetailAsetPanel({ asset }: { readonly asset: Asset }) {
     let status = asset.status || 'Available';
     let tenantName = null;
     let contractValue = 0;
@@ -121,11 +125,6 @@ function DetailAsetPanel({ asset }: { asset: Asset }) {
             contractValue = Number(activeContract.total_amount || 0);
         }
     }
-
-    let statusColor = "text-green-600 bg-green-50 border-green-200";
-    if (status === 'Occupied') statusColor = "text-blue-700 bg-blue-50 border-blue-200";
-    if (status === 'Expiring') statusColor = "text-yellow-700 bg-yellow-50 border-yellow-200";
-    if (status === 'Maintenance' || status === 'Problem') statusColor = "text-red-700 bg-red-50 border-red-200";
 
     return (
         <div className="flex flex-col">
@@ -142,9 +141,7 @@ function DetailAsetPanel({ asset }: { asset: Asset }) {
                     <h3 className="font-black text-xl text-slate-800 leading-tight">{asset.kode_aset}</h3>
                     <p className="text-sm font-medium text-slate-600">{asset.nama_aset}</p>
                 </div>
-                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border ${statusColor}`}>
-                    {status}
-                </span>
+                <StatusBadge status={status} />
             </div>
 
             <div className="space-y-4">

@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { assetService } from '@/services/assetService';
 import { Asset } from '@/types/asset';
-import { Building, MapPin, Plus, Edit, Trash2, Home, Search, Loader2 } from 'lucide-react';
+import { MapPin, Plus, Edit, Trash2, Home, Search, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function MasterAsetPage() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState('All');
+  const [filterType, setFilterType] = useState('All'); 
 
   const fetchAssets = async () => {
     try {
@@ -35,27 +36,13 @@ export default function MasterAsetPage() {
         toast.success('Aset berhasil dihapus');
         fetchAssets();
       } catch (error) {
+        console.error('Error deleting asset:', error);
         toast.error('Gagal menghapus aset');
       }
     }
   };
 
   const filteredAssets = filterType === 'All' ? assets : assets.filter(a => a.jenis_aset === filterType);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Available': return 'bg-[#00a65a]';
-      case 'Reserved': return 'bg-[#f39c12]';
-      case 'Contracted': return 'bg-[#3c8dbc]';
-      case 'Active': return 'bg-[#0073b7]';
-      case 'Maintenance': return 'bg-[#dd4b39]';
-      case 'Vacant': return 'bg-[#6c757d]';
-      case 'Leased': return 'bg-[#3c8dbc]';
-      case 'Restricted': return 'bg-[#dd4b39]';
-      case 'Closed': return 'bg-[#333333]';
-      default: return 'bg-gray-500';
-    }
-  };
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
@@ -142,9 +129,7 @@ export default function MasterAsetPage() {
                         {asset.kapasitas && <div className="text-[12px] text-[#777] mt-0.5">Kapasitas: {asset.kapasitas}</div>}
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`${getStatusColor(asset.status || '')} text-white text-[11px] font-bold px-2 py-1 rounded-sm uppercase tracking-wide shadow-sm`}>
-                          {asset.status || 'Unknown'}
-                        </span>
+                        <StatusBadge status={asset.status || 'Unknown'} />
                       </td>
                       <td className="py-3 px-4 text-center">
                         <div className="flex justify-center gap-1">

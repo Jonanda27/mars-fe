@@ -3,53 +3,93 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import toast from 'react-hot-toast';
 import Sidebar from './Sidebar';
+import DinasSidebar from './DinasSidebar';
 import TenantSidebar from './TenantSidebar';
 import PetugasSidebar from './PetugasSidebar';
 import EksekutifSidebar from './EksekutifSidebar';
 import TopNavbar from './TopNavbar';
+import { checkRouteAccess, isPublicRoute, isTenantRole, isPetugasRole, isEksekutifRole } from '@/utils/routeGuard';
 
-export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
+const emptySubscribe = () => () => {};
+
+export default function LayoutWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const noSidebarRoutes = ['/', '/register', '/login'];
+  const isMounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const pathname = usePathname();
   const router = useRouter();
-  const { user, syncUser } = useAuthStore();
+  const { user, isAuthenticated, isAuthReady, syncUser } = useAuthStore();
 
   useEffect(() => {
     // Sync profil user ke backend setiap kali app di-mount atau dimuat ulang
     syncUser();
   }, [syncUser]);
 
+  const access = checkRouteAccess(pathname, isAuthenticated, user);
+
   useEffect(() => {
-    if (user?.role === 'Tenant' && user?.status_verifikasi === 'Pending') {
-      if (pathname.startsWith('/tenant') && pathname !== '/tenant/profil') {
-        router.push('/tenant/profil');
+    if (!isMounted || !isAuthReady) return;
+
+    if (!access.allowed && access.redirectTo) {
+      if (access.reason) {
+        toast.error(access.reason, { id: 'route-guard-denied' });
       }
+      router.replace(access.redirectTo);
     }
-  }, [user, pathname, router]);
+  }, [access, isAuthReady, isMounted, router]);
+
+  // Jika belum mounted di client atau auth belum siap atau akses rute privat tidak diizinkan, cegah render dan tampilkan loader konsisten
+  if (!isPublicRoute(pathname) && (!isMounted || !isAuthReady || !access.allowed)) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-[#ecf0f5]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#3c8dbc] border-t-transparent"></div>
+          <span className="text-sm font-medium text-gray-500">Memeriksa hak akses...</span>
+        </div>
+      </div>
+    );
+  }
 
   // Jika di halaman awal (Login), register, atau khusus layar penuh lainnya
-  if (noSidebarRoutes.includes(pathname) || pathname.startsWith('/cetak') || pathname === '/admin/dashboard') {
+  if (isPublicRoute(pathname) || pathname === '/admin/dashboard') {
     return <>{children}</>;
   }
 
-  const isTenant = user?.role === 'Tenant' || pathname.startsWith('/tenant');
-  const isPetugas = user?.role === 'Petugas' || pathname.startsWith('/petugas');
-  const isEksekutif = user?.role?.toLowerCase() === 'kepala dinas' || pathname.startsWith('/eksekutif');
+  const userRole = (user?.role || '').toLowerCase();
+  const isDinas = userRole === 'dinas';
+  const isAdmin = userRole === 'admin' || userRole === 'superadmin' || userRole === 'super admin';
+  const isEksekutif = isEksekutifRole(userRole) || (pathname.startsWith('/eksekutif') && !isAdmin && !isDinas);
+  const isPetugas = isPetugasRole(userRole) || (pathname.startsWith('/petugas') && !isAdmin && !isDinas);
+  const isTenant = isTenantRole(userRole) || (pathname.startsWith('/tenant') && !isAdmin && !isDinas);
+
+  const renderSidebar = () => {
+    if (isDinas) {
+      return <DinasSidebar isOpen={isSidebarOpen} />;
+    }
+    if (isAdmin) {
+      return <Sidebar isOpen={isSidebarOpen} />;
+    }
+    if (isTenant) {
+      return <TenantSidebar isOpen={isSidebarOpen} />;
+    }
+    if (isPetugas) {
+      return <PetugasSidebar isOpen={isSidebarOpen} />;
+    }
+    if (isEksekutif) {
+      return <EksekutifSidebar isOpen={isSidebarOpen} />;
+    }
+    return <Sidebar isOpen={isSidebarOpen} />;
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#ecf0f5]">
       {/* Sidebar */}
-      {isTenant ? (
-        <TenantSidebar isOpen={isSidebarOpen} />
-      ) : isPetugas ? (
-        <PetugasSidebar isOpen={isSidebarOpen} />
-      ) : isEksekutif ? (
-        <EksekutifSidebar isOpen={isSidebarOpen} />
-      ) : (
-        <Sidebar isOpen={isSidebarOpen} />
-      )}
+      {renderSidebar()}
       
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">

@@ -40,19 +40,23 @@ const SuratPermohonanTemplate = forwardRef<HTMLDivElement, SuratPermohonanTempla
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr>
-                  <td style={{ width: '80px', verticalAlign: 'top' }}>Nomor</td>
+                  <th scope="row" style={{ width: '80px', verticalAlign: 'top', textAlign: 'left', fontWeight: 'normal' }}>Nomor</th>
                   <td style={{ width: '10px', verticalAlign: 'top' }}>:</td>
                   <td>...../...../...../20.....</td>
                 </tr>
                 <tr>
-                  <td style={{ verticalAlign: 'top' }}>Lampiran</td>
+                  <th scope="row" style={{ verticalAlign: 'top', textAlign: 'left', fontWeight: 'normal' }}>Lampiran</th>
                   <td style={{ verticalAlign: 'top' }}>:</td>
                   <td>1 (satu) Berkas</td>
                 </tr>
                 <tr>
-                  <td style={{ verticalAlign: 'top' }}>Perihal</td>
+                  <th scope="row" style={{ verticalAlign: 'top', textAlign: 'left', fontWeight: 'normal' }}>Perihal</th>
                   <td style={{ verticalAlign: 'top' }}>:</td>
-                  <td style={{ fontWeight: 'bold' }}>Permohonan Sewa {applicationType}</td>
+                  <td style={{ fontWeight: 'bold' }}>
+                    {applicationType?.toLowerCase().startsWith('sewa') || applicationType?.toLowerCase().startsWith('perpanjangan')
+                      ? `Permohonan ${applicationType}`
+                      : `Permohonan Sewa ${applicationType}`}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -74,7 +78,7 @@ const SuratPermohonanTemplate = forwardRef<HTMLDivElement, SuratPermohonanTempla
             Dengan hormat,
           </p>
           <p style={{ textIndent: '30px', marginBottom: '10px' }}>
-            Yang bertanda tangan di bawah ini, mewakili manajemen <strong>{tenantName}</strong>, dengan ini mengajukan permohonan penyewaan fasilitas {applicationType} di area Bandar Udara Mozes Kilangin.
+            Yang bertanda tangan di bawah ini, mewakili manajemen <strong>{tenantName}</strong>, dengan ini mengajukan permohonan {applicationType?.toLowerCase().startsWith('perpanjangan') ? applicationType.toLowerCase() : `penyewaan fasilitas ${applicationType?.toLowerCase().replace('sewa ', '') || applicationType}`} di area Bandar Udara Mozes Kilangin.
           </p>
           <p style={{ textIndent: '30px', marginBottom: '10px' }}>
             Adapun tujuan penyewaan fasilitas tersebut adalah untuk: <strong>{purpose || '...................................................'}</strong>. Kami berkomitmen untuk mematuhi seluruh peraturan, ketentuan keselamatan penerbangan, serta standar operasional yang berlaku di lingkungan Bandar Udara Mozes Kilangin.

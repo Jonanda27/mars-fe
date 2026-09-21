@@ -1,154 +1,338 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
-  Building2, Users, DollarSign, Activity, 
-  TrendingUp, MapPin, AlertCircle, Info, Plane
+  Users, Activity, 
+  TrendingUp, MapPin, AlertCircle, Info, Plane,
+  Loader2, RefreshCw, CheckCircle2, Clock, ShieldAlert,
+  ArrowRight, ExternalLink, Building2
 } from 'lucide-react';
+import RupiahIcon from '@/components/icons/RupiahIcon';
+import { dashboardService, AdminDashboardData } from '@/services/dashboardService';
+import { formatRupiah } from '@/utils/formatCurrency';
+import dayjs from 'dayjs';
+
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function AdminExecutiveDashboard() {
+  const [data, setData] = useState<AdminDashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.role?.toLowerCase() === 'dinas') {
+      router.replace('/dinas');
+    }
+  }, [user, router]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      const res = await dashboardService.getAdminDashboardStats();
+      setData(res);
+    } catch (error) {
+      console.error('Error fetching admin dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading || !data) {
+    return (
+      <div className="p-12 bg-[#ecf0f5] min-h-[calc(100vh-60px)] flex flex-col justify-center items-center text-[#777]">
+        <Loader2 className="w-10 h-10 animate-spin text-[#3c8dbc] mb-3" />
+        <p className="font-bold text-sm">Memuat Dashboard Operasional & Real-time Database MARS...</p>
+      </div>
+    );
+  }
+
+  const { kpi, action_queue, visual_assets, expiring_contracts, master_tariffs } = data;
+
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4">
-      <header className="flex justify-between items-end">
-        <h1 className="text-[20px] font-normal text-[#333] uppercase">
-          Executive Dashboard
-        </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Dashboard</span>
+    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
+      {/* Header */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+        <div>
+          <h1 className="text-[20px] font-normal text-[#333] uppercase flex items-center gap-2">
+            Dashboard Operasional &amp; Aset
+          </h1>
+          <p className="text-[12px] text-[#777] mt-0.5">
+            Monitoring Utilisasi Fasilitas, Peta Spasial Hanggar &amp; Log Lapangan Bandara Mozes Kilangin
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetchDashboardData}
+            title="Refresh Data"
+            className="p-1.5 bg-white border border-[#d2d6de] hover:bg-slate-50 text-slate-600 transition-colors shadow-2xs rounded-none flex items-center gap-1 text-xs font-bold cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5 text-[#3c8dbc]" /> Refresh
+          </button>
+          <div className="text-[12px] text-[#777] items-center bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-2xs hidden sm:flex">
+            <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-bold text-slate-800">Dashboard Operasional</span>
+          </div>
         </div>
       </header>
 
-      {/* Baris 1: KPI Cards (Warna seragam Biru Admin #3c8dbc) */}
+      {/* Baris 1: 4 KPI Cards (AdminLTE Flat Style) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1 */}
+        {/* KPI 1: Realisasi Pendapatan */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
           <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
-            <DollarSign className="w-8 h-8" />
+            <RupiahIcon className="w-8 h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center">
-            <span className="uppercase text-[12px] text-[#777] font-bold">Realisasi Pendapatan (YTD)</span>
-            <span className="text-[18px] font-bold text-[#333]">Rp 8,4 Milyar</span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Target: Rp 12 Milyar (70%)</span>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Realisasi Pendapatan (YTD)</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {formatRupiah(kpi.realisasi_pad)}
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+              Target: Rp 15 M ({kpi.achievement_percent}%) • {kpi.paid_invoices_count} SKRD Lunas
+            </span>
           </div>
         </div>
         
-        {/* KPI 2 */}
+        {/* KPI 2: Occupancy Rate Aset */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
           <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
             <Activity className="w-8 h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center">
-            <span className="uppercase text-[12px] text-[#777] font-bold">Occupancy Rate Aset</span>
-            <span className="text-[18px] font-bold text-[#333]">75.5%</span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Terisi: 12.000m² dari 15.800m²</span>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Occupancy Rate Aset</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {kpi.occupancy_rate}%
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+              Terisi: {kpi.used_area_m2.toLocaleString('id-ID')} m² dari {kpi.total_area_m2.toLocaleString('id-ID')} m²
+            </span>
           </div>
         </div>
 
-        {/* KPI 3 */}
+        {/* KPI 3: Total Penyewa (Tenant) */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
           <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
             <Users className="w-8 h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center">
-            <span className="uppercase text-[12px] text-[#777] font-bold">Total Penyewa (Tenant)</span>
-            <span className="text-[18px] font-bold text-[#333]">14 Maskapai</span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">2 Menunggu Verifikasi</span>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Total Penyewa (Tenant)</span>
+            <span className="text-[18px] font-bold text-[#333] leading-tight mt-0.5">
+              {kpi.total_tenants} Mitra
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+              {kpi.pending_tenants > 0 ? `${kpi.pending_tenants} Menunggu Verifikasi` : 'Semua Terverifikasi'} • {kpi.active_contracts_count} PKS Aktif
+            </span>
           </div>
         </div>
 
-        {/* KPI 4 */}
+        {/* KPI 4: Piutang (Outstanding) */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
           <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
             <TrendingUp className="w-8 h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center">
-            <span className="uppercase text-[12px] text-[#777] font-bold">Piutang (Outstanding)</span>
-            <span className="text-[18px] font-bold text-[#333]">Rp 450 Juta</span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Terdapat 3 SKRD Jatuh Tempo</span>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Piutang (Outstanding)</span>
+            <span className="text-[18px] font-bold text-[#dd4b39] font-mono leading-tight mt-0.5">
+              {formatRupiah(kpi.total_piutang)}
+            </span>
+            <span className="text-[11px] text-slate-500 font-bold mt-1">
+              {kpi.overdue_invoices_count > 0 ? (
+                <span className="text-[#dd4b39] font-bold">⚠️ Terdapat {kpi.overdue_invoices_count} SKRD Jatuh Tempo</span>
+              ) : (
+                <span className="text-[#3c8dbc] font-bold">Tagihan Berjalan Lancar</span>
+              )}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-2">
+      {/* Baris 1.5: Antrean Tindakan Cepat Admin (Action Hub - Tema Konsisten Biru #3c8dbc) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Link 
+          href="/admin/tenants" 
+          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
+        >
+          <div>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">Verifikasi Mitra</span>
+            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
+              {action_queue.pendingTenants} Mitra Baru Menunggu
+            </p>
+          </div>
+          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
+            action_queue.pendingTenants > 0 
+              ? 'bg-amber-50 text-[#f39c12] border border-amber-200' 
+              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
+          }`}>
+            {action_queue.pendingTenants}
+          </span>
+        </Link>
+
+        <Link 
+          href="/admin/tagihan" 
+          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
+        >
+          <div>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">SKRD Hanggar Siap</span>
+            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
+              {action_queue.unbilledHanggarLogs} Log Pesawat Siap Tagih
+            </p>
+          </div>
+          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
+            action_queue.unbilledHanggarLogs > 0 
+              ? 'bg-blue-100 text-[#3c8dbc] border border-blue-300' 
+              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
+          }`}>
+            {action_queue.unbilledHanggarLogs}
+          </span>
+        </Link>
+
+        <Link 
+          href="/admin/tagihan" 
+          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
+        >
+          <div>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">Verifikasi Pembayaran</span>
+            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
+              {action_queue.pendingPaymentReceipts} Bukti Transfer Masuk
+            </p>
+          </div>
+          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
+            action_queue.pendingPaymentReceipts > 0 
+              ? 'bg-amber-50 text-[#f39c12] border border-amber-200' 
+              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
+          }`}>
+            {action_queue.pendingPaymentReceipts}
+          </span>
+        </Link>
+
+        <Link 
+          href="/petugas/verifikasi-jadwal" 
+          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
+        >
+          <div>
+            <span className="text-[11px] font-bold text-slate-500 uppercase">Jadwal Pesawat</span>
+            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
+              {action_queue.pendingFlightSchedules} Rencana Menunggu Respon
+            </p>
+          </div>
+          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
+            action_queue.pendingFlightSchedules > 0 
+              ? 'bg-amber-50 text-[#f39c12] border border-amber-200' 
+              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
+          }`}>
+            {action_queue.pendingFlightSchedules}
+          </span>
+        </Link>
+      </div>
+
+      {/* Baris 2: Layout 2 Kolom (Peta Visual Aset & Kolom Kanan Monitoring) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
         {/* Kolom Kiri: Peta Visual Aset (2/3 lebar) */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex-1">
-            <div className="p-[15px] border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50 cursor-move">
-              <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-                <MapPin className="w-4 h-4 mr-2 text-[#3c8dbc]" /> Peta Visual Fasilitas Hanggar (Sisi Utara)
+            <div className="p-[15px] border-b border-[#f4f4f4] flex flex-col sm:flex-row justify-between sm:items-center gap-2 bg-slate-50">
+              <h3 className="text-[15px] text-[#444] font-bold flex items-center">
+                <MapPin className="w-4 h-4 mr-2 text-[#3c8dbc]" /> Peta Visual Fasilitas Hanggar & Aset Daerah
               </h3>
-              <div className="flex gap-3 text-[11px] font-bold">
-                <span className="flex items-center"><div className="w-3 h-3 bg-[#3c8dbc] mr-1"></div> Terisi</span>
-                <span className="flex items-center"><div className="w-3 h-3 border border-[#d2d6de] mr-1"></div> Kosong</span>
-                <span className="flex items-center"><div className="w-3 h-3 bg-[#f4f4f4] mr-1"></div> Maintenance</span>
+              <div className="flex flex-wrap gap-3 text-[11px] font-bold">
+                <span className="flex items-center"><div className="w-3 h-3 bg-[#3c8dbc] mr-1"></div> Terisi / Sebagian</span>
+                <span className="flex items-center"><div className="w-3 h-3 border border-[#d2d6de] mr-1"></div> Tersedia / Kosong</span>
+                <span className="flex items-center"><div className="w-3 h-3 bg-amber-500 mr-1"></div> Maintenance</span>
               </div>
             </div>
             
-            <div className="p-6 bg-slate-50">
-              {/* Grid Aset (Visual Map) - Tema Konsisten Biru */}
+            <div className="p-5 bg-slate-50">
+              {/* Grid Aset (Visual Map Riil dari Database) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                {/* Aset 1 - Terisi */}
-                <div className="border border-[#3c8dbc] bg-white p-4 relative shadow-sm">
-                  <div className="absolute top-0 right-0 bg-[#3c8dbc] text-white px-2 py-1 text-[10px] font-bold uppercase">Terisi (100%)</div>
-                  <h4 className="font-bold text-[18px] text-[#333]">Hanggar HGR-001</h4>
-                  <p className="text-[12px] text-[#666] mb-3">Luas Total: 3.000 m²</p>
-                  
-                  <div className="border-t border-[#f4f4f4] pt-3">
-                    <p className="text-[11px] text-[#777] font-bold uppercase mb-1">Penyewa Saat Ini:</p>
-                    <div className="flex items-center bg-slate-50 p-2 border border-[#d2d6de]">
-                      <Plane className="w-6 h-6 mr-3 text-[#3c8dbc]" />
-                      <div>
-                        <p className="font-bold text-[#333] text-[13px]">Susi Air (PT. ASI Pudjiastuti)</p>
-                        <p className="text-[11px] text-[#3c8dbc] font-bold">Kontrak hg. 31 Des 2026</p>
+                {visual_assets.slice(0, 4).map((asset) => {
+                  const isHanggar = asset.jenis_aset === 'Hanggar';
+                  const isFull = asset.occupancy_percent >= 100;
+                  const isPartial = asset.occupancy_percent > 0 && asset.occupancy_percent < 100;
+                  const isAvailable = asset.occupancy_percent === 0;
+
+                  return (
+                    <div 
+                      key={asset.id} 
+                      className={`bg-white p-4 relative shadow-sm border transition-all ${
+                        isFull || isPartial ? 'border-[#3c8dbc]' : 'border-[#d2d6de]'
+                      }`}
+                    >
+                      {/* Badge status pojok kanan */}
+                      <div className={`absolute top-0 right-0 text-white px-2.5 py-1 text-[10px] font-bold uppercase ${
+                        isFull 
+                          ? 'bg-[#3c8dbc]' 
+                          : isPartial 
+                            ? 'bg-[#00c0ef]' 
+                            : 'bg-slate-400'
+                      }`}>
+                        {isFull ? 'Terisi Penuh (100%)' : isPartial ? `Terisi Sebagian (${asset.occupancy_percent}%)` : 'Tersedia'}
+                      </div>
+
+                      <h4 className="font-bold text-[17px] text-[#333] flex items-center gap-1.5">
+                        {asset.nama_aset}
+                      </h4>
+                      <p className="text-[11.5px] text-[#666] mb-3">
+                        Kode: <span className="font-mono font-bold text-slate-700">{asset.kode_aset}</span> • Luas: {asset.luas_total.toLocaleString('id-ID')} m² 
+                        {isHanggar && ` (Tersisa: ${asset.sisa_luas.toLocaleString('id-ID')} m²)`}
+                      </p>
+                      
+                      {/* Sub-info Penyewa / Armada */}
+                      <div className="border-t border-[#f4f4f4] pt-3">
+                        {asset.current_tenant ? (
+                          <div>
+                            <p className="text-[10.5px] text-[#777] font-bold uppercase mb-1">Penyewa / Kontrak Aktif:</p>
+                            <div className="flex items-center bg-slate-50 p-2 border border-[#d2d6de]">
+                              {isHanggar ? (
+                                <Plane className="w-5 h-5 mr-2.5 text-[#3c8dbc] flex-shrink-0" />
+                              ) : (
+                                <Building2 className="w-5 h-5 mr-2.5 text-[#3c8dbc] flex-shrink-0" />
+                              )}
+                              <div className="truncate">
+                                <p className="font-bold text-[#333] text-[12.5px] truncate">
+                                  {asset.current_tenant.nama_perusahaan}
+                                </p>
+                                <p className="text-[10.5px] text-[#3c8dbc] font-mono">
+                                  {asset.current_tenant.contract_number} (s/d {asset.current_tenant.end_date ? dayjs(asset.current_tenant.end_date).format('DD MMM YYYY') : '-'})
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : asset.parked_aircrafts.length > 0 ? (
+                          <div>
+                            <p className="text-[10.5px] text-[#777] font-bold uppercase mb-1">Armada Sedang Parkir:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {asset.parked_aircrafts.map(ac => (
+                                <span key={ac.id} className="bg-blue-50 text-[#3c8dbc] border border-blue-200 px-2 py-0.5 text-[11px] font-bold font-mono">
+                                  ✈ {ac.registration_number} ({ac.aircraft_type})
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center h-[48px] bg-slate-50 border border-dashed border-slate-200">
+                            <span className="text-[11.5px] font-bold text-slate-400 italic">
+                              Aset Kosong / Siap Digunakan
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </div>
-                </div>
+                  );
+                })}
+              </div>
 
-                {/* Aset 2 - Kosong Sebagian */}
-                <div className="border border-[#3c8dbc] bg-white p-4 relative shadow-sm">
-                  <div className="absolute top-0 right-0 bg-[#3c8dbc] opacity-80 text-white px-2 py-1 text-[10px] font-bold uppercase">Terisi Sebagian (50%)</div>
-                  <h4 className="font-bold text-[18px] text-[#333]">Hanggar HGR-002</h4>
-                  <p className="text-[12px] text-[#666] mb-3">Luas Total: 4.000 m² (Tersisa: 2.000 m²)</p>
-                  
-                  <div className="border-t border-[#f4f4f4] pt-3">
-                    <p className="text-[11px] text-[#777] font-bold uppercase mb-1">Penyewa Saat Ini:</p>
-                    <div className="flex items-center bg-slate-50 p-2 border border-[#d2d6de]">
-                      <Plane className="w-6 h-6 mr-3 text-[#3c8dbc]" />
-                      <div>
-                        <p className="font-bold text-[#333] text-[13px]">PT. Airfast Indonesia</p>
-                        <p className="text-[11px] text-[#3c8dbc] font-bold">Menyewa 2.000 m² (Aktif)</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Aset 3 - Kosong Total */}
-                <div className="border border-[#d2d6de] bg-white p-4 relative shadow-sm opacity-80">
-                  <div className="absolute top-0 right-0 bg-[#f4f4f4] border-b border-l border-[#d2d6de] text-[#777] px-2 py-1 text-[10px] font-bold uppercase">Tersedia</div>
-                  <h4 className="font-bold text-[18px] text-[#777]">Hanggar HGR-003</h4>
-                  <p className="text-[12px] text-[#666] mb-3">Luas Total: 2.500 m² (Tersisa: 2.500 m²)</p>
-                  
-                  <div className="border-t border-[#d2d6de] pt-3 flex items-center justify-center h-[60px]">
-                    <span className="text-[12px] font-bold text-[#777] italic">Kosong / Siap Disewakan</span>
-                  </div>
-                </div>
-
-                {/* Aset 4 - Maintenance */}
-                <div className="border border-[#d2d6de] bg-[#f9f9f9] p-4 relative shadow-sm">
-                  <div className="absolute top-0 right-0 bg-[#d2d6de] text-[#444] px-2 py-1 text-[10px] font-bold uppercase">Maintenance</div>
-                  <h4 className="font-bold text-[18px] text-[#555]">Gudang Kargo (CG-01)</h4>
-                  <p className="text-[12px] text-[#666] mb-3">Luas Total: 1.200 m²</p>
-                  
-                  <div className="border-t border-[#d2d6de] pt-3 flex items-center h-[60px]">
-                    <AlertCircle className="w-6 h-6 text-[#777] mr-3" />
-                    <div>
-                      <span className="text-[12px] font-bold text-[#555] block">Perbaikan Atap (Fasilitasi)</span>
-                      <span className="text-[11px] text-[#777]">Estimasi selesai: 15 Sep 2026</span>
-                    </div>
-                  </div>
-                </div>
-
+              <div className="mt-4 pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
+                <span className="text-slate-500">Menampilkan fasilitas utama Bandara Mozes Kilangin</span>
+                <Link href="/admin/assets" className="text-[#3c8dbc] font-bold hover:underline flex items-center gap-1">
+                  Kelola Seluruh Aset ({visual_assets.length}) <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
           </div>
@@ -157,50 +341,80 @@ export default function AdminExecutiveDashboard() {
         {/* Kolom Kanan: Aktivitas & Kontrak (1/3 lebar) */}
         <div className="flex flex-col gap-4">
           
-          {/* Box 1: Peringatan Kontrak */}
+          {/* Box 1: Peringatan Kontrak Segera Berakhir */}
           <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
-            <div className="p-[12px] border-b border-[#f4f4f4] bg-slate-50">
-              <h3 className="text-[15px] text-[#444] font-bold flex items-center">
-                <AlertCircle className="w-4 h-4 mr-2 text-[#3c8dbc]" /> Kontrak Segera Berakhir
+            <div className="p-[12px] border-b border-[#f4f4f4] bg-slate-50 flex justify-between items-center">
+              <h3 className="text-[14px] text-[#444] font-bold flex items-center">
+                <AlertCircle className="w-4 h-4 mr-2 text-[#f39c12]" /> Kontrak Segera Berakhir
               </h3>
+              <span className="text-[11px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 border border-amber-200">
+                {expiring_contracts.length} Perlu Perhatian
+              </span>
             </div>
             <div className="p-0">
-              <ul className="flex flex-col text-[13px]">
-                <li className="p-3 border-b border-[#f4f4f4] flex justify-between items-center hover:bg-slate-50">
-                  <div>
-                    <span className="font-bold text-[#333] block">PT. Trigana Air Service</span>
-                    <span className="text-[11px] text-[#666]">Ruang Kantor (OFF-05)</span>
-                  </div>
-                  <span className="bg-[#3c8dbc] text-white text-[10px] font-bold px-2 py-1">H-12</span>
-                </li>
-                <li className="p-3 border-b border-[#f4f4f4] flex justify-between items-center hover:bg-slate-50">
-                  <div>
-                    <span className="font-bold text-[#333] block">PT. Jaya Dirgantara</span>
-                    <span className="text-[11px] text-[#666]">Ruang Kantor (OFF-01)</span>
-                  </div>
-                  <span className="border border-[#3c8dbc] text-[#3c8dbc] text-[10px] font-bold px-2 py-1">H-35</span>
-                </li>
-              </ul>
-              <div className="p-2 text-center border-t border-[#f4f4f4]">
-                <a href="/admin/kontrak" className="text-[12px] text-[#3c8dbc] font-bold hover:underline">Lihat Semua Kontrak &rarr;</a>
+              {expiring_contracts.length === 0 ? (
+                <div className="p-6 text-center text-slate-400">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-1.5 opacity-80" />
+                  <p className="text-xs font-bold text-slate-600">Semua Kontrak Berjalan Normal</p>
+                  <p className="text-[11px] text-slate-400">Tidak ada kontrak yang kedaluwarsa dalam 45 hari ke depan.</p>
+                </div>
+              ) : (
+                <ul className="flex flex-col text-[13px]">
+                  {expiring_contracts.map((c) => {
+                    const isUrgent = c.days_remaining <= 7;
+                    return (
+                      <li key={c.id} className="p-3 border-b border-[#f4f4f4] flex justify-between items-center hover:bg-slate-50 transition-colors">
+                        <div>
+                          <span className="font-bold text-[#333] block text-[12.5px]">{c.tenant_name}</span>
+                          <span className="text-[11px] text-[#666] font-mono">{c.contract_number} • {c.asset_name}</span>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-none ${
+                          isUrgent 
+                            ? 'bg-[#dd4b39] text-white animate-pulse' 
+                            : 'bg-[#f39c12] text-white'
+                        }`}>
+                          H-{c.days_remaining}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <div className="p-2.5 text-center border-t border-[#f4f4f4]">
+                <Link href="/admin/kontrak" className="text-[12px] text-[#3c8dbc] font-bold hover:underline flex items-center justify-center gap-1">
+                  Lihat Semua Kontrak &rarr;
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Box 2: Info Sistem */}
+          {/* Box 2: Info Tarif Perda Riil */}
           <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
-            <div className="p-[12px] border-b border-[#f4f4f4] bg-slate-50">
-              <h3 className="text-[15px] text-[#444] font-bold flex items-center">
-                <Info className="w-4 h-4 mr-2 text-[#3c8dbc]" /> Info Tarif Perda No. 4/2023
+            <div className="p-[12px] border-b border-[#f4f4f4] bg-slate-50 flex justify-between items-center">
+              <h3 className="text-[14px] text-[#444] font-bold flex items-center">
+                <Info className="w-4 h-4 mr-2 text-[#3c8dbc]" /> Tarif Retribusi Daerah (Perda)
               </h3>
+              <span className="text-[10px] font-mono text-slate-400">Aktif</span>
             </div>
             <div className="p-4 text-[13px] text-[#444]">
-              <p className="mb-2">Basis perhitungan sistem SKRD bulan ini menggunakan tarif retribusi berikut:</p>
-              <ul className="list-disc pl-4 text-[#666] flex flex-col gap-1">
-                <li><strong className="text-[#333]">Hanggar Tertutup:</strong> Rp 60.000 /m² /Tahun</li>
-                <li><strong className="text-[#333]">Ruang Kantor:</strong> Rp 85.000 /m² /Tahun</li>
-                <li><strong className="text-[#333]">Lahan Terbuka:</strong> Rp 25.000 /m² /Tahun</li>
+              <p className="text-xs text-slate-500 mb-2.5">
+                Dasar penetapan perhitungan SKRD Hanggar & Ruangan sesuai Perda Retribusi Daerah:
+              </p>
+              <ul className="flex flex-col gap-2 text-xs">
+                {master_tariffs.slice(0, 4).map((t) => (
+                  <li key={t.id} className="flex justify-between items-center border-b border-slate-100 pb-1.5">
+                    <span className="font-medium text-slate-700">{t.objek || t.jenis_layanan}</span>
+                    <span className="font-mono font-bold text-slate-900">
+                      {formatRupiah(t.tarif)} <span className="text-[10px] font-normal text-slate-500">/{t.satuan}</span>
+                    </span>
+                  </li>
+                ))}
               </ul>
+              <div className="mt-3 pt-2 text-right">
+                <Link href="/admin/tarif" className="text-[11.5px] text-[#3c8dbc] font-bold hover:underline">
+                  Kelola Master Tarif & Dasar Hukum &rarr;
+                </Link>
+              </div>
             </div>
           </div>
 

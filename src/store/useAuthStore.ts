@@ -9,6 +9,7 @@ interface AuthState {
   user: UserData | null;
   token: string | null;
   isAuthenticated: boolean;
+  isAuthReady: boolean;
   loginUser: (data: LoginPayload) => Promise<boolean>;
   logout: () => void;
   registerTenant: (data: RegisterTenantPayload) => Promise<void>;
@@ -16,13 +17,29 @@ interface AuthState {
   resetState: () => void;
 }
 
+const getInitialUser = (): UserData | null => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const getInitialToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token');
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
   isLoading: false,
   error: null,
   registerSuccess: false,
-  user: null,
-  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
+  user: getInitialUser(),
+  token: getInitialToken(),
   isAuthenticated: typeof window !== 'undefined' ? !!localStorage.getItem('token') : false,
+  isAuthReady: typeof window !== 'undefined' ? !localStorage.getItem('token') || !!getInitialUser() : false,
 
   loginUser: async (data: LoginPayload) => {
     set({ isLoading: true, error: null });
@@ -30,16 +47,19 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await authService.login(data);
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       set({ 
         isLoading: false, 
         user: response.data.user,
         token: response.data.token,
-        isAuthenticated: true 
+        isAuthenticated: true,
+        isAuthReady: true
       });
       return true;
-    } catch (err: any) {
-      const message = err.response?.data?.message || err.message;
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } }; message?: string };
+      const message = axiosError.response?.data?.message || axiosError.message || 'Terjadi kesalahan saat masuk';
       set({ isLoading: false, error: message });
       return false;
     }
@@ -53,13 +73,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
     set({
       isAuthenticated: false,
       user: null,
       token: null,
       error: null,
-      registerSuccess: false
+      registerSuccess: false,
+      isAuthReady: true
     });
   },
 
@@ -68,26 +90,36 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await authService.registerTenant(data);
       set({ isLoading: false, registerSuccess: true });
-    } catch (err: any) {
-      set({ isLoading: false, error: err.message });
+    } catch (err: unknown) {
+      const axiosError = err as { message?: string };
+      set({ isLoading: false, error: axiosError.message || 'Pendaftaran gagal' });
     }
   },
 
   syncUser: async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (!token) return;
+    if (!token) {
+      set({ isAuthReady: true });
+      return;
+    }
 
     try {
       const user = await authService.getMe();
-      set({ user, isAuthenticated: true });
-    } catch (err: any) {
-      if (err.response?.status === 401 || err.response?.status === 403) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      set({ user, token, isAuthenticated: true, isAuthReady: true });
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { status?: number } };
+      if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
         // Token invalid or expired
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
         }
-        set({ isAuthenticated: false, user: null, token: null });
+        set({ isAuthenticated: false, user: null, token: null, isAuthReady: true });
+      } else {
+        set({ isAuthReady: true });
       }
     }
   },

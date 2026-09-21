@@ -1,22 +1,21 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { 
-  Building2, FileText, Landmark, TrendingDown, TrendingUp, AlertTriangle, 
+  Building2, FileText, Landmark, TrendingDown, AlertTriangle, 
   CheckCircle2, XCircle, ArrowLeft, ShieldCheck, Lock, Loader2, Download
 } from 'lucide-react';
 import { tenantService } from '@/services/tenantService';
 import { Tenant } from '@/types/tenant';
-import api, { getBaseUrl } from '@/services/api';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah } from '@/utils/formatCurrency';
 import toast from 'react-hot-toast';
+import { getFileUrl } from '@/utils/url';
 
 export default function AdminPenyewaDetailPage() {
   const { id } = useParams();
-  const router = useRouter();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -26,16 +25,6 @@ export default function AdminPenyewaDetailPage() {
   useEffect(() => {
     fetchTenant();
   }, [id]);
-
-  // Using getBaseUrl from api.ts
-
-  const getFileUrl = (path: string) => {
-    if (!path) return '#';
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      return path;
-    }
-    return `${getBaseUrl()}${path.startsWith('/') ? '' : '/'}${path}`;
-  };
 
   const fetchTenant = async () => {
     try {
