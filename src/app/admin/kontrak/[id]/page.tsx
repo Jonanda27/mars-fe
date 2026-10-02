@@ -11,6 +11,8 @@ import SignaturePad from '@/components/SignaturePad';
 import { toast } from 'react-hot-toast';
 import EditContractModal from '@/components/EditContractModal';
 import SuratPKS from '@/components/SuratPKS';
+import ContractPDFViewer from '@/components/ContractPDFViewer';
+import StatusBadge from '@/components/StatusBadge';
 import { getFileUrl } from '@/utils/url';
 
 export default function AdminContractDetailPage() {
@@ -105,17 +107,9 @@ export default function AdminContractDetailPage() {
 
       {/* Action Bar */}
       <div className="bg-white p-4 shadow-sm border-t-[3px] border-[#3c8dbc] mb-6 flex justify-between items-center">
-        <div>
+        <div className="flex items-center">
           <span className="text-sm text-gray-500 mr-2">Status Saat Ini:</span>
-          {contract.status?.toLowerCase() === 'draft' && <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-bold">DRAFT</span>}
-          {contract.status?.toLowerCase() === 'review' && <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> Menunggu TTE Tenant</span>}
-          {contract.status?.toLowerCase() === 'menunggu verifikasi admin' && <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> MENUNGGU VERIFIKASI ADMIN</span>}
-          {contract.status?.toLowerCase() === 'approved' && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><CheckCircle2 className="w-3 h-3 mr-1" /> APPROVED (TTE Selesai)</span>}
-          {contract.status?.toLowerCase() === 'waiting payment' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> MENUNGGU PEMBAYARAN SKRD</span>}
-          {(contract.status?.toLowerCase() === 'active' || contract.status?.toLowerCase() === 'aktif') && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">AKTIF</span>}
-          {contract.status?.toLowerCase() === 'expiring' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">AKAN HABIS</span>}
-          {contract.status?.toLowerCase() === 'expired' && <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">KEDALUWARSA</span>}
-          {contract.status?.toLowerCase() === 'terminated' && <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">TERMINATED</span>}
+          <StatusBadge status={contract.status || ''} />
         </div>
         
         <div className="flex gap-2">
@@ -127,7 +121,7 @@ export default function AdminContractDetailPage() {
                   href={getFileUrl(contract.signed_document_url)}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+                  className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
                 >
                   <Eye className="w-4 h-4 mr-2" /> Preview File
                 </a>
@@ -147,7 +141,7 @@ export default function AdminContractDetailPage() {
                   }
                 }}
                 disabled={isUpdating}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50"
+                className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-50"
               >
                 {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />} 
                 Verifikasi & Aktifkan
@@ -159,7 +153,7 @@ export default function AdminContractDetailPage() {
           {(contract.admin_signature && contract.tenant_signature) && (
             <button
               onClick={handleDownloadPDF}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+              className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
             >
               <Download className="w-4 h-4 mr-2" /> Download PDF PKS
             </button>
@@ -170,13 +164,13 @@ export default function AdminContractDetailPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowEditModal(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+                className="bg-[#f39c12] hover:bg-[#e08e0b] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
               >
                 <Edit className="w-4 h-4 mr-2" /> Edit Draft
               </button>
               <button
                 onClick={() => setShowSignaturePad(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+                className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
               >
                 <FileSignature className="w-4 h-4 mr-2" /> Tinjau Dokumen & TTE
               </button>
@@ -253,25 +247,36 @@ export default function AdminContractDetailPage() {
       )}
 
       {/* Dokumen PKS Preview */}
-      <div className="bg-gray-200 p-4 md:p-8 rounded-lg overflow-auto flex justify-center mb-10 min-h-[800px]">
-        {contract.contract_type === 'Payung' && contract.signed_document_url && (
-          <iframe 
-            src={getFileUrl(contract.signed_document_url)} 
-            className="w-full max-w-[1000px] h-[800px] border-0 shadow-xl bg-white rounded"
-            title="Kontrak Payung"
-          />
-        )}
-        {contract.contract_type === 'Payung' && !contract.signed_document_url && (
-          <div className="flex flex-col items-center justify-center h-full text-slate-500 pt-20">
-            <FileText className="w-16 h-16 mb-4 text-slate-400" />
-            <p className="font-medium text-lg text-slate-600">Dokumen TTD Belum Diunggah</p>
-            <p className="text-sm mt-2 max-w-md text-center">Menunggu pihak Tenant untuk mengunggah pindaian Kontrak Payung yang telah ditandatangani.</p>
+      {(() => {
+        const isPayungContract = contract.contract_type === 'Payung' || 
+                                 contract.contract_type === 'PKS Payung Mini Airport' || 
+                                 contract.contract_type === 'PKS Payung Mozes Kilangin' ||
+                                 Boolean(contract.contract_number?.startsWith('PKS-PAYUNG/'));
+
+        return (
+          <div className="bg-gray-200 p-4 md:p-8 rounded-lg overflow-auto flex justify-center mb-10 min-h-[800px]">
+            {isPayungContract && contract.signed_document_url && (
+              <iframe 
+                src={getFileUrl(contract.signed_document_url)} 
+                className="w-full max-w-[1000px] h-[800px] border-0 shadow-xl bg-white rounded"
+                title="Kontrak Payung"
+              />
+            )}
+            {isPayungContract && !contract.signed_document_url && (
+              <div className="w-full max-w-[1000px]">
+                <div className="bg-amber-50 border border-amber-200 p-3 mb-4 text-xs text-amber-900 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <span>Mitra belum mengunggah berkas scan TTD basah. Di bawah ini adalah pratinjau draf dokumen:</span>
+                </div>
+                <ContractPDFViewer contract={contract} tenant={contract.tenants} onClose={() => {}} isInline={true} />
+              </div>
+            )}
+            {!isPayungContract && (
+              <SuratPKS contract={contract} ref={pksRef} />
+            )}
           </div>
-        )}
-        {contract.contract_type !== 'Payung' && (
-          <SuratPKS contract={contract} ref={pksRef} />
-        )}
-      </div>
+        );
+      })()}
 
     </div>
   );

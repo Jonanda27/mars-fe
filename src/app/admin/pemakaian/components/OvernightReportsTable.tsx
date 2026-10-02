@@ -3,6 +3,7 @@ import {
   Calendar, User, Loader2, Eye, AlertCircle 
 } from 'lucide-react';
 import { OvernightReport } from '@/services/overnightReportService';
+import StatusBadge from '@/components/StatusBadge';
 import dayjs from 'dayjs';
 
 interface OvernightReportsTableProps {
@@ -80,9 +81,7 @@ export const OvernightReportsTable: React.FC<OvernightReportsTableProps> = ({
                 {dayjs(report.created_at).format('DD/MM/YYYY HH:mm')} WIT
               </td>
               <td className="px-4 py-3.5">
-                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 border border-emerald-200">
-                  {report.status || 'VERIFIED'}
-                </span>
+                <StatusBadge status={report.status || 'VERIFIED'} />
               </td>
               <td className="px-4 py-3.5 text-center">
                 <button

@@ -15,12 +15,15 @@ import dayjs from 'dayjs';
 
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
+import { MiniAirportDashboardView } from './components/MiniAirportDashboardView';
 
 export default function AdminExecutiveDashboard() {
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
   const router = useRouter();
+
+  const isMiniAdmin = (user?.role || '').toLowerCase() === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
 
   useEffect(() => {
     if (user?.role?.toLowerCase() === 'dinas') {
@@ -29,8 +32,10 @@ export default function AdminExecutiveDashboard() {
   }, [user, router]);
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (!isMiniAdmin) {
+      fetchDashboardData();
+    }
+  }, [isMiniAdmin]);
 
   const fetchDashboardData = async () => {
     try {
@@ -43,6 +48,10 @@ export default function AdminExecutiveDashboard() {
       setIsLoading(false);
     }
   };
+
+  if (isMiniAdmin) {
+    return <MiniAirportDashboardView user={user} />;
+  }
 
   if (isLoading || !data) {
     return (
@@ -90,7 +99,7 @@ export default function AdminExecutiveDashboard() {
           </div>
           <div className="p-3 flex flex-col justify-center flex-1">
             <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Realisasi Pendapatan (YTD)</span>
-            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+            <span className="text-[18px] font-bold text-[#00a65a] font-mono leading-tight mt-0.5">
               {formatRupiah(kpi.realisasi_pad)}
             </span>
             <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
@@ -252,6 +261,7 @@ export default function AdminExecutiveDashboard() {
               {/* Grid Aset (Visual Map Riil dari Database) */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {visual_assets.slice(0, 4).map((asset) => {
+                  const isAviation = asset.jenis_aset === 'Hanggar' || asset.jenis_aset === 'Apron' || (asset.nama_aset || '').toLowerCase().includes('hanggar') || (asset.nama_aset || '').toLowerCase().includes('apron');
                   const isHanggar = asset.jenis_aset === 'Hanggar';
                   const isFull = asset.occupancy_percent >= 100;
                   const isPartial = asset.occupancy_percent > 0 && asset.occupancy_percent < 100;
@@ -280,47 +290,84 @@ export default function AdminExecutiveDashboard() {
                       </h4>
                       <p className="text-[11.5px] text-[#666] mb-3">
                         Kode: <span className="font-mono font-bold text-slate-700">{asset.kode_aset}</span> • Luas: {asset.luas_total.toLocaleString('id-ID')} m² 
-                        {isHanggar && ` (Tersisa: ${asset.sisa_luas.toLocaleString('id-ID')} m²)`}
+                        {isAviation && ` (Tersisa: ${asset.sisa_luas.toLocaleString('id-ID')} m²)`}
                       </p>
                       
                       {/* Sub-info Penyewa / Armada */}
                       <div className="border-t border-[#f4f4f4] pt-3">
-                        {asset.current_tenant ? (
-                          <div>
-                            <p className="text-[10.5px] text-[#777] font-bold uppercase mb-1">Penyewa / Kontrak Aktif:</p>
-                            <div className="flex items-center bg-slate-50 p-2 border border-[#d2d6de]">
-                              {isHanggar ? (
-                                <Plane className="w-5 h-5 mr-2.5 text-[#3c8dbc] flex-shrink-0" />
-                              ) : (
-                                <Building2 className="w-5 h-5 mr-2.5 text-[#3c8dbc] flex-shrink-0" />
+                        {isAviation ? (
+                          asset.parked_aircrafts && asset.parked_aircrafts.length > 0 ? (
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <p className="text-[10.5px] text-[#777] font-bold uppercase">
+                                  Armada Sedang Parkir ({asset.parked_aircrafts.length}):
+                                </p>
+                                <span className="text-[10.5px] text-slate-500 font-medium">
+                                  {asset.luas_terpakai.toLocaleString('id-ID')} m² terpakai
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-1.5 mb-2">
+                                {asset.parked_aircrafts.map((ac, idx) => (
+                                  <span key={`${asset.id}-${ac.registration_number || idx}`} className="bg-blue-50 text-[#3c8dbc] border border-blue-200 px-2 py-0.5 text-[11px] font-bold font-mono">
+                                    ✈ {ac.registration_number} ({ac.aircraft_type})
+                                  </span>
+                                ))}
+                              </div>
+                              {asset.current_tenant && (
+                                <div className="text-[11px] text-slate-500 flex items-center gap-1.5 pt-1.5 border-t border-slate-100">
+                                  <Building2 className="w-3.5 h-3.5 text-[#3c8dbc] flex-shrink-0" />
+                                  <span className="truncate">
+                                    Penyewa / Kontrak: <strong className="text-slate-700">{asset.current_tenant.nama_perusahaan}</strong> <span className="font-mono text-slate-500">({asset.current_tenant.contract_number})</span>
+                                  </span>
+                                </div>
                               )}
-                              <div className="truncate">
-                                <p className="font-bold text-[#333] text-[12.5px] truncate">
-                                  {asset.current_tenant.nama_perusahaan}
-                                </p>
-                                <p className="text-[10.5px] text-[#3c8dbc] font-mono">
-                                  {asset.current_tenant.contract_number} (s/d {asset.current_tenant.end_date ? dayjs(asset.current_tenant.end_date).format('DD MMM YYYY') : '-'})
-                                </p>
+                            </div>
+                          ) : asset.current_tenant ? (
+                            <div>
+                              <p className="text-[10.5px] text-[#777] font-bold uppercase mb-1">Penyewa / Kontrak Aktif:</p>
+                              <div className="flex items-center bg-slate-50 p-2 border border-[#d2d6de]">
+                                <Plane className="w-5 h-5 mr-2.5 text-[#3c8dbc] flex-shrink-0" />
+                                <div className="truncate">
+                                  <p className="font-bold text-[#333] text-[12.5px] truncate">
+                                    {asset.current_tenant.nama_perusahaan}
+                                  </p>
+                                  <p className="text-[10.5px] text-[#3c8dbc] font-mono">
+                                    {asset.current_tenant.contract_number} (s/d {asset.current_tenant.end_date ? dayjs(asset.current_tenant.end_date).format('DD MMM YYYY') : '-'})
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ) : asset.parked_aircrafts.length > 0 ? (
-                          <div>
-                            <p className="text-[10.5px] text-[#777] font-bold uppercase mb-1">Armada Sedang Parkir:</p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {asset.parked_aircrafts.map(ac => (
-                                <span key={ac.id} className="bg-blue-50 text-[#3c8dbc] border border-blue-200 px-2 py-0.5 text-[11px] font-bold font-mono">
-                                  ✈ {ac.registration_number} ({ac.aircraft_type})
-                                </span>
-                              ))}
+                          ) : (
+                            <div className="flex items-center justify-center h-[48px] bg-slate-50 border border-dashed border-slate-200">
+                              <span className="text-[11.5px] font-bold text-slate-400 italic">
+                                Fasilitas Kosong / Siap Digunakan
+                              </span>
                             </div>
-                          </div>
+                          )
                         ) : (
-                          <div className="flex items-center justify-center h-[48px] bg-slate-50 border border-dashed border-slate-200">
-                            <span className="text-[11.5px] font-bold text-slate-400 italic">
-                              Aset Kosong / Siap Digunakan
-                            </span>
-                          </div>
+                          // Non-aviation (Ruangan / Gudang)
+                          asset.current_tenant ? (
+                            <div>
+                              <p className="text-[10.5px] text-[#777] font-bold uppercase mb-1">Penyewa / Kontrak Aktif:</p>
+                              <div className="flex items-center bg-slate-50 p-2 border border-[#d2d6de]">
+                                <Building2 className="w-5 h-5 mr-2.5 text-[#3c8dbc] flex-shrink-0" />
+                                <div className="truncate">
+                                  <p className="font-bold text-[#333] text-[12.5px] truncate">
+                                    {asset.current_tenant.nama_perusahaan}
+                                  </p>
+                                  <p className="text-[10.5px] text-[#3c8dbc] font-mono">
+                                    {asset.current_tenant.contract_number} (s/d {asset.current_tenant.end_date ? dayjs(asset.current_tenant.end_date).format('DD MMM YYYY') : '-'})
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center h-[48px] bg-slate-50 border border-dashed border-slate-200">
+                              <span className="text-[11.5px] font-bold text-slate-400 italic">
+                                Aset Kosong / Siap Digunakan
+                              </span>
+                            </div>
+                          )
                         )}
                       </div>
                     </div>
@@ -330,7 +377,7 @@ export default function AdminExecutiveDashboard() {
 
               <div className="mt-4 pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
                 <span className="text-slate-500">Menampilkan fasilitas utama Bandara Mozes Kilangin</span>
-                <Link href="/admin/assets" className="text-[#3c8dbc] font-bold hover:underline flex items-center gap-1">
+                <Link href="/admin/aset" className="text-[#3c8dbc] font-bold hover:underline flex items-center gap-1">
                   Kelola Seluruh Aset ({visual_assets.length}) <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>

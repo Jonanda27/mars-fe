@@ -2,6 +2,7 @@ import React from 'react';
 import { Search, FileText } from 'lucide-react';
 import { ReportInvoiceItem } from '@/services/reportService';
 import { formatRupiah } from '@/utils/formatCurrency';
+import StatusBadge from '@/components/StatusBadge';
 import dayjs from 'dayjs';
 
 interface LaporanTransactionTableProps {
@@ -115,26 +116,14 @@ export const LaporanTransactionTable: React.FC<LaporanTransactionTableProps> = (
                   <td className="p-3 text-right font-mono text-slate-700">
                     {formatRupiah(inv.amount)}
                   </td>
-                  <td className="p-3 text-right font-mono text-amber-600">
+                  <td className="p-3 text-right font-mono text-slate-700">
                     {inv.penalty_amount > 0 ? formatRupiah(inv.penalty_amount) : '-'}
                   </td>
                   <td className="p-3 text-right font-mono font-bold text-slate-900">
                     {formatRupiah(inv.total_amount)}
                   </td>
                   <td className="p-3 text-center">
-                    {inv.status === 'PAID' ? (
-                      <span className="bg-[#00a65a]/10 text-[#00a65a] font-bold text-[10px] px-2 py-0.5 border border-[#00a65a]/20">
-                        LUNAS
-                      </span>
-                    ) : inv.status === 'CANCELLED' ? (
-                      <span className="bg-slate-100 text-slate-500 font-bold text-[10px] px-2 py-0.5 border border-slate-300">
-                        BATAL
-                      </span>
-                    ) : (
-                      <span className="bg-[#dd4b39]/10 text-[#dd4b39] font-bold text-[10px] px-2 py-0.5 border border-[#dd4b39]/20">
-                        BELUM LUNAS
-                      </span>
-                    )}
+                    <StatusBadge status={inv.status} />
                   </td>
                 </tr>
               ))

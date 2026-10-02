@@ -44,7 +44,7 @@ export const SKRDPreviewModal: React.FC<SKRDPreviewModalProps> = ({
           <div className="flex gap-2">
             <button 
               onClick={handleDownloadPdf}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium flex items-center cursor-pointer"
+              className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 text-sm font-medium flex items-center cursor-pointer"
             >
               <Download className="w-4 h-4 mr-2" /> Download PDF
             </button>

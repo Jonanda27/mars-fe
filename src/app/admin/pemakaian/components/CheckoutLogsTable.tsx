@@ -2,6 +2,7 @@ import React from 'react';
 import { 
   MapPin, Loader2, AlertCircle 
 } from 'lucide-react';
+import StatusBadge from '@/components/StatusBadge';
 import dayjs from 'dayjs';
 
 interface CheckoutLogsTableProps {
@@ -74,15 +75,10 @@ export const CheckoutLogsTable: React.FC<CheckoutLogsTableProps> = ({
                 )}
               </td>
               <td className="px-4 py-3.5 text-center">
-                {log.billing_status === 'Unbilled' ? (
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 text-[10px] font-bold border border-yellow-200">
-                    Menunggu Tagihan
-                  </span>
-                ) : (
-                  <span className="bg-green-100 text-green-800 px-2 py-0.5 text-[10px] font-bold border border-green-200">
-                    Sudah Ditagih
-                  </span>
-                )}
+                <StatusBadge 
+                  status={log.billing_status === 'Unbilled' ? 'Unbilled' : 'Billed'} 
+                  label={log.billing_status === 'Unbilled' ? 'Menunggu Tagihan' : 'Sudah Ditagih'} 
+                />
               </td>
             </tr>
           ))

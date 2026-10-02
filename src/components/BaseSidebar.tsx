@@ -55,7 +55,7 @@ export default function BaseSidebar({
                 {userName}
               </p>
               {userStatus && (
-                <div className="text-[11px] text-slate-300 flex items-center mt-1">
+                <div className="text-[11px] text-slate-300 mt-1">
                   {userStatus}
                 </div>
               )}

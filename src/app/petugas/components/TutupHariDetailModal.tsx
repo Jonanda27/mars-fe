@@ -7,6 +7,7 @@ import {
   FileText, ExternalLink, ShieldCheck, Camera
 } from 'lucide-react';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 interface TutupHariDetailModalProps {
   report: OvernightReport | null;
@@ -68,9 +69,9 @@ export const TutupHariDetailModal: React.FC<TutupHariDetailModalProps> = ({ repo
 
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Status Laporan</span>
-              <span className="inline-block bg-emerald-100 text-emerald-800 px-2 py-0.5 font-bold text-[10px] border border-emerald-200">
-                {report.status || 'VERIFIED'}
-              </span>
+              <div className="mt-1">
+                <StatusBadge status={report.status || 'VERIFIED'} />
+              </div>
             </div>
           </div>
 

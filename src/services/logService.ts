@@ -25,6 +25,14 @@ export const logService = {
     return response.data.data;
   },
 
+  emergencyCheckin: async (data: FormData | Record<string, unknown>): Promise<any> => {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    const response = await api.post('/logs/emergency-checkin', data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : undefined);
+    return response.data.data;
+  },
+
   createExitLog: async (id: number, payload: { exit_time?: string; notes?: string }): Promise<OperationalLog> => {
     const response = await api.put(`/logs/exit/${id}`, payload);
     return response.data.data;

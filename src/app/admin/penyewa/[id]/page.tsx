@@ -11,6 +11,7 @@ import { Tenant } from '@/types/tenant';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatRupiah } from '@/utils/formatCurrency';
+import StatusBadge from '@/components/StatusBadge';
 import toast from 'react-hot-toast';
 import { getFileUrl } from '@/utils/url';
 
@@ -96,11 +97,9 @@ export default function AdminPenyewaDetailPage() {
 
       {/* Action Bar */}
       <div className="bg-white p-4 shadow-sm rounded-sm border-t-[3px] border-[#3c8dbc] mb-6 flex justify-between items-center">
-        <div>
+        <div className="flex items-center">
           <span className="text-sm text-gray-500 mr-2">Status Verifikasi:</span>
-          {tenant.status_verifikasi === 'Verified' && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><ShieldCheck className="w-3 h-3 mr-1" /> VERIFIED</span>}
-          {tenant.status_verifikasi === 'Pending' && <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><AlertTriangle className="w-3 h-3 mr-1" /> PENDING</span>}
-          {tenant.status_verifikasi === 'Suspended' && <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><Lock className="w-3 h-3 mr-1" /> SUSPENDED</span>}
+          <StatusBadge status={tenant.status_verifikasi || 'Pending'} />
         </div>
         
         <div className="flex gap-2">
@@ -229,7 +228,9 @@ export default function AdminPenyewaDetailPage() {
           <div className="p-3 border-b border-[#f4f4f4]">
             <h3 className="text-[16px] text-[#444] font-bold flex items-center">
               <FileText className="w-5 h-5 mr-2 text-slate-500" /> Dokumen Legalitas 
-              {isComplete ? <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-bold">LENGKAP</span> : <span className="ml-2 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">BELUM LENGKAP</span>}
+              <span className="ml-2 inline-block">
+                <StatusBadge status={isComplete ? 'lengkap' : 'ditolak'} label={isComplete ? 'LENGKAP' : 'BELUM LENGKAP'} />
+              </span>
             </h3>
           </div>
           <div className="p-4 space-y-3">

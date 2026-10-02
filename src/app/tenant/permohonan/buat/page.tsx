@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, FileText, ArrowLeft, Loader2, Info, Download } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
 import { getErrorMessage } from '@/services/api';
 import { rentalService } from '@/services/rentalService';
 import { Stepper } from '@/components/Stepper';
+import { ContractStatusBar } from '@/components/ContractStatusBar';
 import { useAuthStore } from '@/store/useAuthStore';
 import SuratPermohonanTemplate from '@/components/SuratPermohonanTemplate';
 import { contractService } from '@/services/contractService';
@@ -18,6 +20,8 @@ function BuatPermohonanForm() {
   const searchParams = useSearchParams();
   const extendFromId = searchParams.get('extend_from');
   const [loading, setLoading] = useState(false);
+  const [contractsLoading, setContractsLoading] = useState(true);
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const { user } = useAuthStore();
   const templateRef = useRef<HTMLDivElement>(null);
   
@@ -33,17 +37,80 @@ function BuatPermohonanForm() {
   useEffect(() => {
     const checkPayung = async () => {
       try {
-        const contracts = await contractService.getTenantContracts();
-        const hasActivePayung = contracts?.some(
-          (c: Contract) => c.contract_type === 'Payung' && (c.status === 'Aktif' || c.status === 'Active')
+        setContractsLoading(true);
+        const fetchedContracts = await contractService.getTenantContracts();
+        setContracts(fetchedContracts || []);
+        const hasActivePayung = fetchedContracts?.some(
+          (c: Contract) => (c.contract_type === 'Payung' || c.contract_type === 'PKS Payung Mozes Kilangin') && (c.status === 'Aktif' || c.status === 'Active')
         );
         setRequiresPayung(!hasActivePayung);
       } catch (err) {
         console.error("Gagal mengecek kontrak payung", err);
+      } finally {
+        setContractsLoading(false);
       }
     };
     checkPayung();
   }, []);
+
+  // Identifikasi Kontrak Payung KHUSUS Bandara Mozes Kilangin (Bukan Mini Airport)
+  const activePayung = useMemo(() => {
+    if (!contracts || contracts.length === 0) return null;
+
+    // Filter KHUSUS Mozes Kilangin (Kecualikan semua Mini Airport: Ilaga, Enarotali, Bilogai, dll.)
+    const mozesPayungList = contracts.filter((c) => {
+      const type = (c.contract_type || '').toLowerCase();
+      const num = (c.contract_number || '').toUpperCase();
+      let fas: any = c.fasilitas;
+      if (typeof fas === 'string') {
+        try { fas = JSON.parse(fas); } catch (e) { fas = {}; }
+      }
+      const isMini = type.includes('mini') || 
+                     Boolean(fas?.mini_airport_id) || 
+                     Boolean(fas?.category === 'Mini Airport') ||
+                     num.includes('PKS/ILA') ||
+                     num.includes('PKS/EWI') ||
+                     num.includes('PKS/UGU') ||
+                     num.includes('/ILA/') ||
+                     num.includes('/EWI/') ||
+                     num.includes('/UGU/') ||
+                     num.includes('/MINI/');
+      if (isMini) return false;
+
+      return (
+        type === 'pks payung mozes kilangin' ||
+        type === 'payung' ||
+        num.includes('MOZES') ||
+        num.includes('/TIM/') ||
+        (type.includes('payung') && !isMini)
+      );
+    });
+
+    const activeMozes = mozesPayungList.find((c) => {
+      const s = (c.status || '').trim().toLowerCase();
+      return s === 'aktif' || s === 'active' || s === 'signed';
+    });
+    return activeMozes || mozesPayungList[0] || null;
+  }, [contracts]);
+
+  const daysRemaining = useMemo(() => {
+    if (!activePayung?.end_date) return null;
+    const today = dayjs().startOf('day');
+    const end = dayjs(activePayung.end_date).startOf('day');
+    return end.diff(today, 'day');
+  }, [activePayung]);
+
+  const statusLower = (activePayung?.status || '').trim().toLowerCase();
+  const isPayungExpired = daysRemaining !== null && daysRemaining < 0;
+  const isContractActive = Boolean(
+    activePayung && 
+    (statusLower === 'aktif' || statusLower === 'active' || statusLower === 'signed') && 
+    !isPayungExpired
+  );
+  const isPendingSignature = statusLower === 'menunggu ttd tenant' || statusLower === 'menunggu ttd';
+  const isPendingVerification = statusLower === 'menunggu verifikasi admin' || statusLower === 'menunggu pengesahan kadis';
+  const companyName = user?.nama_perusahaan || activePayung?.tenants?.nama_perusahaan || 'PT Geo Citra';
+
 
   useEffect(() => {
     if (extendFromId) {
@@ -137,6 +204,19 @@ function BuatPermohonanForm() {
         </h1>
       </header>
 
+      {/* Status Kontrak Payung Induk (Persis Tampilan Gambar) */}
+      <div className="mb-4">
+        <ContractStatusBar
+          activePayung={activePayung}
+          companyName={companyName}
+          isLoading={contractsLoading}
+          isContractActive={isContractActive}
+          isPendingSignature={isPendingSignature}
+          isPendingVerification={isPendingVerification}
+          subtitle="• Izin operasional fasilitas kebandarudaraan & pemanfaatan hanggar aktif"
+        />
+      </div>
+
       {/* Stepper Component */}
       {(() => {
         const isHangar = formData.application_type.toLowerCase().includes('hanggar');
@@ -190,7 +270,7 @@ function BuatPermohonanForm() {
                       onChange={handleChange} 
                       required
                       disabled={!!extendFromId}
-                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-[#3c8dbc] focus:ring-1 focus:ring-[#3c8dbc] transition-all bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     >
                       {extendFromId ? (
                         <>
@@ -217,7 +297,7 @@ function BuatPermohonanForm() {
                       onChange={handleChange} 
                       required
                       placeholder={`Cth: Permohonan ${formData.application_type}...`}
-                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-sm"
+                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-[#3c8dbc] focus:ring-1 focus:ring-[#3c8dbc] transition-all shadow-sm"
                     />
                   </div>
                 </div>

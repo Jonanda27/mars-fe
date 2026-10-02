@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 // Subcomponents imported from admin review components
 import { TenantProfileCard } from '@/app/admin/permohonan/review/[id]/components/TenantProfileCard';
 import { RentalPlanCard } from '@/app/admin/permohonan/review/[id]/components/RentalPlanCard';
+import { MiniAirportPlanCard } from '@/app/admin/permohonan/review/[id]/components/MiniAirportPlanCard';
 import { AdminReviewActionPanel } from '@/app/admin/permohonan/review/[id]/components/AdminReviewActionPanel';
 
 export default function DinasReviewPermohonanPage() {
@@ -183,8 +184,30 @@ export default function DinasReviewPermohonanPage() {
   const isKadisStep = app.status === 'Menunggu Verifikasi Kadis';
   const isAdminStep = app.status === 'Menunggu Validasi Admin';
 
+  const isMini = Boolean(
+    app.application_type?.toLowerCase().includes('mini') ||
+    (app.specific_needs && (
+      typeof app.specific_needs === 'string'
+        ? app.specific_needs.includes('airport_name') || app.specific_needs.includes('Mini Airport')
+        : ('airport_name' in app.specific_needs || app.specific_needs.service_type === 'Mini Airport')
+    ))
+  );
+
+  const miniAirportName = (() => {
+    if (!app.specific_needs) return '';
+    if (typeof app.specific_needs === 'string') {
+      try {
+        const parsed = JSON.parse(app.specific_needs);
+        return parsed.airport_name || '';
+      } catch (e) {
+        return '';
+      }
+    }
+    return app.specific_needs.airport_name || '';
+  })();
+
   return (
-    <div className="p-6 bg-slate-50 min-h-full font-sans">
+    <div className="p-4 sm:p-6 bg-[#ecf0f5] min-h-full font-sans">
       
       {/* Header & Breadcrumb */}
       <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -193,11 +216,18 @@ export default function DinasReviewPermohonanPage() {
             <ArrowLeft className="w-4 h-4 mr-1" /> Kembali ke Daftar Permohonan
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Telaah Permohonan Sewa</h1>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+              {isMini ? 'Telaah Permohonan Mini Airport' : 'Telaah Permohonan Sewa'}
+            </h1>
             <StatusBadge status={app.status} className="text-xs px-4 py-1.5" />
           </div>
           <p className="text-sm text-slate-500 mt-1">
             ID Ref: <span className="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-slate-700">{app.application_number}</span> &bull; Diajukan pada: {app.created_at ? dayjs(app.created_at).format('DD MMMM YYYY') : '-'}
+            {isMini && miniAirportName && (
+              <span className="ml-2 font-medium text-slate-600">
+                &bull; Wilayah: <span className="text-[#3c8dbc] font-bold">{miniAirportName}</span>
+              </span>
+            )}
           </p>
         </div>
       </div>
@@ -207,7 +237,11 @@ export default function DinasReviewPermohonanPage() {
         {/* Left Column: Tenant & Plan Information */}
         <div className="lg:col-span-2 space-y-6">
           <TenantProfileCard tenant={app.tenants} />
-          <RentalPlanCard app={app} currentStep={currentStep} />
+          {isMini ? (
+            <MiniAirportPlanCard app={app} currentStep={currentStep} />
+          ) : (
+            <RentalPlanCard app={app} currentStep={currentStep} />
+          )}
         </div>
 
         {/* Right Column: Action Decision Panel */}

@@ -59,7 +59,7 @@ export const Step1WaitingLetter: React.FC<Step1WaitingLetterProps> = ({ app, onS
         </div>
         
         <div className="text-center md:text-left flex-1 z-10 mt-2">
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100/50 text-[#3c8dbc] border border-blue-200 text-[11px] font-bold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center px-3 py-1 rounded bg-blue-100/50 text-[#3c8dbc] border border-blue-200 text-[11px] font-bold uppercase tracking-wider mb-3">
             Status Saat Ini
           </div>
           <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight">Menunggu Verifikasi Kepala Dinas</h2>

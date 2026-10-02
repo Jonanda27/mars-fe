@@ -73,6 +73,8 @@ export default function MasterAsetPage() {
             >
               <option value="All">Semua Aset</option>
               <option value="Hanggar">Hanggar</option>
+              <option value="Apron">Apron</option>
+              <option value="Ruangan">Ruangan</option>
               <option value="Ruang Office">Ruang Office</option>
               <option value="Gudang Warehouse">Gudang Warehouse</option>
             </select>

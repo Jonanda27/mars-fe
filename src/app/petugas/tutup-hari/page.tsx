@@ -21,7 +21,7 @@ export default function PetugasTutupHariPage() {
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
           <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
-            Laporan Tutup Hari (End of Day){' '}
+            Laporan Tutup Hari{' '}
             <span className="text-[15px] font-light text-[#777] ml-2">Overnight Log &amp; Rekonsiliasi Armada Inap</span>
           </h1>
         </div>

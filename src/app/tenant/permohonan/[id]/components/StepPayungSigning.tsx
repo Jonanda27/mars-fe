@@ -240,7 +240,7 @@ export const StepPayungSigning: React.FC<StepPayungSigningProps> = ({ app, onSuc
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status Dokumen</p>
-                <span className="inline-flex items-center px-2.5 py-1 text-[11px] font-bold bg-[#f39c12] text-white rounded-none">
+                <span className="inline-flex items-center px-2.5 py-1 text-[11px] font-bold bg-[#f39c12] text-white rounded">
                   Menunggu Pengesahan Kadis
                 </span>
               </div>
@@ -374,7 +374,7 @@ export const StepPayungSigning: React.FC<StepPayungSigningProps> = ({ app, onSuc
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="bg-blue-100 text-[#3c8dbc] border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-none uppercase tracking-wider">
+                <span className="bg-blue-100 text-[#3c8dbc] border border-blue-200 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
                   Langkah Wajib Mitra Baru
                 </span>
                 <span className="text-xs font-mono font-bold text-blue-900">

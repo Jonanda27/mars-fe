@@ -16,7 +16,7 @@ export interface FlightSchedule {
   estimated_nights: number;
   notes?: string | null;
   flight_plan_url?: string | null;
-  status: 'Menunggu Verifikasi Petugas' | 'Disetujui' | 'Ditolak' | 'Checked-In' | 'Completed' | 'Cancelled';
+  status: 'Menunggu Verifikasi Petugas' | 'Disetujui' | 'Ditolak' | 'Checked-In' | 'Completed' | 'Selesai' | 'Cancelled';
   verified_by_officer_id?: number | null;
   officer_notes?: string | null;
   verified_at?: string | null;

@@ -4,6 +4,7 @@ import { AlertTriangle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { formatRupiah } from '@/utils/formatCurrency';
 import { DinasDashboardData } from '@/services/dashboardService';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 interface DinasOverdueInvoicesTableProps {
   readonly overdueInvoices: DinasDashboardData['top_overdue_invoices'];
@@ -58,20 +59,10 @@ export const DinasOverdueInvoicesTable: React.FC<DinasOverdueInvoicesTableProps>
                     {inv.due_date ? dayjs(inv.due_date).format('DD/MM/YYYY') : '-'}
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <span className="bg-red-50 text-[#dd4b39] border border-red-200 font-bold px-2 py-0.5 text-[10px]">
-                      {inv.days_overdue} Hari
-                    </span>
+                    <StatusBadge status="danger" label={`${inv.days_overdue} Hari`} />
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 border ${
-                      inv.days_overdue >= 21
-                        ? 'bg-red-100 text-red-800 border-red-300'
-                        : inv.days_overdue >= 14
-                          ? 'bg-amber-100 text-amber-800 border-amber-300'
-                          : 'bg-yellow-50 text-yellow-800 border-yellow-200'
-                    }`}>
-                      {inv.recommended_action}
-                    </span>
+                    <StatusBadge status={inv.recommended_action} />
                   </td>
                   <td className="py-3 px-4 text-center">
                     <Link

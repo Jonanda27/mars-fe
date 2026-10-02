@@ -90,8 +90,51 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
   const [isDownloading, setIsDownloading] = useState(false);
 
   const tenantData = contract.tenants || tenant;
-  const masterTariffs = Array.isArray(contract.fasilitas) ? contract.fasilitas : [];
-  const pages = computeContractPages(masterTariffs);
+  let fasilitasObj: any = contract.fasilitas;
+  if (typeof fasilitasObj === 'string') {
+    try {
+      fasilitasObj = JSON.parse(fasilitasObj);
+    } catch (e) {
+      fasilitasObj = {};
+    }
+  }
+
+  const isMini = contract.contract_type === 'PKS Payung Mini Airport' || 
+                 (contract as any).airport_type === 'MINI_AIRPORT' ||
+                 Boolean(
+                   fasilitasObj && 
+                   !Array.isArray(fasilitasObj) && 
+                   (fasilitasObj.category === 'Mini Airport' ||
+                    fasilitasObj.mini_airport_id ||
+                    fasilitasObj.mini_airport_name ||
+                    fasilitasObj.airport_code ||
+                    (fasilitasObj.airport_name && !fasilitasObj.airport_name.toLowerCase().includes('mozes')))
+                 );
+  
+  const miniSpec = isMini && !Array.isArray(fasilitasObj) ? fasilitasObj : null;
+  const airportDisplayName = 
+    miniSpec?.airport_name || 
+    miniSpec?.nama_bandara || 
+    miniSpec?.mini_airport_name || 
+    (contract as any).airport_name || 
+    'Mini Airport Perintis';
+
+  const airportDisplayCode = 
+    miniSpec?.airport_code || 
+    miniSpec?.kode_bandara || 
+    (contract as any).airport_code || 
+    '';
+
+  const airportLocation = 
+    miniSpec?.airport_location || 
+    miniSpec?.lokasi || 
+    'Papua Tengah';
+
+  const rawItems = isMini 
+    ? (miniSpec?.master_taxes || [])
+    : (Array.isArray(fasilitasObj) ? fasilitasObj : (Array.isArray(contract.fasilitas) ? contract.fasilitas : []));
+  
+  const pages = computeContractPages(rawItems);
 
   const handleDownloadPdf = async () => {
     setIsDownloading(true);
@@ -189,10 +232,21 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
                     />
                   </div>
                   <div className="text-center flex-1 mx-4">
-                    <h1 className="text-xl font-bold uppercase m-0 p-0">Kementerian Perhubungan Republik Indonesia</h1>
-                    <h2 className="text-lg font-bold uppercase m-0 p-0">Direktorat Jenderal Perhubungan Udara</h2>
-                    <h3 className="text-md font-bold uppercase m-0 p-0">Kantor Unit Penyelenggara Bandar Udara Mozes Kilangin</h3>
-                    <p className="text-xs mt-1 m-0 p-0">Jl. Airport No. 1, Timika, Mimika, Papua Tengah - 99910</p>
+                    {isMini ? (
+                      <>
+                        <h1 className="text-xl font-bold uppercase m-0 p-0">Pemerintah Provinsi Papua Tengah</h1>
+                        <h2 className="text-lg font-bold uppercase m-0 p-0">Dinas Perhubungan</h2>
+                        <h3 className="text-md font-bold uppercase m-0 p-0">Unit Pelaksana Teknis Bandara Perintis — {airportDisplayName.toUpperCase()}</h3>
+                        <p className="text-xs mt-1 m-0 p-0">{airportLocation}, Indonesia</p>
+                      </>
+                    ) : (
+                      <>
+                        <h1 className="text-xl font-bold uppercase m-0 p-0">Kementerian Perhubungan Republik Indonesia</h1>
+                        <h2 className="text-lg font-bold uppercase m-0 p-0">Direktorat Jenderal Perhubungan Udara</h2>
+                        <h3 className="text-md font-bold uppercase m-0 p-0">Kantor Unit Penyelenggara Bandar Udara Mozes Kilangin</h3>
+                        <p className="text-xs mt-1 m-0 p-0">Jl. Airport No. 1, Timika, Mimika, Papua Tengah - 99910</p>
+                      </>
+                    )}
                   </div>
                   <div className="w-[80px]"></div> {/* Spacer */}
                 </div>
@@ -200,9 +254,22 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
                 
                 {/* Judul Dokumen */}
                 <div className="text-center mb-6">
-                  <h2 className="text-lg font-bold uppercase underline underline-offset-4 m-0 p-0">
-                    {contract.contract_type === 'Sewa' ? 'Kontrak Sewa Pemanfaatan Aset' : 'Kontrak Payung Pemanfaatan Aset'}
-                  </h2>
+                  {isMini ? (
+                    <>
+                      <h2 className="text-lg font-bold uppercase underline underline-offset-4 m-0 p-0">
+                        Perjanjian Kerja Sama Induk (PKS Payung) Pelayanan Penerbangan Perintis
+                      </h2>
+                      <h3 className="text-sm font-bold uppercase mt-1 m-0 p-0">
+                        {airportDisplayName.toUpperCase().startsWith('BANDARA') || airportDisplayName.toUpperCase().startsWith('MINI')
+                          ? airportDisplayName.toUpperCase()
+                          : `Bandara ${airportDisplayName.toUpperCase()}`} {airportDisplayCode ? `(${airportDisplayCode})` : ''}
+                      </h3>
+                    </>
+                  ) : (
+                    <h2 className="text-lg font-bold uppercase underline underline-offset-4 m-0 p-0">
+                      {contract.contract_type === 'Sewa' ? 'Kontrak Sewa Pemanfaatan Aset' : 'Kontrak Payung Pemanfaatan Aset'}
+                    </h2>
+                  )}
                   <p className="text-sm mt-1 m-0 p-0">Nomor: {contract.contract_number}</p>
                 </div>
 
@@ -216,7 +283,11 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
                     <div className="flex">
                       <span className="w-8">I.</span>
                       <span className="w-32 font-bold">Pihak Pertama</span>
-                      <span className="flex-1">: Kepala Unit Penyelenggara Bandar Udara Mozes Kilangin, dalam hal ini bertindak untuk dan atas nama instansi tersebut.</span>
+                      <span className="flex-1">
+                        {isMini 
+                          ? ': Kepala Dinas Perhubungan Provinsi Papua Tengah, dalam hal ini bertindak untuk dan atas nama Pemerintah Provinsi Papua Tengah.'
+                          : ': Kepala Unit Penyelenggara Bandar Udara Mozes Kilangin, dalam hal ini bertindak untuk dan atas nama instansi tersebut.'}
+                      </span>
                     </div>
                     <div className="flex">
                       <span className="w-8">II.</span>
@@ -239,7 +310,7 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
                   </div>
 
                   <p className="m-0 p-0 mt-4">
-                    Kedua belah pihak telah sepakat untuk mengikatkan diri dalam {contract.contract_type === 'Sewa' ? 'Kontrak Sewa' : 'Kontrak Payung'} Pemanfaatan Aset Bandar Udara dengan syarat dan ketentuan sebagai berikut:
+                    Kedua belah pihak telah sepakat untuk mengikatkan diri dalam {isMini ? 'Perjanjian Kerja Sama Induk (PKS Payung) Pelayanan Penerbangan Perintis' : (contract.contract_type === 'Sewa' ? 'Kontrak Sewa' : 'Kontrak Payung')} Pemanfaatan Jasa Kebandarudaraan dengan syarat dan ketentuan sebagai berikut:
                   </p>
                 </div>
 
@@ -248,51 +319,85 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
                   <div>
                     <h3 className="font-bold text-center m-0 p-0">PASAL 1<br/>MASA BERLAKU</h3>
                     <p className="m-0 p-0 mt-1">
-                      Kontrak ini berlaku efektif terhitung mulai tanggal <strong>{dayjs(contract.start_date).format('DD MMMM YYYY')}</strong> sampai dengan tanggal <strong>{dayjs(contract.end_date).format('DD MMMM YYYY')}</strong>. Selama masa kontrak berstatus <strong>{contract.status?.toUpperCase() || 'ACTIVE'}</strong>, Pihak Kedua berhak memanfaatkan aset bandara.
+                      Kontrak ini berlaku efektif selama 1 (satu) tahun terhitung mulai tanggal <strong>{dayjs(contract.start_date).format('DD MMMM YYYY')}</strong> sampai dengan tanggal <strong>{dayjs(contract.end_date).format('DD MMMM YYYY')}</strong>. Selama masa kontrak berstatus <strong>{contract.status?.toUpperCase() || 'ACTIVE'}</strong>, Pihak Kedua berhak memanfaatkan fasilitas penerbangan dan pendaratan bandara.
                     </p>
                   </div>
                 </div>
               </>
             )}
 
-            {/* Jika ada tarif untuk halaman ini */}
+            {/* Jika ada tarif/pajak untuk halaman ini */}
             {page.tariffs.length > 0 && (
               <div className="text-[13px] leading-relaxed text-justify">
                 {page.isFirstPage && (
                   <>
-                    <h3 className="font-bold text-center m-0 p-0">PASAL 2<br/>DAFTAR TARIF DAN FASILITAS</h3>
+                    <h3 className="font-bold text-center m-0 p-0">
+                      PASAL 2<br/>
+                      {isMini ? 'DAFTAR KOMPONEN TAX RETRIBUSI JASA KEBANDARUDARAAN' : 'DAFTAR TARIF DAN FASILITAS'}
+                    </h3>
                     <p className="m-0 p-0 mt-1 mb-2">
-                      Pihak Kedua tunduk pada Master Tarif pemanfaatan fasilitas Bandar Udara Mozes Kilangin yang telah ditetapkan di bawah ini:
+                      {isMini 
+                        ? `Pihak Kedua tunduk pada Master Tax Retribusi Jasa Kebandarudaraan ${airportDisplayName} yang ditetapkan oleh Pemerintah Daerah di bawah ini:`
+                        : 'Pihak Kedua tunduk pada Master Tarif pemanfaatan fasilitas Bandar Udara Mozes Kilangin yang telah ditetapkan di bawah ini:'}
                     </p>
                   </>
                 )}
                 {!page.isFirstPage && (
-                  <p className="m-0 p-0 mb-2 italic">Lanjutan Daftar Tarif dan Fasilitas...</p>
+                  <p className="m-0 p-0 mb-2 italic">
+                    {isMini ? 'Lanjutan Daftar Komponen Tax Retribusi...' : 'Lanjutan Daftar Tarif dan Fasilitas...'}
+                  </p>
                 )}
                 
-                {/* Tabel Tarif */}
-                <table className="w-full text-left border-collapse mt-2" style={{ border: '1px solid #000000' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#f3f4f6' }}>
-                      <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Kode</th>
-                      <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Objek / Fasilitas</th>
-                      <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Jenis Layanan</th>
-                      <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Tarif (Rp)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {page.tariffs.map((tarif: any, tIndex: number) => (
-                      <tr key={tarif.id || `${tarif.kode_tarif}-${tIndex}`}>
-                        <td className="p-1.5 text-center text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.kode_tarif}</td>
-                        <td className="p-1.5 text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.objek}</td>
-                        <td className="p-1.5 text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.jenis_layanan}</td>
-                        <td className="p-1.5 text-right text-[11px]" style={{ border: '1px solid #000000' }}>
-                          {formatRupiah(tarif.tarif)} <span style={{ fontSize: '9px' }}>/ {tarif.satuan}</span>
-                        </td>
+                {/* Tabel Tarif / Tax */}
+                {isMini ? (
+                  <table className="w-full text-left border-collapse mt-2" style={{ border: '1px solid #000000' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f3f4f6' }}>
+                        <th className="p-1.5 font-bold text-center text-[11px]" style={{ border: '1px solid #000000' }}>Kode Tax</th>
+                        <th className="p-1.5 font-bold text-left text-[11px]" style={{ border: '1px solid #000000' }}>Komponen Retribusi</th>
+                        <th className="p-1.5 font-bold text-center text-[11px]" style={{ border: '1px solid #000000' }}>Kategori</th>
+                        <th className="p-1.5 font-bold text-left text-[11px]" style={{ border: '1px solid #000000' }}>Armada / Tipe</th>
+                        <th className="p-1.5 font-bold text-right text-[11px]" style={{ border: '1px solid #000000' }}>Tarif Retribusi</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {page.tariffs.map((tax: any, tIndex: number) => (
+                        <tr key={tax.id || `${tax.kode_tax}-${tIndex}`}>
+                          <td className="p-1.5 text-center text-[10.5px] font-mono" style={{ border: '1px solid #000000' }}>{tax.kode_tax}</td>
+                          <td className="p-1.5 text-[10.5px] font-semibold" style={{ border: '1px solid #000000' }}>{tax.nama_tax}</td>
+                          <td className="p-1.5 text-center text-[10.5px]" style={{ border: '1px solid #000000' }}>{tax.kategori}</td>
+                          <td className="p-1.5 text-[10.5px]" style={{ border: '1px solid #000000' }}>{tax.aircraft_types?.jenis_pesawat || '-'}</td>
+                          <td className="p-1.5 text-right text-[10.5px] font-mono font-bold" style={{ border: '1px solid #000000' }}>
+                            {formatRupiah(tax.tarif)} <span style={{ fontSize: '9px', fontWeight: 'normal' }}>/ {tax.satuan || 'Pendaratan'}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <table className="w-full text-left border-collapse mt-2" style={{ border: '1px solid #000000' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f3f4f6' }}>
+                        <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Kode</th>
+                        <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Objek / Fasilitas</th>
+                        <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Jenis Layanan</th>
+                        <th className="p-1.5 font-bold text-center text-[12px]" style={{ border: '1px solid #000000' }}>Tarif (Rp)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {page.tariffs.map((tarif: any, tIndex: number) => (
+                        <tr key={tarif.id || `${tarif.kode_tarif}-${tIndex}`}>
+                          <td className="p-1.5 text-center text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.kode_tarif}</td>
+                          <td className="p-1.5 text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.objek}</td>
+                          <td className="p-1.5 text-[11px]" style={{ border: '1px solid #000000' }}>{tarif.jenis_layanan}</td>
+                          <td className="p-1.5 text-right text-[11px]" style={{ border: '1px solid #000000' }}>
+                            {formatRupiah(tarif.tarif)} <span style={{ fontSize: '9px' }}>/ {tarif.satuan}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             )}
 
@@ -300,9 +405,11 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
             {page.hasSignature && (
               <div className="mt-8">
                 <div className="text-[13px] leading-relaxed text-justify mb-10">
-                  <h3 className="font-bold text-center m-0 p-0 mt-6">PASAL 3<br/>SKEMA PENAGIHAN</h3>
+                  <h3 className="font-bold text-center m-0 p-0 mt-6">PASAL 3<br/>SKEMA PENAGIHAN RETRIBUSI</h3>
                   <p className="m-0 p-0 mt-1">
-                    Penagihan atas pemanfaatan yang diajukan oleh Pihak Kedua akan ditagihkan dengan periode <strong>{contract.periode_pembayaran || 'Sesuai Pemakaian'}</strong>. Pembayaran harus dilakukan sebelum batas waktu yang tertera pada dokumen Tagihan.
+                    {isMini 
+                      ? 'Penagihan retribusi daerah atas pendaratan, penumpang, dan parkir/inap dihitung secara otomatis berdasarkan realisasi fisik kedatangan yang dicatat petugas lapangan, yang kemudian diterbitkan Surat Ketetapan Retribusi Daerah (SKRD) resmi oleh Dinas Perhubungan. Pembayaran wajib disetorkan sebelum batas waktu yang tertera pada SKRD.'
+                      : `Penagihan atas pemanfaatan yang diajukan oleh Pihak Kedua akan ditagihkan dengan periode ${contract.periode_pembayaran || 'Sesuai Pemakaian'}. Pembayaran harus dilakukan sebelum batas waktu yang tertera pada dokumen Tagihan.`}
                   </p>
                 </div>
 
@@ -315,9 +422,19 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
                       <p className="mt-1 text-[11px]">{tenantData?.nama_perusahaan || 'Direktur Perusahaan'}</p>
                     </div>
                     <div className="text-center">
-                      <p>Timika, {dayjs(contract.start_date).format('DD MMMM YYYY')}</p>
+                      <p>{isMini ? (airportLocation.toLowerCase().includes('nabire') ? 'Nabire' : 'Papua Tengah') : 'Timika'}, {dayjs(contract.start_date).format('DD MMMM YYYY')}</p>
                       <p className="mb-14"><strong>PIHAK PERTAMA</strong></p>
-                      <p className="font-bold inline-block min-w-[150px]" style={{ borderBottom: '1px solid #000000' }}>Kepala Mozes Kilangin</p>
+                      <p className="font-bold inline-block min-w-[150px]" style={{ borderBottom: '1px solid #000000' }}>
+                        {isMini ? 'Kepala Dinas Perhubungan' : 'Kepala UPBU Mozes Kilangin'}
+                      </p>
+                      {isMini ? (
+                        <>
+                          <p className="mt-1 text-[11px]">Pemerintah Provinsi Papua Tengah</p>
+                          <p className="text-[10px] text-gray-500 italic">(Pengelola {airportDisplayName})</p>
+                        </>
+                      ) : (
+                        <p className="mt-1 text-[11px]">UPBU Mozes Kilangin Timika</p>
+                      )}
                     </div>
                   </div>
                 </div>

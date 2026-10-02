@@ -22,8 +22,9 @@ export const assetService = {
     return response.data.data;
   },
 
-  getAssetCapacity: async (id: number): Promise<{ isHangar: boolean, totalArea: number, usedArea: number, remainingArea: number }> => {
-    const response = await api.get(`/assets/${id}/capacity`);
+  getAssetCapacity: async (id: number, excludeApplicationId?: number): Promise<{ isHangar: boolean, totalArea: number, usedArea: number, remainingArea: number }> => {
+    const params = excludeApplicationId ? { exclude_application_id: excludeApplicationId } : {};
+    const response = await api.get(`/assets/${id}/capacity`, { params });
     return response.data.data;
   },
 

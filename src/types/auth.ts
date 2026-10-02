@@ -7,6 +7,11 @@ export interface UserData {
   id: number;
   username: string;
   role: string;
+  airport_id?: number | null;
+  mini_airport_id?: number | null;
+  airport_name?: string | null;
+  airport_code?: string | null;
+  airport_type?: 'main' | 'mini' | null;
   tenant_id?: number | null;
   tenant_id_str?: string | null;
   nama_perusahaan?: string | null;

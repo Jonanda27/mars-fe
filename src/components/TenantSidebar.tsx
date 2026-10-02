@@ -13,7 +13,8 @@ import {
   LayoutDashboard,
   FileSignature,
   Building2,
-  Calendar
+  Calendar,
+  TowerControl
 } from 'lucide-react';
 import RupiahIcon from './icons/RupiahIcon';
 
@@ -24,7 +25,8 @@ export default function TenantSidebar({ isOpen }: Readonly<{ isOpen: boolean }>)
   const navItems: NavItem[] = [
     { href: "/tenant", label: "Dashboard", icon: <LayoutDashboard /> },
     { href: "/tenant/permohonan", label: "Permohonan Sewa", icon: <FileText /> },
-    { href: "/tenant/jadwal-hanggar", label: "Jadwal Hanggar", icon: <Calendar /> },
+    { href: "/tenant/mini-airport", label: "Permohonan Mini Airport", icon: <TowerControl /> },
+    { href: "/tenant/jadwal-hanggar", label: "Jadwal Pemakaian", icon: <Calendar /> },
     { href: "/tenant/kontrak-payung", label: "Kontrak Payung", icon: <FileSignature /> },
     { href: "/tenant/kontrak-sewa", label: "Kontrak Sewa", icon: <Building2 /> },
     { href: "/tenant/pesawat", label: "Data Pesawat", icon: <Plane /> },

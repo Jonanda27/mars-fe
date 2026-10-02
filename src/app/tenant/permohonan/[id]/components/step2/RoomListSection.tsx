@@ -134,7 +134,7 @@ export const RoomListSection: React.FC<RoomListSectionProps> = ({
           </p>
         </div>
         {roomZone && roomType && roomAC && (
-          <span className="text-[11px] text-slate-600 bg-slate-100 px-3 py-1 rounded-full font-medium self-start sm:self-auto">
+          <span className="text-[11px] text-slate-600 bg-slate-100 px-3 py-1 rounded border border-slate-200 font-medium self-start sm:self-auto">
             Filter: {roomZone === 'dalam' ? 'Dalam Terminal' : 'Luar Terminal'} • {roomType} • {roomAC === 'dengan' ? 'Dengan AC' : 'Tanpa AC'}
           </span>
         )}

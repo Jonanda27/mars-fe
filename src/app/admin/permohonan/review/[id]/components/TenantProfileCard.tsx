@@ -27,7 +27,7 @@ export const TenantProfileCard: React.FC<TenantProfileCardProps> = ({ tenant }) 
           <div>
             <h3 className="text-xl font-bold text-slate-800 mb-1">{tenant?.nama_perusahaan || '-'}</h3>
             <div className="flex items-center gap-2">
-              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-none uppercase tracking-wider border border-slate-200">
+              <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border border-slate-200">
                 Verified Legal Entity
               </span>
             </div>

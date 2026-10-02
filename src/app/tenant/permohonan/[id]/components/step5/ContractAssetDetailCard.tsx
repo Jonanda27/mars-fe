@@ -6,6 +6,7 @@ import { RentalApplication } from '@/types/rental';
 import { formatRupiah } from '@/utils/formatCurrency';
 import { getAircraftTariff } from '@/utils/aircraftTariff';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 interface ContractAssetDetailCardProps {
   readonly app: RentalApplication;
@@ -26,6 +27,14 @@ export const ContractAssetDetailCard: React.FC<ContractAssetDetailCardProps> = (
   hangarRentalCalc,
   calculateAircraftArea,
 }) => {
+  const spec = typeof app.specific_needs === 'string'
+    ? JSON.parse(app.specific_needs)
+    : (app.specific_needs || {});
+  const extReq = spec?.extension_request;
+  const hasApprovedExt = extReq && extReq.status === 'Approved';
+  const prevEndDate = extReq?.original_end_date || (app.end_date && extReq?.additional_days ? dayjs(app.end_date).subtract(extReq.additional_days, 'day').format('YYYY-MM-DD') : null);
+  const initialDuration = (app.start_date && prevEndDate) ? Math.max(1, dayjs(prevEndDate).diff(dayjs(app.start_date), 'day')) : null;
+
   return (
     <div className="space-y-6">
       {/* Rincian Fasilitas & Jadwal Sewa */}
@@ -51,7 +60,7 @@ export const ContractAssetDetailCard: React.FC<ContractAssetDetailCardProps> = (
           {app.asset_id && (
             <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-none">
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">
-                Aset Hanggar Dialokasikan
+                Aset Penempatan Dialokasikan ({app.assets?.jenis_aset || 'Fasilitas'})
               </span>
               <div className="flex items-center justify-between">
                 <div>
@@ -60,10 +69,14 @@ export const ContractAssetDetailCard: React.FC<ContractAssetDetailCardProps> = (
                     Kode: <strong className="text-slate-700">{app.assets?.kode_aset}</strong> &bull; Kapasitas Luas: <strong className="text-[#3c8dbc]">{app.assets?.luas || 0} m²</strong>
                   </p>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5">
-                  Tersedia
-                </span>
+                <StatusBadge status="Tersedia" />
               </div>
+              {app.specific_needs?.relocations && app.specific_needs.relocations.length > 0 && (
+                <div className="mt-2 text-[11px] text-blue-800 bg-blue-50 border border-blue-200 p-2 rounded-none flex items-center gap-1.5">
+                  <span className="font-bold">🔄 Penempatan Relokasi:</span>
+                  <span>Dialihkan dari {app.specific_needs.relocations[app.specific_needs.relocations.length - 1].previous_asset_name} ke {app.assets?.nama_aset} saat perpanjangan sewa</span>
+                </div>
+              )}
             </div>
           )}
 
@@ -78,12 +91,24 @@ export const ContractAssetDetailCard: React.FC<ContractAssetDetailCardProps> = (
               </p>
             </div>
             <div className="bg-white border border-slate-200 p-3 rounded-none">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center gap-1 mb-1">
-                <Clock className="w-3 h-3 text-[#3c8dbc]" /> Tanggal Selesai
-              </span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-[#3c8dbc]" /> Tanggal Selesai
+                </span>
+                {hasApprovedExt && (
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
+                    +{extReq.additional_days} Hari
+                  </span>
+                )}
+              </div>
               <p className="text-[13px] font-bold text-slate-800">
                 {dayjs(app.end_date || app.contracts?.end_date).format('DD MMMM YYYY')}
               </p>
+              {hasApprovedExt && prevEndDate && (
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Semula: <span className="line-through decoration-slate-400 font-mono text-slate-500">{dayjs(prevEndDate).format('DD MMMM YYYY')}</span>
+                </p>
+              )}
             </div>
           </div>
 

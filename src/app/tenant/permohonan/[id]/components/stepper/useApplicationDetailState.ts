@@ -25,18 +25,63 @@ const filterAssetsByType = (assets: any[], appType: string, currentAssetId?: num
   });
 };
 
-const getUsedAircraftIds = (apps: any[], currentAppId: number, oldAppId: number | null) => {
+const getUsedAircraftInfo = (apps: any[], currentAppId: number, oldAppId: number | null) => {
   const usedIds = new Set<string>();
-  apps.forEach((a: any) => {
-    if (a.id !== currentAppId && a.status !== 'Rejected' && a.status !== 'Terminated' && a.status !== 'Expired') {
-      if (oldAppId && a.id === oldAppId) return;
-      const spec = a.specific_needs;
-      if (Array.isArray(spec?.aircraft_ids)) {
-        spec.aircraft_ids.forEach((i: string) => usedIds.add(i.toString()));
+  const usedRegs = new Set<string>();
+
+  (apps || []).forEach((a: any) => {
+    const isCurrent = a.id === currentAppId || (oldAppId && a.id === oldAppId);
+    const status = (a.status || '').trim().toLowerCase();
+    const isTerminated = 
+      status === 'rejected' || 
+      status === 'terminated' || 
+      status === 'expired' || 
+      status === 'ditolak' || 
+      status === 'dibatalkan' ||
+      status === 'cancelled';
+
+    if (!isCurrent && !isTerminated) {
+      let spec = a.specific_needs;
+      if (typeof spec === 'string') {
+        try { spec = JSON.parse(spec); } catch (e) { spec = {}; }
+      }
+      spec = spec || {};
+
+      // 1. Single aircraft_id (biasa di Mini Airport)
+      if (spec.aircraft_id !== undefined && spec.aircraft_id !== null && spec.aircraft_id !== '') {
+        usedIds.add(spec.aircraft_id.toString());
+      }
+
+      // 2. Registration number (Mini Airport)
+      if (spec.registration_number) {
+        usedRegs.add(String(spec.registration_number).trim().toUpperCase());
+      }
+
+      // 3. Array of aircraft_ids (biasa di Sewa Hanggar)
+      if (Array.isArray(spec.aircraft_ids)) {
+        spec.aircraft_ids.forEach((id: any) => {
+          if (id !== undefined && id !== null && id !== '') {
+            usedIds.add(id.toString());
+          }
+        });
+      }
+
+      // 4. Array of aircraft_details
+      if (Array.isArray(spec.aircraft_details)) {
+        spec.aircraft_details.forEach((d: any) => {
+          const detailId = d.aircraft_id || d.id;
+          if (detailId !== undefined && detailId !== null) {
+            usedIds.add(detailId.toString());
+          }
+          if (d.registration_number) {
+            usedRegs.add(String(d.registration_number).trim().toUpperCase());
+          }
+        });
       }
     }
   });
-  return usedIds;
+
+  return { usedIds, usedRegs };
 };
 
 const applyRoomSpecs = (
@@ -118,10 +163,17 @@ export function useApplicationDetailState(id: string) {
       }
       
       const oldAppId = oldContractParam?.rental_applications?.[0]?.id || null;
-      const usedAircraftIds = getUsedAircraftIds(appsData, Number.parseInt(id, 10), oldAppId);
+      const { usedIds, usedRegs } = getUsedAircraftInfo(appsData, Number.parseInt(id, 10), oldAppId);
 
       setAllTenantAircrafts(aircraftsData);
-      setTenantAircrafts(aircraftsData.filter((a: any) => !usedAircraftIds.has(a.id.toString())));
+      setTenantAircrafts(
+        (aircraftsData || []).filter((a: any) => {
+          const idStr = a.id?.toString();
+          const regUpper = (a.registration_number || '').trim().toUpperCase();
+          const isUsed = (idStr && usedIds.has(idStr)) || (regUpper && usedRegs.has(regUpper));
+          return !isUsed;
+        })
+      );
     } catch (err) {
       console.error("Error fetching reference data", err);
     }
@@ -151,13 +203,22 @@ export function useApplicationDetailState(id: string) {
       let initAssetId = appData.asset_id?.toString() || '';
       let initStartDate = appData.start_date ? dayjs(appData.start_date).format('YYYY-MM-DD') : '';
       let initEndDate = appData.end_date ? dayjs(appData.end_date).format('YYYY-MM-DD') : '';
-      let initAircrafts = appData.specific_needs?.aircraft_ids || [];
+      let parsedSpec = appData.specific_needs;
+      if (typeof parsedSpec === 'string') {
+        try { parsedSpec = JSON.parse(parsedSpec); } catch (e) { parsedSpec = {}; }
+      }
+      parsedSpec = parsedSpec || {};
+
+      let initAircrafts = Array.isArray(parsedSpec.aircraft_ids) ? parsedSpec.aircraft_ids : [];
 
       if (oldContract && appData.status === 'Surat Disetujui' && !appData.asset_id) {
         initAssetId = oldContract.asset_id?.toString() || '';
         initStartDate = oldContract.end_date ? dayjs(oldContract.end_date).add(1, 'day').format('YYYY-MM-DD') : '';
-        if (initAircrafts.length === 0 && oldContract.rental_applications?.[0]?.specific_needs?.aircraft_ids) {
-          initAircrafts = oldContract.rental_applications[0].specific_needs.aircraft_ids;
+        const oldSpec = typeof oldContract.rental_applications?.[0]?.specific_needs === 'string'
+          ? JSON.parse(oldContract.rental_applications[0].specific_needs)
+          : oldContract.rental_applications?.[0]?.specific_needs;
+        if (initAircrafts.length === 0 && oldSpec?.aircraft_ids) {
+          initAircrafts = oldSpec.aircraft_ids;
         }
       }
 
@@ -171,8 +232,17 @@ export function useApplicationDetailState(id: string) {
         
       setSpecificNeeds({
         aircraft_ids: initAircrafts,
-        kebutuhan_ruang_pendukung: appData.specific_needs?.facilities || appData.specific_needs?.kebutuhan_ruang_pendukung || ''
+        kebutuhan_ruang_pendukung: parsedSpec.facilities || parsedSpec.kebutuhan_ruang_pendukung || ''
       });
+
+      if (initAssetId) {
+        try {
+          const capacity = await assetService.getAssetCapacity(Number.parseInt(initAssetId, 10), Number.parseInt(id, 10));
+          setAssetCapacity(capacity);
+        } catch (capErr) {
+          console.error("Gagal memuat kapasitas aset awal:", capErr);
+        }
+      }
 
     } catch (error) {
       console.error(error);
@@ -210,7 +280,7 @@ export function useApplicationDetailState(id: string) {
     
     if (name === 'asset_id' && value) {
       try {
-        const capacity = await assetService.getAssetCapacity(Number.parseInt(value, 10));
+        const capacity = await assetService.getAssetCapacity(Number.parseInt(value, 10), Number.parseInt(id, 10));
         setAssetCapacity(capacity);
       } catch (err) {
         console.error(err);

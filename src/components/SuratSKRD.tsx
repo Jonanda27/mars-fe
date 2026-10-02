@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import { Invoice } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
 import dayjs from 'dayjs';
@@ -38,10 +38,27 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
   const penaltyAmount = Number(invoice.penalty_amount || 0);
   const totalAmount = baseAmount + penaltyAmount;
 
+  // Safe parsing details & contract.fasilitas
+  const detailsObj = useMemo(() => {
+    if (!invoice?.details) return {};
+    if (typeof invoice.details === 'string') {
+      try { return JSON.parse(invoice.details); } catch (e) { return {}; }
+    }
+    return typeof invoice.details === 'object' ? (invoice.details as any) : {};
+  }, [invoice?.details]);
+
+  const contractFasilitas = useMemo(() => {
+    if (!contract?.fasilitas) return {};
+    if (typeof contract.fasilitas === 'string') {
+      try { return JSON.parse(contract.fasilitas); } catch (e) { return {}; }
+    }
+    return typeof contract.fasilitas === 'object' ? (contract.fasilitas as any) : {};
+  }, [contract?.fasilitas]);
+
   const isDenda = Boolean(
     invoice.invoice_type === 'SKRD Denda' ||
     invoice.invoice_number?.includes('DND') ||
-    invoice.details?.type === 'PENALTY_INVOICE'
+    detailsObj?.type === 'PENALTY_INVOICE'
   );
 
   const isCancelled = invoice.status === 'Cancelled' || invoice.status === 'Dibatalkan';
@@ -53,7 +70,19 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
     contract?.contract_number?.includes('PKS-RG')
   );
 
-  const isHanggar = !isDenda && !isRuangan && Boolean(
+  const isMiniAirport = !isDenda && Boolean(
+    invoice.invoice_type === 'Mini Airport' ||
+    invoice.invoice_number?.includes('MAP') ||
+    invoice.invoice_number?.includes('MINI') ||
+    detailsObj.service_type === 'Mini Airport' ||
+    contract?.contract_type === 'PKS Payung Mini Airport' ||
+    contractFasilitas.category === 'Mini Airport' ||
+    contractFasilitas.mini_airport_id ||
+    (Boolean(detailsObj.airport_name) && !detailsObj.airport_name.toLowerCase().includes('mozes')) ||
+    (Boolean(contractFasilitas.airport_name) && !contractFasilitas.airport_name.toLowerCase().includes('mozes'))
+  );
+
+  const isHanggar = !isDenda && !isRuangan && !isMiniAirport && Boolean(
     invoice.invoice_type === 'Sewa Hanggar' || 
     (Array.isArray(invoice.details) && invoice.details.length > 0) || 
     invoice.invoice_number?.includes('HGR') ||
@@ -62,9 +91,35 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
     contract?.jenis_pemanfaatan?.toLowerCase().includes('hanggar')
   );
 
+  // Metadata Mini Airport
+  const miniAirportName = 
+    detailsObj.airport_name || 
+    contractFasilitas.airport_name || 
+    contractFasilitas.mini_airport_name || 
+    'Mini Airport Perintis';
+
+  const miniAirportCode = 
+    detailsObj.airport_code || 
+    contractFasilitas.airport_code || 
+    '';
+
+  const miniAirportLocation = 
+    detailsObj.airport_location || 
+    contractFasilitas.airport_location || 
+    contractFasilitas.lokasi || 
+    'Papua Tengah';
+
+  // Format Nama Airport untuk Kop & Judul SKRD
+  const formattedAirportTitle = miniAirportCode 
+    ? `${miniAirportName.toUpperCase()} (${miniAirportCode.toUpperCase()})` 
+    : miniAirportName.toUpperCase();
+
   const getMasaRetribusi = () => {
     if (isDenda) {
-      return `${invoice.details?.overdue_days || 0} Hari (${invoice.details?.months_overdue || 1} Bulan)`;
+      return `${detailsObj?.overdue_days || 0} Hari (${detailsObj?.months_overdue || 1} Bulan)`;
+    }
+    if (isMiniAirport && detailsObj.entry_time) {
+      return dayjs(detailsObj.entry_time).format('DD-MM-YYYY');
     }
     if (Array.isArray(invoice.details) && invoice.details.length > 0) {
       const dates = invoice.details
@@ -124,9 +179,19 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
             {/* Row 1 & 2 */}
             <tr>
               <td rowSpan={2} className="border border-black p-2 w-1/3 text-center align-top font-bold">
-                PEMERINTAH KABUPATEN MIMIKA<br/>
-                DINAS PERHUBUNGAN<br/>
-                UPBU MOZES KILANGIN TIMIKA
+                {isMiniAirport ? (
+                  <>
+                    PEMERINTAH PROVINSI PAPUA TENGAH<br/>
+                    DINAS PERHUBUNGAN<br/>
+                    UPT BANDARA PERINTIS — {formattedAirportTitle}
+                  </>
+                ) : (
+                  <>
+                    PEMERINTAH KABUPATEN MIMIKA<br/>
+                    DINAS PERHUBUNGAN<br/>
+                    UPBU MOZES KILANGIN TIMIKA
+                  </>
+                )}
               </td>
               <td className="border border-black p-2 text-center w-1/3 font-bold text-xl">
                 {isDenda ? 'SKRD DENDA' : 'SKRD'}
@@ -171,7 +236,9 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                     <tr>
                       <td>Alamat</td>
                       <td>:</td>
-                      <td className="font-bold">{tenant?.alamat || 'Bandara Mozes Kilangin Timika'}</td>
+                      <td className="font-bold">
+                        {tenant?.alamat || (isMiniAirport ? `${miniAirportName}, ${miniAirportLocation}` : 'Bandara Mozes Kilangin Timika')}
+                      </td>
                     </tr>
                     <tr>
                       <td>NPWRD / NPWP</td>
@@ -200,7 +267,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
             {/* Items Body */}
             <tr>
               <td className="border border-black p-2 text-center align-top" style={{ minHeight: '120px' }}>
-                 {isDenda ? '4.1.4.01.01' : isHanggar ? '4.1.2.02.02' : '4.1.2.02.01'}
+                 {isDenda ? '4.1.4.01.01' : isMiniAirport ? '4.1.2.02.03' : isHanggar ? '4.1.2.02.02' : '4.1.2.02.01'}
               </td>
               <td className="border border-black p-2 align-top">
                 {isDenda ? (
@@ -209,7 +276,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                       Pendapatan Denda Retribusi Daerah
                     </div>
                     <div className="text-xs text-slate-700 mb-2">
-                      Sanksi administratif berupa bunga keterlambatan sebesar 2% per bulan atas keterlambatan pelunasan SKRD Pokok.
+                      Sanksi administratif berupa bunga keterlambatan sebesar {invoice.details?.rate_percent_per_month || 1}% per bulan atas keterlambatan pelunasan SKRD Pokok.
                     </div>
                     
                     <div className="mt-2 p-2 bg-slate-50 border border-slate-200 rounded text-xs space-y-1">
@@ -227,13 +294,62 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                       </div>
                       <div className="flex">
                         <span className="w-36 text-slate-500">Tarif Denda:</span>
-                        <span className="font-bold text-slate-900">2% per bulan</span>
+                        <span className="font-bold text-slate-900">{invoice.details?.rate_percent_per_month || 1}% per bulan</span>
                       </div>
                       <div className="flex">
                         <span className="w-36 text-slate-500">Keterangan:</span>
                         <span className="text-slate-800 italic">{invoice.details?.reference_note || '-'}</span>
                       </div>
                     </div>
+                  </div>
+                ) : isMiniAirport ? (
+                  <div>
+                    <div className="font-bold text-base mb-1">
+                      Retribusi Pelayanan Lapangan Terbang Perintis ({miniAirportName})
+                    </div>
+                    <div className="text-xs text-slate-600 mb-2">
+                      Pelayanan pendaratan, jasa kebandarudaraan, dan penempatan pesawat perintis di {miniAirportName} {miniAirportCode ? `(${miniAirportCode})` : ''} berdasarkan Peraturan Daerah Provinsi Papua Tengah tentang Retribusi Jasa Kebandarudaraan Perintis.
+                    </div>
+
+                    <div className="bg-slate-50 p-2.5 border border-slate-200 text-xs mb-3 space-y-0.5">
+                      <div><strong>Armada Pesawat:</strong> <span className="font-mono">{detailsObj.registration_number || '-'}</span> ({detailsObj.aircraft_type || 'Perintis'})</div>
+                      <div><strong>Lokasi Stand:</strong> <span className="font-mono font-bold text-slate-900">{detailsObj.allocated_stand || 'STAND 01'}</span> • <strong>Penumpang:</strong> {detailsObj.passengers_count || 1} Pax</div>
+                      <div><strong>Status Penempatan:</strong> {detailsObj.is_overnight ? `Menginap (RON ${detailsObj.overnight_nights || 1} Malam)` : 'Hanya Parkir Apron (Transit)'}</div>
+                    </div>
+
+                    {/* Rincian Komponen Tax */}
+                    {detailsObj.taxes && detailsObj.taxes.length > 0 ? (
+                      <table className="w-full border-collapse border border-slate-300 text-[11px] mb-2">
+                        <thead>
+                          <tr className="bg-slate-100 text-slate-800 font-bold">
+                            <th className="border border-slate-300 p-1 text-center w-6">No</th>
+                            <th className="border border-slate-300 p-1 text-left">Komponen Retribusi (Tax)</th>
+                            <th className="border border-slate-300 p-1 text-right">Tarif Dasar</th>
+                            <th className="border border-slate-300 p-1 text-center">Volume</th>
+                            <th className="border border-slate-300 p-1 text-right">Subtotal</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {detailsObj.taxes.map((t: any, idx: number) => (
+                            <tr key={idx} className="border-b border-slate-200">
+                              <td className="border border-slate-300 p-1 text-center">{idx + 1}</td>
+                              <td className="border border-slate-300 p-1 font-medium">
+                                {t.nama_tax}
+                                <span className="block text-[9px] text-slate-400 font-mono">Kode: {t.kode_tax} • {t.satuan}</span>
+                              </td>
+                              <td className="border border-slate-300 p-1 text-right font-mono">Rp {Number(t.tarif).toLocaleString('id-ID')}</td>
+                              <td className="border border-slate-300 p-1 text-center font-bold">{t.qty}</td>
+                              <td className="border border-slate-300 p-1 text-right font-mono font-bold">Rp {Number(t.subtotal).toLocaleString('id-ID')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="text-xs space-y-1">
+                        <div>Tarif Dasar: Sesuai Master Tax Pelayanan Kebandarudaraan {miniAirportName}</div>
+                        <div>Dasar Penetapan: Catatan Realisasi Fisik Petugas Lapangan Terverifikasi</div>
+                      </div>
+                    )}
                   </div>
                 ) : isHanggar ? (
                   <div>
@@ -316,7 +432,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                   4.1.4.01.01
                 </td>
                 <td className="border border-black p-2 align-top" style={{ color: '#dc2626' }}>
-                  <div className="font-bold">Denda Keterlambatan Pembayaran (2% per bulan)</div>
+                  <div className="font-bold">Denda Keterlambatan Pembayaran (1% per bulan)</div>
                 </td>
                 <td className="border border-black p-2 text-right align-top font-bold" style={{ color: '#dc2626' }}>
                   {penaltyAmount.toLocaleString('id-ID')}
@@ -363,12 +479,25 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                     </div>
                     <div className="w-1/2 p-4 text-center flex flex-col justify-between">
                        <div className="mb-16 text-sm">
-                          Timika, {dayjs(invoice.created_at).format('DD MMMM YYYY')}<br/>
+                          {isMiniAirport 
+                            ? (miniAirportLocation.toLowerCase().includes('nabire') ? 'Nabire' : 'Papua Tengah') 
+                            : 'Timika'}, {dayjs(invoice.created_at).format('DD MMMM YYYY')}<br/>
                           Pejabat Yang Menetapkan
                        </div>
                        <div className="text-sm">
-                          <div className="underline font-bold">Kepala UPBU Mozes Kilangin</div>
-                          <div>NIP. 19700101 199001 1 001</div>
+                          {isMiniAirport ? (
+                            <>
+                              <div className="underline font-bold">Kepala Dinas Perhubungan</div>
+                              <div className="text-xs text-slate-700">Pemerintah Provinsi Papua Tengah</div>
+                              <div className="text-[11px] text-slate-500 italic">(Pengelola {miniAirportName})</div>
+                              <div>NIP. 19720512 199803 1 004</div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="underline font-bold">Kepala UPBU Mozes Kilangin</div>
+                              <div>NIP. 19700101 199001 1 001</div>
+                            </>
+                          )}
                        </div>
                     </div>
                  </div>
@@ -414,7 +543,9 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
             <tr>
               <td className="border border-black p-2 border-r-0">Alamat</td>
               <td className="border-y border-black p-2">:</td>
-              <td className="border border-black p-2 border-l-0 font-bold">{tenant?.alamat || '-'}</td>
+              <td className="border border-black p-2 border-l-0 font-bold">
+                {tenant?.alamat || (isMiniAirport ? `${miniAirportName}, ${miniAirportLocation}` : '-')}
+              </td>
             </tr>
             <tr>
               <td colSpan={3} className="border border-black p-0">
@@ -456,9 +587,13 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                    </div>
                    <div className="w-1/2 p-4 text-center text-xs flex flex-col justify-between items-center relative">
                       <div className="text-right w-full" style={{ color: '#6b7280' }}>
-                         Timika, .............................. {dayjs().format('YYYY')}
+                         {isMiniAirport 
+                           ? (miniAirportLocation.toLowerCase().includes('nabire') ? 'Nabire' : 'Papua Tengah') 
+                           : 'Timika'}, .............................. {dayjs().format('YYYY')}
                       </div>
-                      <div className="mb-16 mt-4 font-bold">Yang Menerima</div>
+                      <div className="mb-16 mt-4 font-bold">
+                        {isMiniAirport ? 'Bendahara Penerimaan Dishub Prov. Papua Tengah' : 'Yang Menerima'}
+                      </div>
                       <div className="w-3/4 border-b border-dashed border-black"></div>
                    </div>
                  </div>

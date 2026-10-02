@@ -68,5 +68,15 @@ export const contractService = {
   rejectContractByKadis: async (id: number, reason: string): Promise<any> => {
     const response = await api.patch(`/contracts/${id}/reject-kadis`, { reason });
     return response.data;
+  },
+
+  createEmergencyContract: async (payload: any): Promise<any> => {
+    const response = await api.post('/contracts/emergency', payload);
+    return response.data;
+  },
+
+  getEmergencyActiveContracts: async (): Promise<Contract[]> => {
+    const response = await api.get('/contracts/emergency-active');
+    return response.data.data;
   }
 };

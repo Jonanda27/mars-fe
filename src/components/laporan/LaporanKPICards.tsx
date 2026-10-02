@@ -54,54 +54,54 @@ export const LaporanKPICards: React.FC<LaporanKPICardsProps> = ({ reportData }) 
         </div>
 
         {/* Card 2: Realisasi Kas Daerah (Paid) */}
-        <div className="bg-white border-t-[3px] border-[#00a65a] shadow-sm p-4 relative overflow-hidden">
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm p-4 relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Realisasi Masuk Kasda</span>
-              <div className="text-[20px] font-bold text-[#00a65a] mt-1 font-mono">
+              <div className="text-[20px] font-bold text-slate-800 mt-1 font-mono">
                 {formatRupiah(summary.total_realisasi_kas_masuk)}
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
                 {reportData?.invoices.filter(i => i.status === 'PAID').length || 0} SKRD Telah Disetor &amp; Lunas
               </p>
             </div>
-            <div className="p-2.5 bg-emerald-50 text-[#00a65a] rounded-none">
+            <div className="p-2.5 bg-blue-50 text-[#3c8dbc] rounded-none">
               <Building2 className="w-5 h-5" />
             </div>
           </div>
         </div>
 
         {/* Card 3: Piutang Daerah (Unpaid) */}
-        <div className="bg-white border-t-[3px] border-[#dd4b39] shadow-sm p-4 relative overflow-hidden">
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm p-4 relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Piutang Belum Tertagih</span>
-              <div className="text-[20px] font-bold text-[#dd4b39] mt-1 font-mono">
+              <div className="text-[20px] font-bold text-slate-800 mt-1 font-mono">
                 {formatRupiah(summary.total_piutang_menunggak)}
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
                 {reportData?.invoices.filter(i => i.status === 'UNPAID').length || 0} SKRD Belum Dilunasi
               </p>
             </div>
-            <div className="p-2.5 bg-red-50 text-[#dd4b39] rounded-none">
+            <div className="p-2.5 bg-blue-50 text-[#3c8dbc] rounded-none">
               <AlertTriangle className="w-5 h-5" />
             </div>
           </div>
         </div>
 
         {/* Card 4: Tingkat Realisasi / Efektivitas */}
-        <div className="bg-white border-t-[3px] border-[#f39c12] shadow-sm p-4 relative overflow-hidden">
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm p-4 relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div>
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Tingkat Realisasi PAD</span>
-              <div className="text-[20px] font-bold text-[#f39c12] mt-1 font-mono">
+              <div className="text-[20px] font-bold text-slate-800 mt-1 font-mono">
                 {collectionRate}%
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
                 Persentase Target Ketetapan Terbayar
               </p>
             </div>
-            <div className="p-2.5 bg-amber-50 text-[#f39c12] rounded-none">
+            <div className="p-2.5 bg-blue-50 text-[#3c8dbc] rounded-none">
               <Calendar className="w-5 h-5" />
             </div>
           </div>
@@ -125,7 +125,7 @@ export const LaporanKPICards: React.FC<LaporanKPICardsProps> = ({ reportData }) 
             <span className="text-[13px] font-bold text-slate-800 font-mono block">
               {formatRupiah(totalRuanganPaid)}
             </span>
-            <span className="text-[10px] text-emerald-600 font-semibold">Kasda Terealisasi</span>
+            <span className="text-[10px] text-slate-500 font-medium">Kasda Terealisasi</span>
           </div>
         </div>
 
@@ -144,14 +144,14 @@ export const LaporanKPICards: React.FC<LaporanKPICardsProps> = ({ reportData }) 
             <span className="text-[13px] font-bold text-slate-800 font-mono block">
               {formatRupiah(totalHanggarPaid)}
             </span>
-            <span className="text-[10px] text-emerald-600 font-semibold">Kasda Terealisasi</span>
+            <span className="text-[10px] text-slate-500 font-medium">Kasda Terealisasi</span>
           </div>
         </div>
 
         {/* Rekening 3: Denda Retribusi (4.1.4.01.01) */}
         <div className="bg-white border border-slate-200 p-3 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-50 text-[#f39c12]">
+            <div className="p-2 bg-blue-50 text-[#3c8dbc]">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
@@ -163,7 +163,7 @@ export const LaporanKPICards: React.FC<LaporanKPICardsProps> = ({ reportData }) 
             <span className="text-[13px] font-bold text-slate-800 font-mono block">
               {formatRupiah(totalDendaPaid)}
             </span>
-            <span className="text-[10px] text-amber-600 font-semibold">Denda Tertagih</span>
+            <span className="text-[10px] text-slate-500 font-medium">Denda Tertagih</span>
           </div>
         </div>
       </div>

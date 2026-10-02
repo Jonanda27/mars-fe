@@ -42,7 +42,7 @@ export const OvernightChecklistTable: React.FC<OvernightChecklistTableProps> = (
         <button
           type="button"
           onClick={onOpenManualModal}
-          className="px-3 py-1.5 bg-[#00a65a] hover:bg-[#008d4c] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors self-end sm:self-auto"
+          className="px-3 py-1.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors self-end sm:self-auto"
         >
           <Plus className="w-3.5 h-3.5" />
           Tambah Pesawat Manual

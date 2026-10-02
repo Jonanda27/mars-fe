@@ -71,7 +71,7 @@ export const PetugasKPICards: React.FC<PetugasKPICardsProps> = ({
             <div>
               <h3 className="font-bold text-emerald-900 text-sm flex items-center gap-2">
                 <span>Laporan Tutup Hari Ini: SUDAH DIKIRIM</span>
-                <span className="text-[11px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full font-semibold">
+                <span className="text-[11px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-semibold">
                   {closingData.existing_report?.items?.length || 0} Armada Tercatat Inap
                 </span>
               </h3>
@@ -95,7 +95,7 @@ export const PetugasKPICards: React.FC<PetugasKPICardsProps> = ({
             <div>
               <h3 className="font-bold text-amber-900 text-sm flex items-center gap-2">
                 <span>Laporan Tutup Hari Hari Ini: BELUM DIKIRIM</span>
-                <span className="text-[11px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-semibold">
+                <span className="text-[11px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-semibold">
                   {activeLogsCount} Armada Sedang Menempati Fasilitas
                 </span>
               </h3>

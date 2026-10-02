@@ -14,12 +14,13 @@ import {
   CheckCircle2, 
   Plane, 
   Building2,
-  FileCheck
+  FileCheck,
+  MapPin
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import StatusBadge from '@/components/StatusBadge';
 
-type FilterTab = 'all' | 'pending' | 'active' | 'hanggar' | 'ruangan';
+type FilterTab = 'all' | 'pending' | 'active' | 'hanggar' | 'mini_airport' | 'ruangan';
 
 export default function EksekutifKontrakPage() {
   const [contracts, setContracts] = useState<Contract[]>([]);
@@ -52,12 +53,30 @@ export default function EksekutifKontrakPage() {
            s === 'draft';
   };
 
+  const isMiniAirport = (c: Contract) => {
+    return c.contract_type === 'PKS Payung Mini Airport' || 
+           Boolean(
+             c.fasilitas && 
+             typeof c.fasilitas === 'object' && 
+             ((c.fasilitas as any).category === 'Mini Airport' || 
+              (c.fasilitas as any).mini_airport_id || 
+              (c.fasilitas as any).airport_code)
+           ) ||
+           Boolean(c.contract_number && c.contract_number.startsWith('PKS-PAYUNG/'));
+  };
+
   const isHanggar = (c: Contract) => {
-    return c.contract_type === 'Payung' || (c.assets?.jenis_aset || '').toLowerCase().includes('hanggar');
+    if (isMiniAirport(c)) return false;
+    return c.contract_type === 'Payung' || 
+           c.contract_type === 'PKS Payung Mozes Kilangin' || 
+           (c.assets?.jenis_aset || '').toLowerCase().includes('hanggar');
   };
 
   const isRuangan = (c: Contract) => {
-    return (c.assets?.jenis_aset || '').toLowerCase().includes('ruang') || c.contract_type !== 'Payung';
+    if (isMiniAirport(c) || isHanggar(c)) return false;
+    return (c.assets?.jenis_aset || '').toLowerCase().includes('ruang') || 
+           (c.contract_type || '').toLowerCase().includes('ruang') ||
+           Boolean(c.asset_id);
   };
 
   // KPIs / Counter Stats
@@ -65,8 +84,9 @@ export default function EksekutifKontrakPage() {
     const pending = contracts.filter(isPendingKadis).length;
     const active = contracts.filter(c => ['Aktif', 'Active'].includes(c.status || '')).length;
     const hanggar = contracts.filter(isHanggar).length;
+    const miniAirport = contracts.filter(isMiniAirport).length;
     const ruangan = contracts.filter(isRuangan).length;
-    return { pending, active, hanggar, ruangan, total: contracts.length };
+    return { pending, active, hanggar, miniAirport, ruangan, total: contracts.length };
   }, [contracts]);
 
   // Filtered List
@@ -76,6 +96,7 @@ export default function EksekutifKontrakPage() {
       if (activeTab === 'pending' && !isPendingKadis(c)) return false;
       if (activeTab === 'active' && !['Aktif', 'Active'].includes(c.status || '')) return false;
       if (activeTab === 'hanggar' && !isHanggar(c)) return false;
+      if (activeTab === 'mini_airport' && !isMiniAirport(c)) return false;
       if (activeTab === 'ruangan' && !isRuangan(c)) return false;
 
       // Search filter
@@ -85,7 +106,8 @@ export default function EksekutifKontrakPage() {
         const tenant = (c.tenants?.nama_perusahaan || '').toLowerCase();
         const asset = (c.assets?.nama_aset || '').toLowerCase();
         const type = (c.contract_type || '').toLowerCase();
-        if (!num.includes(query) && !tenant.includes(query) && !asset.includes(query) && !type.includes(query)) {
+        const purpose = (c.jenis_pemanfaatan || '').toLowerCase();
+        if (!num.includes(query) && !tenant.includes(query) && !asset.includes(query) && !type.includes(query) && !purpose.includes(query)) {
           return false;
         }
       }
@@ -164,6 +186,24 @@ export default function EksekutifKontrakPage() {
                 activeTab === 'hanggar' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
                 {stats.hanggar}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('mini_airport')}
+              className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 rounded-none border ${
+                activeTab === 'mini_airport'
+                  ? 'bg-[#3c8dbc] text-white border-[#3c8dbc] shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
+              }`}
+            >
+              <MapPin className="w-3.5 h-3.5" /> 
+              <span>PKS Payung (Mini Airport)</span>
+              <span className={`px-1.5 py-0.2 rounded-none text-[10.5px] font-mono ${
+                activeTab === 'mini_airport' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
+                {stats.miniAirport}
               </span>
             </button>
 
@@ -264,13 +304,27 @@ export default function EksekutifKontrakPage() {
                         {/* Objek Sewa (Membungkus 2 baris agar tabel pas di layar tanpa horizontal scroll) */}
                         <td className="py-2.5 px-3 max-w-[220px]">
                           <div className="flex items-center gap-1.5">
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-none uppercase tracking-wider whitespace-nowrap ${
-                              isPayungContract 
-                                ? 'bg-blue-50 text-[#3c8dbc] border border-blue-200' 
-                                : 'bg-purple-50 text-purple-700 border border-purple-200'
-                            }`}>
-                              {isPayungContract ? 'PKS Payung (Hanggar)' : 'PKS Sewa Ruangan'}
-                            </span>
+                            {(() => {
+                              if (isMiniAirport(c)) {
+                                return (
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider whitespace-nowrap bg-sky-50 text-sky-700 border border-sky-300">
+                                    PKS Payung (Mini Airport)
+                                  </span>
+                                );
+                              }
+                              if (isHanggar(c)) {
+                                return (
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider whitespace-nowrap bg-blue-50 text-[#3c8dbc] border border-blue-200">
+                                    PKS Payung (Hanggar)
+                                  </span>
+                                );
+                              }
+                              return (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider whitespace-nowrap bg-purple-50 text-purple-700 border border-purple-200">
+                                  PKS Sewa Ruangan
+                                </span>
+                              );
+                            })()}
                           </div>
                           <div className="text-[11.5px] font-medium text-slate-700 mt-1 leading-snug break-words" title={c.assets?.nama_aset || c.jenis_pemanfaatan || '-'}>
                             {c.assets?.nama_aset || c.jenis_pemanfaatan || '-'}
@@ -290,12 +344,12 @@ export default function EksekutifKontrakPage() {
                         {/* Dokumen Lampiran (Tetap 1 baris) */}
                         <td className="py-2.5 px-3 text-center whitespace-nowrap">
                           {c.signed_document_url ? (
-                            <span className="inline-flex items-center text-[11px] font-bold text-[#3c8dbc] bg-blue-50 px-2.5 py-1 border border-blue-200 rounded-none whitespace-nowrap">
+                            <span className="inline-flex items-center text-[11px] font-bold text-[#3c8dbc] bg-blue-50 px-2.5 py-1 border border-blue-200 rounded whitespace-nowrap">
                               <FileCheck className="w-3.5 h-3.5 mr-1 text-[#3c8dbc] flex-shrink-0" />
                               <span>Tersedia (Scan TTD)</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center text-[11px] text-slate-400 bg-slate-100 px-2.5 py-1 rounded-none whitespace-nowrap">
+                            <span className="inline-flex items-center text-[11px] text-slate-400 bg-slate-100 px-2.5 py-1 rounded whitespace-nowrap">
                               <FileText className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
                               <span>Draf Sistem</span>
                             </span>

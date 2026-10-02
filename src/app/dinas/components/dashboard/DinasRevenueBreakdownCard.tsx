@@ -76,7 +76,7 @@ export const DinasRevenueBreakdownCard: React.FC<DinasRevenueBreakdownCardProps>
               />
             </div>
             <span className="text-[10px] text-slate-400 mt-0.5 block">
-              Sanksi bunga 2% per bulan terbayar
+              Sanksi bunga 1% per bulan terbayar
             </span>
           </div>
 

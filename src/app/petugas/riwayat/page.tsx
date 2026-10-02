@@ -9,6 +9,7 @@ import {
 import { logService } from '@/services/logService';
 import { overnightReportService, OvernightReport } from '@/services/overnightReportService';
 import { TutupHariDetailModal } from '../components/TutupHariDetailModal';
+import StatusBadge from '@/components/StatusBadge';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
@@ -137,7 +138,7 @@ export default function RiwayatPetugasPage() {
         <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
           <div>
             <h2 className="font-bold text-slate-800 text-sm">
-              {activeTab === 'overnight' ? 'Arsip Laporan Tutup Hari (End of Day)' : 'Daftar Log Keberangkatan (Check-Out Selesai)'}
+              {activeTab === 'overnight' ? 'Arsip Laporan Tutup Hari' : 'Daftar Log Keberangkatan (Check-Out Selesai)'}
             </h2>
             <p className="text-[11px] text-slate-500">
               {activeTab === 'overnight' 
@@ -235,9 +236,7 @@ export default function RiwayatPetugasPage() {
                         {dayjs(report.created_at).format('DD/MM/YYYY HH:mm')} WIT
                       </td>
                       <td className="px-4 py-3.5">
-                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 border border-emerald-200">
-                          {report.status || 'VERIFIED'}
-                        </span>
+                        <StatusBadge status={report.status || 'VERIFIED'} />
                       </td>
                       <td className="px-4 py-3.5 text-center">
                         <button
@@ -315,15 +314,10 @@ export default function RiwayatPetugasPage() {
                         )}
                       </td>
                       <td className="px-4 py-3.5">
-                        {log.billing_status === 'Unbilled' ? (
-                          <span className="bg-yellow-100 text-yellow-800 px-2 py-0.5 text-[10px] font-bold border border-yellow-200">
-                            Menunggu Tagihan
-                          </span>
-                        ) : (
-                          <span className="bg-green-100 text-green-800 px-2 py-0.5 text-[10px] font-bold border border-green-200">
-                            Sudah Ditagih
-                          </span>
-                        )}
+                        <StatusBadge 
+                          status={log.billing_status === 'Unbilled' ? 'Unbilled' : 'Billed'} 
+                          label={log.billing_status === 'Unbilled' ? 'Menunggu Tagihan' : 'Sudah Ditagih'} 
+                        />
                       </td>
                     </tr>
                   ))

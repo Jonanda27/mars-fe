@@ -72,5 +72,22 @@ export const invoiceService = {
   generateOverstaySkrd: async (logId: number): Promise<Invoice> => {
     const response = await api.post(`/invoices/generate-skrd-overstay/${logId}`);
     return response.data.data;
+  },
+
+  getEmergencyInvoiceByToken: async (token: string): Promise<any> => {
+    const response = await api.get(`/invoices/emergency-payment/${token}`);
+    return response.data.data;
+  },
+
+  uploadEmergencyPaymentReceipt: async (token: string, formData: FormData): Promise<any> => {
+    const response = await api.post(`/invoices/emergency-payment/${token}/upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
+  generateMiniAirportSkrd: async (logId: number): Promise<Invoice> => {
+    const response = await api.post(`/invoices/generate-mini-airport-skrd/${logId}`);
+    return response.data.data;
   }
 };

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { tenantService } from '@/services/tenantService';
 import { Tenant } from '@/types/tenant';
+import StatusBadge from '@/components/StatusBadge';
 import Link from 'next/link';
 
 export default function AdminPenyewaPage() {
@@ -120,21 +121,7 @@ export default function AdminPenyewaPage() {
                           </ul>
                         </td>
                         <td className="py-4 px-5 text-center">
-                          {tenant.status_verifikasi === 'Verified' && (
-                            <span className="inline-flex items-center bg-[#00a65a]/10 text-[#00a65a] border border-[#00a65a]/20 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-                              <ShieldCheck className="w-3 h-3 mr-1" /> Verified
-                            </span>
-                          )}
-                          {tenant.status_verifikasi === 'Pending' && (
-                            <span className="inline-flex items-center bg-[#f39c12] text-white text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-                              Menunggu Review
-                            </span>
-                          )}
-                          {tenant.status_verifikasi === 'Suspended' && (
-                            <span className="inline-flex items-center bg-[#dd4b39] text-white text-[11px] px-2 py-1 font-bold uppercase tracking-wider shadow-sm">
-                              Dibekukan
-                            </span>
-                          )}
+                          <StatusBadge status={tenant.status_verifikasi || 'Pending'} />
                         </td>
                         <td className="py-4 px-5 text-center">
                           <Link href={`/admin/penyewa/${tenant.id}`}>

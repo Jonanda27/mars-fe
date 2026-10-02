@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useMemo, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { Stepper } from '@/components/Stepper';
 import { Loader2 } from 'lucide-react';
 import { AircraftModal } from '@/components/AircraftModal';
@@ -11,6 +11,7 @@ import { ApplicationDetailHeader } from './components/stepper/ApplicationDetailH
 import { ApplicationStepRouter } from './components/stepper/ApplicationStepRouter';
 
 export default function TenantPermohonanDetailPage() {
+  const router = useRouter();
   const params = useParams();
   const { id } = params as { id: string };
 
@@ -50,8 +51,23 @@ export default function TenantPermohonanDetailPage() {
   const isHangar = useMemo(() => Boolean(
     app?.application_type?.toLowerCase().includes('hanggar') ||
     app?.assets?.kategori?.toLowerCase().includes('hanggar') ||
-    app?.contracts?.contract_type === 'Payung'
+    app?.contracts?.contract_type === 'Payung' ||
+    app?.contracts?.contract_type === 'PKS Payung Mozes Kilangin'
   ), [app?.application_type, app?.assets?.kategori, app?.contracts?.contract_type]);
+
+  useEffect(() => {
+    if (app) {
+      const type = (app.application_type || '').toLowerCase();
+      let spec: any = app.specific_needs;
+      if (typeof spec === 'string') {
+        try { spec = JSON.parse(spec); } catch (e) {}
+      }
+      const isMini = type.includes('mini') || type.includes('perintis') || spec?.service_type === 'Mini Airport' || Boolean(spec?.airport_id && spec?.airport_code);
+      if (isMini) {
+        router.replace(`/tenant/mini-airport/${app.id}`);
+      }
+    }
+  }, [app, router]);
 
   if (loading || !app) {
     return (

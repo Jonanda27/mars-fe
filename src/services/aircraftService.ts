@@ -2,8 +2,8 @@ import api from './api';
 import { Aircraft } from '../types/aircraft';
 
 export const aircraftService = {
-  getTenantAircrafts: async (): Promise<Aircraft[]> => {
-    const response = await api.get('/aircrafts/tenant');
+  getTenantAircrafts: async (params?: { only_available?: boolean; available?: boolean }): Promise<Aircraft[]> => {
+    const response = await api.get('/aircrafts/tenant', { params });
     return response.data.data;
   },
 

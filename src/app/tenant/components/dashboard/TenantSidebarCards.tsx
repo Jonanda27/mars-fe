@@ -6,6 +6,7 @@ import { FlightSchedule } from '@/types/flightSchedule';
 import { Contract } from '@/types/contract';
 import { Tenant } from '@/types/tenant';
 import { UserData } from '@/types/auth';
+import StatusBadge from '@/components/StatusBadge';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 
@@ -114,7 +115,7 @@ export const TenantSidebarCards: React.FC<TenantSidebarCardsProps> = ({
                     <span className="font-bold text-slate-800 text-[12px]">
                       {c.assets?.nama_aset || 'Fasilitas Bandara'}
                     </span>
-                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5">
+                    <span className="text-[10px] font-bold bg-[#00a65a] text-white px-1.5 py-0.5 rounded">
                       {c.contract_type || 'Sewa'}
                     </span>
                   </div>
@@ -138,13 +139,7 @@ export const TenantSidebarCards: React.FC<TenantSidebarCardsProps> = ({
           <h3 className="text-[14px] text-[#333] font-bold flex items-center">
             <ShieldCheck className="w-4 h-4 mr-2 text-[#3c8dbc]" /> Status Legalitas Mitra
           </h3>
-          <span className={`text-[10px] font-bold px-2 py-0.5 border ${
-            user.status_verifikasi === 'Verified'
-              ? 'bg-emerald-50 text-[#00a65a] border-emerald-200'
-              : 'bg-amber-50 text-amber-800 border-amber-200'
-          }`}>
-            {user.status_verifikasi || 'Pending'}
-          </span>
+          <StatusBadge status={user.status_verifikasi || 'Pending'} />
         </div>
 
         <div className="p-4 text-xs space-y-3">

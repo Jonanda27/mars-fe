@@ -23,22 +23,22 @@ export const UnbilledHanggarStats: React.FC<UnbilledHanggarStatsProps> = ({ tota
         </div>
       </div>
 
-      <div className="bg-white border-l-4 border-emerald-500 shadow-xs p-4 flex items-center justify-between">
+      <div className="bg-white border-l-4 border-[#3c8dbc] shadow-xs p-4 flex items-center justify-between">
         <div>
           <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Akumulasi Malam Terverifikasi</div>
-          <div className="text-2xl font-bold text-emerald-700 mt-1">{totalStats.totalNights} <span className="text-xs font-normal text-slate-500">malam inap</span></div>
+          <div className="text-2xl font-bold text-slate-800 mt-1">{totalStats.totalNights} <span className="text-xs font-normal text-slate-500">malam inap</span></div>
         </div>
-        <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
+        <div className="w-10 h-10 bg-blue-50 text-[#3c8dbc] rounded-full flex items-center justify-center">
           <ShieldCheck className="w-5 h-5" />
         </div>
       </div>
 
-      <div className="bg-white border-l-4 border-orange-500 shadow-xs p-4 flex items-center justify-between">
+      <div className="bg-white border-l-4 border-[#3c8dbc] shadow-xs p-4 flex items-center justify-between">
         <div>
           <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Estimasi Retribusi Hanggar</div>
-          <div className="text-2xl font-bold text-orange-600 mt-1">{formatRupiah(totalStats.estRevenue)}</div>
+          <div className="text-2xl font-bold text-slate-800 font-mono mt-1">{formatRupiah(totalStats.estRevenue)}</div>
         </div>
-        <div className="w-10 h-10 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center">
+        <div className="w-10 h-10 bg-blue-50 text-[#3c8dbc] rounded-full flex items-center justify-center">
           <Sparkles className="w-5 h-5" />
         </div>
       </div>

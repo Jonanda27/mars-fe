@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/id';
 import { formatRupiah } from '@/utils/formatCurrency';
 import SuratPKSModal from '@/components/SuratPKSModal';
+import StatusBadge from '@/components/StatusBadge';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -109,21 +110,6 @@ export default function TenantKontrakSewaPage() {
       toast.error(err.response?.data?.message || 'Gagal mengunggah dokumen');
     } finally {
       setIsUploading(false);
-    }
-  };
-
-  const renderStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Aktif':
-      case 'Active':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-none bg-emerald-100 text-emerald-800 border border-emerald-200">Aktif</span>;
-      case 'Menunggu TTD Tenant':
-      case 'Draft':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-none bg-amber-100 text-amber-800 border border-amber-200">Menunggu TTD Anda</span>;
-      case 'Menunggu Verifikasi Admin':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-none bg-blue-100 text-blue-800 border border-blue-200">Menunggu Verifikasi Admin</span>;
-      default:
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-none bg-slate-100 text-slate-800 border border-slate-200">{status}</span>;
     }
   };
 
@@ -226,7 +212,7 @@ export default function TenantKontrakSewaPage() {
                     <p className="text-xs text-slate-500 font-semibold">{contract.assets?.nama_aset || contract.assets?.kode_aset || 'Ruangan Bandara'}</p>
                   </div>
                   <div className="ml-auto sm:ml-0">
-                    {renderStatusBadge(contract.status || '')}
+                    <StatusBadge status={contract.status || ''} />
                   </div>
                 </div>
 

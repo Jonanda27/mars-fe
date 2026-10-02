@@ -26,9 +26,9 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-none shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header Modal */}
-        <div className="bg-[#3c8dbc] p-4 flex justify-between items-center text-white rounded-t-xl">
+        <div className="bg-[#3c8dbc] p-4 flex justify-between items-center text-white rounded-none">
           <div>
             <h3 className="font-bold text-lg flex items-center">
               <Building2 className="w-5 h-5 mr-3 text-white/90" />

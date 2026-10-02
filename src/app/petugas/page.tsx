@@ -13,6 +13,7 @@ import { ApprovedScheduleCheckinTable } from './components/dashboard/ApprovedSch
 import { ActiveHangarAircraftTable } from './components/dashboard/ActiveHangarAircraftTable';
 import { ManualCheckinModal } from './components/dashboard/ManualCheckinModal';
 import { CheckoutAircraftModal } from './components/dashboard/CheckoutAircraftModal';
+import { EmergencyCheckinModal } from './components/modals/EmergencyCheckinModal';
 
 export default function PetugasDashboardPage() {
   // Operasional Check-In / Check-Out states
@@ -36,6 +37,9 @@ export default function PetugasDashboardPage() {
   const [evidencePhoto, setEvidencePhoto] = useState<File | null>(null);
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Emergency Check-In Modal
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
 
   // Check-Out Modal
   const [isCheckingOut, setIsCheckingOut] = useState<number | null>(null);
@@ -72,7 +76,12 @@ export default function PetugasDashboardPage() {
     try {
       setIsLoadingTodayArrivals(true);
       const data = await flightScheduleService.getTodayExpectedArrivals();
-      setTodayArrivals(data || []);
+      // Pastikan hanya jadwal kedatangan fasilitas Bandara Mozes Kilangin (Hanggar/Apron)
+      const mozesArrivals = (data || []).filter((s: FlightSchedule) => {
+        const loc = (s.parking_location || '').toLowerCase();
+        return !loc.includes('stand') && !loc.includes('mini') && !loc.includes('airstrip');
+      });
+      setTodayArrivals(mozesArrivals);
     } catch (error) {
       console.error(error);
     } finally {
@@ -83,7 +92,11 @@ export default function PetugasDashboardPage() {
   const fetchActiveApplications = useCallback(async () => {
     try {
       const data = await rentalService.getApprovedRentals();
-      setApplications(data || []);
+      // Pastikan hanya permohonan Sewa Hanggar & Sewa Apron Bandara Mozes Kilangin
+      const mozesApps = (data || []).filter(
+        (a: any) => a.application_type === 'Sewa Hanggar' || a.application_type === 'Sewa Apron'
+      );
+      setApplications(mozesApps);
     } catch (error) {
       console.error(error);
     }
@@ -165,6 +178,12 @@ export default function PetugasDashboardPage() {
     }
   };
 
+  const handleEmergencyCheckInSubmit = async (formData: FormData) => {
+    const res = await logService.emergencyCheckin(formData);
+    toast.success(`Check-In Darurat Berhasil! PKS Darurat no. ${res.contract?.contract_number || ''} aktif.`, { duration: 6000 });
+    fetchActiveLogs();
+  };
+
   const openCheckOutModal = (logId: number, registration: string) => {
     setCheckOutLogId(logId);
     setCheckOutRegistration(registration);
@@ -242,6 +261,7 @@ export default function PetugasDashboardPage() {
         searchLogTerm={searchLogTerm}
         setSearchLogTerm={setSearchLogTerm}
         onOpenCheckInModal={() => setShowCheckInModal(true)}
+        onOpenEmergencyModal={() => setShowEmergencyModal(true)}
         onOpenCheckOutModal={openCheckOutModal}
       />
 
@@ -261,6 +281,13 @@ export default function PetugasDashboardPage() {
         isSubmitting={isSubmitting}
         onClose={() => setShowCheckInModal(false)}
         onSubmit={handleManualCheckIn}
+      />
+
+      {/* MODAL EMERGENCY CHECK-IN */}
+      <EmergencyCheckinModal
+        isOpen={showEmergencyModal}
+        onClose={() => setShowEmergencyModal(false)}
+        onSubmit={handleEmergencyCheckInSubmit}
       />
 
       {/* MODAL CHECK-OUT */}

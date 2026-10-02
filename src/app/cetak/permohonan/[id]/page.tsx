@@ -35,7 +35,7 @@ export default function CetakPermohonan() {
         </div>
         <button 
           onClick={() => window.print()}
-          className="bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 font-bold flex items-center"
+          className="bg-[#3c8dbc] text-white px-5 py-2.5 rounded shadow-sm hover:bg-[#367fa9] font-bold flex items-center cursor-pointer transition-colors"
         >
           Cetak ke PDF
         </button>

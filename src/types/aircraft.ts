@@ -17,9 +17,16 @@ export interface Aircraft {
   foto?: string;
   custom_type_name?: string;
   custom_type_area?: string;
-  created_at?: string;
   assets?: {
     nama_aset: string;
     kode_aset: string;
   };
+  is_tied_to_rental?: boolean;
+  rental_application?: {
+    appId: number;
+    application_number: string;
+    status: string;
+  } | null;
+  is_in_use?: boolean;
+  is_available?: boolean;
 }

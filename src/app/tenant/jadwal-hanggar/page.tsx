@@ -6,6 +6,7 @@ import { contractService } from '@/services/contractService';
 import { aircraftService } from '@/services/aircraftService';
 import { flightScheduleService } from '@/services/flightScheduleService';
 import { rentalService } from '@/services/rentalService';
+import { logService } from '@/services/logService';
 import { Contract } from '@/types/contract';
 import { Aircraft } from '@/types/aircraft';
 import { FlightSchedule } from '@/types/flightSchedule';
@@ -14,14 +15,16 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
 import { PayungContractStatusBanner } from './components/PayungContractStatusBanner';
-import { CreateScheduleModal } from './components/CreateScheduleModal';
+import { CreateScheduleModal, AircraftWithBooking } from './components/CreateScheduleModal';
 import { ScheduleRosterTable } from './components/ScheduleRosterTable';
+import { RequestExtensionModal } from './components/RequestExtensionModal';
 
 export default function TenantJadwalHanggarPage() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [allTenantAircrafts, setAllTenantAircrafts] = useState<Aircraft[]>([]);
   const [schedules, setSchedules] = useState<FlightSchedule[]>([]);
   const [rentalApplications, setRentalApplications] = useState<RentalApplication[]>([]);
+  const [activeLogs, setActiveLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Form State
@@ -32,19 +35,30 @@ export default function TenantJadwalHanggarPage() {
   const [arrivalTime, setArrivalTime] = useState<string>('08:00');
   const [notes, setNotes] = useState<string>('');
 
+  // State Modal Perpanjangan Sewa
+  const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
+  const [selectedAppForExtension, setSelectedAppForExtension] = useState<RentalApplication | null>(null);
+
+  const handleOpenExtensionModal = (app: RentalApplication) => {
+    setSelectedAppForExtension(app);
+    setIsExtensionModalOpen(true);
+  };
+
   const fetchInitialData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [contractData, aircraftData, scheduleData, rentalAppData] = await Promise.all([
+      const [contractData, aircraftData, scheduleData, rentalAppData, activeLogData] = await Promise.all([
         contractService.getTenantContracts(),
         aircraftService.getTenantAircrafts(),
         flightScheduleService.getTenantSchedules(),
-        rentalService.getTenantApplications()
+        rentalService.getTenantApplications(),
+        logService.getActiveLogs().catch(() => [])
       ]);
       setContracts(contractData || []);
       setAllTenantAircrafts(aircraftData || []);
       setSchedules(scheduleData || []);
       setRentalApplications(rentalAppData || []);
+      setActiveLogs(activeLogData || []);
     } catch (error) {
       console.error(error);
       toast.error('Gagal memuat data jadwal');
@@ -62,45 +76,18 @@ export default function TenantJadwalHanggarPage() {
     return contracts.find(c => c.contract_type === 'Payung' && (c.status === 'Aktif' || c.status === 'Active')) || null;
   }, [contracts]);
 
-  // Permohonan Sewa Hanggar Terkait
-  const hanggarApplication = useMemo(() => {
-    const hanggarApps = rentalApplications.filter(a => a.application_type === 'Sewa Hanggar');
+  // Daftar Semua Permohonan Sewa Hanggar & Apron Aktif Milik Tenant
+  const activeHanggarApps = useMemo(() => {
+    return rentalApplications
+      .filter(a => 
+        (a.application_type === 'Sewa Hanggar' || a.application_type === 'Sewa Apron' || ['Hanggar', 'Apron'].includes(a.assets?.jenis_aset || '')) &&
+        ['Aktif', 'Active', 'Disetujui', 'Approved', 'Signed', 'Draft Kontrak', 'Surat Disetujui'].includes(a.status || '') &&
+        a.start_date && a.end_date
+      )
+      .sort((a, b) => b.id - a.id);
+  }, [rentalApplications]);
 
-    const activeWithDates = hanggarApps.find(a => 
-      ['Aktif', 'Active', 'Disetujui', 'Approved', 'Signed', 'Draft Kontrak', 'Surat Disetujui'].includes(a.status || '') && 
-      a.start_date && a.end_date
-    );
-    if (activeWithDates) return activeWithDates;
-
-    const anyWithDates = hanggarApps.find(a => a.start_date && a.end_date);
-    if (anyWithDates) return anyWithDates;
-
-    if (activePayung?.rental_applications && activePayung.rental_applications.length > 0) {
-      const fromPayung = activePayung.rental_applications.find((a: any) => a.application_type === 'Sewa Hanggar' && a.start_date && a.end_date)
-        || activePayung.rental_applications.find((a: any) => a.start_date && a.end_date)
-        || activePayung.rental_applications[0];
-      if (fromPayung) return fromPayung;
-    }
-
-    return hanggarApps[0] || null;
-  }, [rentalApplications, activePayung]);
-
-  // Periode Layanan Sewa Hanggar
-  const serviceStartDate = useMemo(() => {
-    return hanggarApplication?.start_date || null;
-  }, [hanggarApplication]);
-
-  const serviceEndDate = useMemo(() => {
-    return hanggarApplication?.end_date || null;
-  }, [hanggarApplication]);
-
-  const isServiceExpired = useMemo(() => {
-    if (!serviceEndDate) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return new Date(serviceEndDate) < today;
-  }, [serviceEndDate]);
-
+  // Validasi Masa Berlaku Kontrak Payung
   const isPayungExpired = useMemo(() => {
     if (!activePayung?.end_date) return false;
     const today = new Date();
@@ -120,57 +107,137 @@ export default function TenantJadwalHanggarPage() {
 
   const isPayungExpiringSoon = daysUntilPayungExpired !== null && daysUntilPayungExpired > 0 && daysUntilPayungExpired <= 7;
 
-  // Batas Minimal dan Maksimal Tanggal
-  const leaseMinDate = useMemo(() => {
-    if (!serviceStartDate) return '';
-    return dayjs(serviceStartDate).format('YYYY-MM-DD');
-  }, [serviceStartDate]);
+  // Pemetaan Pintar (Smart Linking): Setiap Armada dikaitkan ke Izin Sewa Permohonannya & Status Kunci
+  const allowedAircrafts = useMemo<AircraftWithBooking[]>(() => {
+    if (!activePayung || activeHanggarApps.length === 0) return [];
 
-  const leaseMaxDate = useMemo(() => {
-    if (!serviceEndDate) return '';
-    return dayjs(serviceEndDate).format('YYYY-MM-DD');
-  }, [serviceEndDate]);
+    return allTenantAircrafts.map(ac => {
+      // 1. Cari permohonan yang mendaftarkan pesawat ini di specific_needs
+      const matchedApp = activeHanggarApps.find(app => {
+        const spec = typeof app.specific_needs === 'string' 
+          ? JSON.parse(app.specific_needs) 
+          : (app.specific_needs || {});
+        const ids = (spec.aircraft_ids || []).map(String);
+        return ids.includes(String(ac.id));
+      });
 
-  // Filter Armada yang Terdaftar pada Kontrak / Akun Tenant
-  const allowedAircrafts = useMemo(() => {
-    if (!activePayung) return allTenantAircrafts;
-    
-    const specNeeds = hanggarApplication?.specific_needs as any;
-    const registeredIds: string[] = specNeeds?.aircraft_ids || [];
+      const chosenApp = matchedApp || activeHanggarApps[0];
 
-    if (registeredIds.length > 0) {
-      const filtered = allTenantAircrafts.filter(a => registeredIds.includes(String(a.id)));
-      if (filtered.length > 0) return filtered;
-    }
+      // 2. Evaluasi Status Kunci (Sudah buat pengajuan / diverifikasi / check-in tapi belum checkout)
+      const acRegUpper = (ac.registration_number || '').trim().toUpperCase();
 
-    return allTenantAircrafts;
-  }, [activePayung, hanggarApplication, allTenantAircrafts]);
+      const activeLogForAc = activeLogs.find((l: any) => 
+        (l.registration_number || '').trim().toUpperCase() === acRegUpper && 
+        !l.exit_time
+      );
 
-  // Auto-select armada pertama jika belum ada yang terpilih
+      const activeScheduleForAc = schedules.find(s => 
+        (s.registration_number || '').trim().toUpperCase() === acRegUpper && 
+        ['Menunggu Verifikasi Petugas', 'Disetujui', 'Checked-In'].includes(s.status)
+      );
+
+      let isLocked = false;
+      let lockReason = '';
+      let lockBadge = '';
+
+      if (activeLogForAc || activeScheduleForAc?.status === 'Checked-In') {
+        isLocked = true;
+        const loc = activeLogForAc?.parking_location || 'Hanggar';
+        lockReason = `saat ini sedang aktif berada di dalam ${loc} (sudah Check-In) dan belum melakukan Check-Out`;
+        lockBadge = 'Sedang Parkir (Belum Check-Out)';
+      } else if (activeScheduleForAc?.status === 'Disetujui') {
+        isLocked = true;
+        lockReason = `sudah memiliki jadwal yang telah disetujui petugas (No. ${activeScheduleForAc.schedule_number}) dan sedang menunggu kedatangan`;
+        lockBadge = 'Jadwal Sudah Disetujui';
+      } else if (activeScheduleForAc?.status === 'Menunggu Verifikasi Petugas') {
+        isLocked = true;
+        lockReason = `masih memiliki pengajuan jadwal yang sedang menunggu verifikasi petugas lapangan (No. ${activeScheduleForAc.schedule_number})`;
+        lockBadge = 'Sedang Menunggu Verifikasi';
+      }
+
+      return {
+        ...ac,
+        bookingApp: chosenApp,
+        bookingNumber: chosenApp?.application_number,
+        bookingPeriodStr: chosenApp ? `${dayjs(chosenApp.start_date).format('DD MMM')} – ${dayjs(chosenApp.end_date).format('DD MMM YYYY')}` : undefined,
+        bookingMinDate: chosenApp?.start_date ? dayjs(chosenApp.start_date).format('YYYY-MM-DD') : undefined,
+        bookingMaxDate: chosenApp?.end_date ? dayjs(chosenApp.end_date).format('YYYY-MM-DD') : undefined,
+        isLocked,
+        lockReason,
+        lockBadge
+      };
+    })
+    .filter(ac => Boolean(ac.bookingApp))
+    .sort((a, b) => (a.isLocked === b.isLocked ? 0 : a.isLocked ? 1 : -1)); // Tersedia di urutan teratas
+  }, [activePayung, activeHanggarApps, allTenantAircrafts, activeLogs, schedules]);
+
+  // Auto-select armada pertama yang tersedia (tidak terkunci)
   useEffect(() => {
-    if (allowedAircrafts.length > 0 && (!selectedAircraftId || !allowedAircrafts.some(a => String(a.id) === selectedAircraftId))) {
-      setSelectedAircraftId(String(allowedAircrafts[0].id));
+    if (allowedAircrafts.length > 0) {
+      const firstAvailable = allowedAircrafts.find(a => !a.isLocked) || allowedAircrafts[0];
+      if (!selectedAircraftId || !allowedAircrafts.some(a => String(a.id) === selectedAircraftId)) {
+        setSelectedAircraftId(String(firstAvailable.id));
+      }
     }
   }, [allowedAircrafts, selectedAircraftId]);
 
   // Detail Armada yang Sedang Dipilih
-  const selectedAircraft = useMemo(() => {
+  const selectedAircraft = useMemo<AircraftWithBooking | null>(() => {
     if (!selectedAircraftId) return allowedAircrafts[0] || null;
     return allowedAircrafts.find(a => String(a.id) === selectedAircraftId) || allowedAircrafts[0] || null;
   }, [allowedAircrafts, selectedAircraftId]);
 
-  // Lokasi Aset Hanggar
+  // Sinkronisasi Tanggal Kedatangan Otomatis saat Pesawat Berubah
+  useEffect(() => {
+    if (selectedAircraft?.bookingMinDate && selectedAircraft?.bookingMaxDate) {
+      const todayStr = dayjs().format('YYYY-MM-DD');
+      const minD = selectedAircraft.bookingMinDate;
+      const maxD = selectedAircraft.bookingMaxDate;
+
+      // Jika tanggal belum ada atau berada di luar rentang sewa pesawat ini
+      if (!arrivalDate || arrivalDate < minD || arrivalDate > maxD) {
+        if (todayStr >= minD && todayStr <= maxD) {
+          setArrivalDate(todayStr);
+        } else {
+          setArrivalDate(minD);
+        }
+      }
+    }
+  }, [selectedAircraft, arrivalDate]);
+
+  // Map Referensi Tiket Sewa untuk Tabel Roster
+  const aircraftBookingMap = useMemo(() => {
+    const map: Record<string, { appNumber: string; periodStr: string }> = {};
+    for (const ac of allowedAircrafts) {
+      if (ac.bookingApp) {
+        const info = {
+          appNumber: ac.bookingApp.application_number,
+          periodStr: `${dayjs(ac.bookingApp.start_date).format('DD MMM')} – ${dayjs(ac.bookingApp.end_date).format('DD MMM YYYY')}`
+        };
+        map[ac.registration_number] = info;
+        map[String(ac.id)] = info;
+      }
+    }
+    return map;
+  }, [allowedAircrafts]);
+
+  // Lokasi Aset (Hanggar / Apron)
   const locationName = useMemo(() => {
-    return hanggarApplication?.assets?.nama_aset || activePayung?.assets?.nama_aset || 'Hanggar Utama Mozes Kilangin';
-  }, [hanggarApplication, activePayung]);
+    if (selectedAircraft?.bookingApp?.assets?.nama_aset) {
+      return selectedAircraft.bookingApp.assets.nama_aset;
+    }
+    return activeHanggarApps[0]?.assets?.nama_aset || activePayung?.assets?.nama_aset || 'Hanggar Mozes Kilangin';
+  }, [selectedAircraft, activeHanggarApps, activePayung]);
 
   const handleOpenModal = () => {
-    if (allowedAircrafts.length > 0) {
-      setSelectedAircraftId(String(allowedAircrafts[0].id));
+    const firstAvailable = allowedAircrafts.find(a => !a.isLocked) || allowedAircrafts[0];
+    if (firstAvailable) {
+      setSelectedAircraftId(String(firstAvailable.id));
     }
+    const targetAircraft = firstAvailable;
     const todayStr = dayjs().format('YYYY-MM-DD');
-    const minD = serviceStartDate ? dayjs(serviceStartDate).format('YYYY-MM-DD') : '';
-    const maxD = serviceEndDate ? dayjs(serviceEndDate).format('YYYY-MM-DD') : '';
+    const minD = targetAircraft?.bookingMinDate || '';
+    const maxD = targetAircraft?.bookingMaxDate || '';
 
     if (minD && maxD && todayStr >= minD && todayStr <= maxD) {
       setArrivalDate(todayStr);
@@ -189,40 +256,42 @@ export default function TenantJadwalHanggarPage() {
       toast.error('Pilih armada pesawat yang akan mendarat');
       return;
     }
+    if (selectedAircraft.isLocked) {
+      toast.error(`Armada ${selectedAircraft.registration_number} ${selectedAircraft.lockReason}. Tidak dapat mengajukan jadwal.`);
+      return;
+    }
     if (!arrivalDate) {
       toast.error('Tentukan tanggal estimasi kedatangan');
       return;
     }
 
-    if (!serviceStartDate || !serviceEndDate) {
-      toast.error('Periode sewa hanggar belum ditentukan pada permohonan sewa');
+    const minD = selectedAircraft.bookingMinDate;
+    const maxD = selectedAircraft.bookingMaxDate;
+
+    if (!minD || !maxD) {
+      toast.error('Periode sewa armada belum ditentukan pada permohonan sewa');
       return;
     }
 
-    const estimatedArrival = `${arrivalDate}T${arrivalTime || '08:00'}`;
-
-    const leaseStart = new Date(serviceStartDate);
-    const leaseEnd = new Date(serviceEndDate);
-    leaseStart.setHours(0, 0, 0, 0);
-    leaseEnd.setHours(23, 59, 59, 999);
-
-    const arrDate = new Date(estimatedArrival);
-    if (arrDate < leaseStart) {
-      toast.error(`Tanggal kedatangan tidak boleh sebelum tanggal mulai sewa (${dayjs(serviceStartDate).format('DD/MM/YYYY')})`);
+    if (arrivalDate < minD || arrivalDate > maxD) {
+      toast.error(`Tanggal kedatangan wajib berada dalam periode sewa armada ${selectedAircraft.registration_number} (${dayjs(minD).format('DD/MM/YYYY')} s/d ${dayjs(maxD).format('DD/MM/YYYY')})`);
       return;
     }
-    if (arrDate > leaseEnd) {
-      toast.error(`Tanggal kedatangan tidak boleh melebihi batas akhir periode sewa (${dayjs(serviceEndDate).format('DD/MM/YYYY')})`);
-      return;
-    }
+
+    const estimatedArrival = `${arrivalDate}T${arrivalTime || '08:00'}:00.000Z`;
 
     try {
       setIsSubmitting(true);
       const formData = new FormData();
       formData.append('aircraft_id', String(selectedAircraft.id));
+      formData.append('registration_number', selectedAircraft.registration_number);
+      formData.append('aircraft_type', selectedAircraft.aircraft_types?.jenis_pesawat || 'Standar');
       formData.append('parking_location', locationName);
       formData.append('purpose', 'Inap / RON');
       formData.append('estimated_arrival', estimatedArrival);
+      if (selectedAircraft.bookingApp?.id) {
+        formData.append('rental_application_id', String(selectedAircraft.bookingApp.id));
+      }
       if (notes) {
         formData.append('notes', notes);
       }
@@ -251,7 +320,7 @@ export default function TenantJadwalHanggarPage() {
   }
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full space-y-4">
+    <div className="p-4 bg-[#ecf0f5] min-h-full space-y-4 font-sans">
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
@@ -265,26 +334,23 @@ export default function TenantJadwalHanggarPage() {
         </div>
       </header>
 
-      {/* BANNER STATUS KONTRAK & PERIODE SEWA */}
+      {/* BANNER STATUS KONTRAK & PERIODE SEWA (Mendukung Multi-Permohonan Sewa Aktif) */}
       <PayungContractStatusBanner
         activePayung={activePayung}
         isPayungExpired={isPayungExpired}
         isPayungExpiringSoon={isPayungExpiringSoon}
         daysUntilPayungExpired={daysUntilPayungExpired}
-        serviceStartDate={serviceStartDate}
-        serviceEndDate={serviceEndDate}
-        isServiceExpired={isServiceExpired}
+        activeHanggarApps={activeHanggarApps}
         locationName={locationName}
         onOpenModal={handleOpenModal}
+        onRequestExtension={handleOpenExtensionModal}
       />
 
-      {/* MODAL FORM PENGAJUAN JADWAL */}
+      {/* MODAL FORM PENGAJUAN JADWAL (Smart Selection per Armada) */}
       <CreateScheduleModal
-        isOpen={isFormOpen && Boolean(activePayung && !isPayungExpired && serviceStartDate && serviceEndDate && !isServiceExpired)}
+        isOpen={isFormOpen && Boolean(activePayung && !isPayungExpired && activeHanggarApps.length > 0)}
         activePayung={activePayung}
         locationName={locationName}
-        serviceStartDate={serviceStartDate}
-        serviceEndDate={serviceEndDate}
         allowedAircrafts={allowedAircrafts}
         selectedAircraft={selectedAircraft}
         selectedAircraftId={selectedAircraftId}
@@ -293,8 +359,6 @@ export default function TenantJadwalHanggarPage() {
         setArrivalDate={setArrivalDate}
         arrivalTime={arrivalTime}
         setArrivalTime={setArrivalTime}
-        leaseMinDate={leaseMinDate}
-        leaseMaxDate={leaseMaxDate}
         notes={notes}
         setNotes={setNotes}
         isSubmitting={isSubmitting}
@@ -302,8 +366,22 @@ export default function TenantJadwalHanggarPage() {
         onSubmit={handleSubmit}
       />
 
+      {/* MODAL PENGAJUAN TAMBAH SEWA / PERPANJANGAN */}
+      <RequestExtensionModal
+        isOpen={isExtensionModalOpen}
+        onClose={() => {
+          setIsExtensionModalOpen(false);
+          setSelectedAppForExtension(null);
+        }}
+        application={selectedAppForExtension}
+        onSuccess={fetchInitialData}
+      />
+
       {/* TABEL RIWAYAT JADWAL PENERBANGAN */}
-      <ScheduleRosterTable schedules={schedules} />
+      <ScheduleRosterTable 
+        schedules={schedules} 
+        aircraftBookingMap={aircraftBookingMap} 
+      />
     </div>
   );
 }

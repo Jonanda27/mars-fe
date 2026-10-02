@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import RupiahIcon from '@/components/icons/RupiahIcon';
 import { Invoice } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
+import StatusBadge from '@/components/StatusBadge';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 
@@ -82,13 +83,7 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                       )}
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <span className={`px-2 py-0.5 text-[10px] font-bold border ${
-                        isOverdue
-                          ? 'bg-red-50 text-[#dd4b39] border-red-200'
-                          : 'bg-amber-50 text-amber-800 border-amber-200'
-                      }`}>
-                        {isOverdue ? 'Jatuh Tempo' : 'Menunggu Bayar'}
-                      </span>
+                      <StatusBadge status={isOverdue ? 'Jatuh Tempo' : (inv.status || 'Menunggu Bayar')} />
                     </td>
                     <td className="py-3 px-4 text-center">
                       <Link

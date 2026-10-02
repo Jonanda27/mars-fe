@@ -411,9 +411,7 @@ export default function EksekutifDashboardPage() {
                           {inv.due_date ? dayjs(inv.due_date).format('DD/MM/YYYY') : '-'}
                         </td>
                         <td className="py-2.5 px-4 text-center">
-                          <span className="text-[10.5px] font-bold px-2 py-0.5 bg-[#dd4b39]/10 text-[#dd4b39] border border-[#dd4b39]/20">
-                            {inv.days_overdue > 0 ? `Lewat ${inv.days_overdue} Hari` : inv.status}
-                          </span>
+                          <StatusBadge status={inv.days_overdue > 0 ? `Lewat ${inv.days_overdue} Hari` : inv.status} />
                         </td>
                       </tr>
                     ))

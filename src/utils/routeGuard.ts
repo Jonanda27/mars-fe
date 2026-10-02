@@ -8,6 +8,7 @@ export const PUBLIC_ROUTES = ['/', '/login', '/register'];
 export const isPublicRoute = (pathname: string): boolean => {
   if (PUBLIC_ROUTES.includes(pathname)) return true;
   if (pathname.startsWith('/cetak')) return true;
+  if (pathname.startsWith('/pembayaran-darurat')) return true;
   return false;
 };
 
@@ -28,9 +29,14 @@ export const isEksekutifRole = (role?: string | null): boolean => {
   return r === 'kepala dinas' || r === 'kadis' || r.includes('kepala') || r.includes('kadis');
 };
 
+export const isSuperAdminRole = (role?: string | null): boolean => {
+  const r = normalizeRole(role);
+  return r === 'superadmin' || r === 'super admin';
+};
+
 export const isAdminRole = (role?: string | null): boolean => {
   const r = normalizeRole(role);
-  return r === 'admin' || r === 'superadmin' || r === 'super admin' || r === 'dinas';
+  return r === 'admin' || r === 'admin_mini_airport' || r === 'superadmin' || r === 'super admin' || r === 'dinas';
 };
 
 export const isTenantRole = (role?: string | null): boolean => {
@@ -44,10 +50,17 @@ export const isTenantRole = (role?: string | null): boolean => {
 export const getDefaultDashboardRoute = (user: UserData | null): string => {
   if (!user?.role) return '/login';
   const role = user.role;
+  if (isSuperAdminRole(role)) {
+    return '/superadmin/users';
+  }
   if (isTenantRole(role)) {
     return user.status_verifikasi === 'Pending' ? '/tenant/profil' : '/tenant';
   }
   if (isPetugasRole(role)) {
+    const r = normalizeRole(role);
+    if (r === 'petugas_mini_airport' || r === 'petugas lapangan mini airport' || Boolean(user?.mini_airport_id)) {
+      return '/petugas/mini-airport';
+    }
     return '/petugas';
   }
   if (isAdminRole(role)) {
@@ -162,15 +175,29 @@ const checkTenantArea = (pathname: string, user: UserData): RouteAccessCheck => 
   };
 };
 
-const checkPetugasArea = (user: UserData): RouteAccessCheck => {
+const checkPetugasArea = (pathname: string, user: UserData): RouteAccessCheck => {
   const isPetugas = isPetugasRole(user.role);
   const isAdmin = isAdminRole(user.role);
-  if (isPetugas || isAdmin) return { allowed: true };
-  return {
-    allowed: false,
-    redirectTo: getDefaultDashboardRoute(user),
-    reason: 'Akses ditolak: Halaman ini khusus untuk Petugas.',
-  };
+  if (!isPetugas && !isAdmin) {
+    return {
+      allowed: false,
+      redirectTo: getDefaultDashboardRoute(user),
+      reason: 'Akses ditolak: Halaman ini khusus untuk Petugas.',
+    };
+  }
+
+  const role = normalizeRole(user.role);
+  const isMiniPetugas = role === 'petugas_mini_airport' || role === 'petugas lapangan mini airport' || Boolean(user.mini_airport_id);
+
+  // Jika petugas mini airport mengakses rute root /petugas atau rute Mozes-only (termasuk pendaratan-darurat), arahkan ke /petugas/mini-airport
+  if (isMiniPetugas && (pathname === '/petugas' || pathname === '/petugas/verifikasi-jadwal' || pathname === '/petugas/tutup-hari' || pathname === '/petugas/riwayat' || pathname === '/petugas/pendaratan-darurat')) {
+    return {
+      allowed: false,
+      redirectTo: '/petugas/mini-airport',
+    };
+  }
+
+  return { allowed: true };
 };
 
 const checkEksekutifArea = (user: UserData): RouteAccessCheck => {
@@ -181,6 +208,16 @@ const checkEksekutifArea = (user: UserData): RouteAccessCheck => {
     allowed: false,
     redirectTo: getDefaultDashboardRoute(user),
     reason: 'Akses ditolak: Halaman ini khusus untuk Eksekutif / Kepala Dinas.',
+  };
+};
+
+const checkSuperAdminArea = (user: UserData): RouteAccessCheck => {
+  const isSuperAdmin = isSuperAdminRole(user.role);
+  if (isSuperAdmin) return { allowed: true };
+  return {
+    allowed: false,
+    redirectTo: getDefaultDashboardRoute(user),
+    reason: 'Akses ditolak: Halaman ini khusus untuk Super Administrator.',
   };
 };
 
@@ -215,6 +252,9 @@ export const checkRouteAccess = (
   const isAdmin = isAdminRole(user.role);
 
   // 3. Pengecekan per area rute
+  if (pathname.startsWith('/superadmin')) {
+    return checkSuperAdminArea(user);
+  }
   if (pathname.startsWith('/admin')) {
     return checkAdminArea(pathname, isAdmin, user);
   }
@@ -225,7 +265,7 @@ export const checkRouteAccess = (
     return checkTenantArea(pathname, user);
   }
   if (pathname.startsWith('/petugas')) {
-    return checkPetugasArea(user);
+    return checkPetugasArea(pathname, user);
   }
   if (pathname.startsWith('/eksekutif')) {
     return checkEksekutifArea(user);

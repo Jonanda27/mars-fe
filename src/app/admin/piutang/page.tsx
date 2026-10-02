@@ -99,7 +99,7 @@ export default function AdminPiutangPage() {
         <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
           <h3 className="text-[16px] text-[#444] font-normal">
             Rincian Tenant Penunggak 
-            {activeFilter !== 'all' && <span className="ml-2 text-[12px] font-normal bg-[#3c8dbc] text-white px-2 py-0.5 rounded-full">Filter: Umur {activeFilter} Hari</span>}
+            {activeFilter !== 'all' && <span className="ml-2 text-[12px] font-normal bg-[#3c8dbc] text-white px-2 py-0.5 rounded">Filter: Umur {activeFilter} Hari</span>}
           </h3>
           
           {activeFilter !== 'all' && (
@@ -135,7 +135,7 @@ export default function AdminPiutangPage() {
                     <span className="font-mono text-[#3c8dbc] font-bold">SKRD-26-0610</span>
                   </td>
                   <td className="py-4 px-5 text-center">
-                    <span className="bg-[#f39c12] text-white px-3 py-1 text-[11px] font-bold rounded-full">15 Hari</span>
+                    <span className="bg-[#f39c12] text-white px-3 py-1 text-[11px] font-bold rounded">15 Hari</span>
                   </td>
                   <td className="py-4 px-5 text-right font-mono font-bold text-[#333]">120.000.000</td>
                   <td className="py-4 px-5 text-center">
@@ -157,7 +157,7 @@ export default function AdminPiutangPage() {
                     <span className="font-mono text-[#3c8dbc] font-bold">SKRD-26-0402</span>
                   </td>
                   <td className="py-4 px-5 text-center">
-                    <span className="bg-[#dd4b39] text-white px-3 py-1 text-[11px] font-bold rounded-full shadow-[0_0_8px_rgba(221,75,57,0.5)]">75 Hari</span>
+                    <span className="bg-[#dd4b39] text-white px-3 py-1 text-[11px] font-bold rounded shadow-[0_0_8px_rgba(221,75,57,0.5)]">75 Hari</span>
                   </td>
                   <td className="py-4 px-5 text-right font-mono font-bold text-[#333]">100.000.000</td>
                   <td className="py-4 px-5 text-center">
@@ -179,7 +179,7 @@ export default function AdminPiutangPage() {
                     <span className="font-mono text-[#3c8dbc] font-bold">SKRD-26-0115</span>
                   </td>
                   <td className="py-4 px-5 text-center">
-                    <span className="bg-[#8c1b1b] text-white px-3 py-1 text-[11px] font-bold rounded-full shadow-[0_0_10px_rgba(140,27,27,0.6)] flex items-center justify-center w-max mx-auto">
+                    <span className="bg-[#8c1b1b] text-white px-3 py-1 text-[11px] font-bold rounded shadow-[0_0_10px_rgba(140,27,27,0.6)] flex items-center justify-center w-max mx-auto">
                       <AlertOctagon className="w-3 h-3 mr-1" /> 140 Hari (Macet)
                     </span>
                   </td>

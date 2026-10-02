@@ -7,10 +7,15 @@ import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import StatusBadge from '@/components/StatusBadge';
+import { useAuthStore } from '@/store/useAuthStore';
 
 function getAssetLabel(contract: Contract): string {
-  if (contract.contract_type === 'Payung') {
-    return 'Semua Aset (Payung)';
+  if (contract.contract_type === 'PKS Payung Mini Airport') {
+    const f = (contract.fasilitas as any) || {};
+    return `Bandara ${f.airport_name || 'Perintis'} (${f.airport_code || 'MINI'})`;
+  }
+  if (contract.contract_type === 'Payung' || contract.contract_type === 'PKS Payung Mozes Kilangin') {
+    return 'Bandara Mozes Kilangin (Payung)';
   }
   if (contract.assets?.kode_aset) {
     return `${contract.assets.kode_aset}`;
@@ -19,6 +24,10 @@ function getAssetLabel(contract: Contract): string {
 }
 
 export default function KontrakPage() {
+  const { user } = useAuthStore();
+  const userRole = (user?.role || '').toLowerCase();
+  const isMiniAdmin = userRole === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
+
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,14 +71,22 @@ export default function KontrakPage() {
       );
     }
 
-    return contracts.map((contract) => (
-      <tr key={contract.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-        <td className="p-4 font-mono font-medium text-blue-600">{contract.contract_number}</td>
-        <td className="p-4">
-          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.contract_type === 'Payung' ? 'bg-purple-100 text-purple-700' : 'bg-teal-100 text-teal-700'}`}>
-            {contract.contract_type}
-          </span>
-        </td>
+    return contracts.map((contract) => {
+      const isEmergency = contract.contract_type === 'PKS Pendaratan Darurat' || contract.contract_type === 'Pendaratan Darurat';
+
+      return (
+        <tr key={contract.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+          <td className="p-4 font-mono font-medium text-blue-600">{contract.contract_number}</td>
+          <td className="p-4">
+            <span className={`px-2 py-1 text-xs font-semibold rounded ${
+              contract.contract_type === 'PKS Payung Mini Airport' ? 'bg-blue-100 text-[#3c8dbc] border border-blue-200' :
+              contract.contract_type === 'Payung' || contract.contract_type === 'PKS Payung Mozes Kilangin' ? 'bg-purple-100 text-purple-700' : 
+              isEmergency ? 'bg-red-100 text-red-700 border border-red-200' :
+              'bg-teal-100 text-teal-700'
+            }`}>
+              {contract.contract_type}
+            </span>
+          </td>
         <td className="p-4 font-medium text-slate-800">{contract.tenants?.nama_perusahaan}</td>
         <td className="p-4 text-slate-600">{getAssetLabel(contract)}</td>
         <td className="p-4 text-slate-600 text-xs">
@@ -81,30 +98,39 @@ export default function KontrakPage() {
         <td className="p-4">
           <div className="flex justify-center">
             <Link href={`/admin/kontrak/${contract.id}`}>
-              <button type="button" className="flex items-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded transition-colors text-xs font-semibold">
+              <button type="button" className="flex items-center text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-1.5 rounded-none transition-colors text-xs font-semibold">
                 <Eye className="w-4 h-4 mr-1" /> Review
               </button>
             </Link>
           </div>
         </td>
       </tr>
-    ));
+      );
+    });
   };
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
       <header className="flex justify-between items-end mb-4">
         <h1 className="text-[24px] font-normal text-[#333]">
-          Manajemen Kontrak <small className="text-[15px] font-light text-[#777] ml-2">Kelola draft, verifikasi TTD basah, dan status kontrak penyewa.</small>
+          {isMiniAdmin ? 'PKS Payung Mini Airport' : 'Manajemen Kontrak'}{' '}
+          <small className="text-[15px] font-light text-[#777] ml-2">
+            {isMiniAdmin
+              ? `Monitoring Dokumen Kontrak Payung & Lampiran Master Tax ${user?.airport_name || 'Mini Airport'}`
+              : 'Kelola draft, verifikasi TTD basah, dan status kontrak penyewa.'
+            }
+          </small>
         </h1>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Manajemen Kontrak</span>
+          <span className="mr-1">{isMiniAdmin ? 'Admin Mini Airport' : 'Admin Portal'}</span> / <span className="ml-1 font-medium">{isMiniAdmin ? 'PKS Payung' : 'Manajemen Kontrak'}</span>
         </div>
       </header>
 
       <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
         <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
-          <h3 className="text-[16px] text-[#444] font-normal">Daftar Kontrak ({contracts.length})</h3>
+          <h3 className="text-[16px] text-[#444] font-normal">
+            {isMiniAdmin ? `Daftar PKS Payung ${user?.airport_code ? `(${user.airport_code})` : ''}` : 'Daftar Kontrak'} ({contracts.length})
+          </h3>
         </div>
         
         <div className="p-0 overflow-x-auto">
@@ -114,7 +140,7 @@ export default function KontrakPage() {
                 <th className="py-3 px-4 font-bold">Nomor Kontrak</th>
                 <th className="py-3 px-4 font-bold">Tipe</th>
                 <th className="py-3 px-4 font-bold">Tenant</th>
-                <th className="py-3 px-4 font-bold">Aset</th>
+                <th className="py-3 px-4 font-bold">{isMiniAdmin ? 'Bandara Tujuan' : 'Aset'}</th>
                 <th className="py-3 px-4 font-bold">Masa Berlaku</th>
                 <th className="py-3 px-4 font-bold">Status</th>
                 <th className="py-3 px-4 font-bold text-center">Aksi</th>

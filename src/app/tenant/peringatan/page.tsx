@@ -3,8 +3,10 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useWarningStore } from '@/store/useWarningStore';
-import { AlertTriangle, Home, Loader2 } from 'lucide-react';
+import { AlertTriangle, Home, Loader2, Clock } from 'lucide-react';
 import { formatRupiah } from '@/utils/formatCurrency';
+import StatusBadge from '@/components/StatusBadge';
+import dayjs from 'dayjs';
 
 export default function TenantPeringatanPage() {
   const { tenantWarnings, isLoading, error, fetchTenantWarnings } = useWarningStore();
@@ -12,12 +14,6 @@ export default function TenantPeringatanPage() {
   useEffect(() => {
     fetchTenantWarnings();
   }, [fetchTenantWarnings]);
-
-  const getWarningColor = (type: string) => {
-    if (type === 'SP 1') return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (type === 'SP 2') return 'bg-red-100 text-red-800 border-red-200';
-    return 'bg-gray-100 text-gray-800 border-gray-200';
-  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -63,21 +59,37 @@ export default function TenantPeringatanPage() {
                   {warn.warning_number}
                 </td>
                 <td className="py-3 px-4">
-                  {warn.invoices ? (
-                    <>
-                      <div className="text-[#3c8dbc] font-medium">
-                        <Link href={`/tenant/tagihan`} className="hover:underline">
-                          {warn.invoices.invoice_number}
-                        </Link>
+                  {warn.invoices ? (() => {
+                    const diffDays = warn.invoices.due_date
+                      ? Math.max(0, dayjs().diff(dayjs(warn.invoices.due_date), 'day'))
+                      : 0;
+                    return (
+                      <div>
+                        <div className="text-[#3c8dbc] font-medium font-mono">
+                          <Link href={`/tenant/tagihan`} className="hover:underline">
+                            {warn.invoices.invoice_number}
+                          </Link>
+                        </div>
+                        <div className="text-xs text-slate-900 font-bold font-mono">{formatRupiah(Number(warn.invoices.amount))}</div>
+                        {diffDays > 0 && (
+                          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold">
+                              <Clock className="w-2.5 h-2.5 text-red-600" />
+                              Telat {diffDays} Hari
+                            </span>
+                            {warn.invoices.due_date && (
+                              <span className="text-[10px] text-slate-400">
+                                (JT: {dayjs(warn.invoices.due_date).format('DD/MM/YYYY')})
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-xs text-red-600 font-semibold">{formatRupiah(Number(warn.invoices.amount))}</div>
-                    </>
-                  ) : '-'}
+                    );
+                  })() : '-'}
                 </td>
                 <td className="py-3 px-4 text-center">
-                  <span className={`px-2.5 py-1 text-[11px] font-bold uppercase rounded-sm border ${getWarningColor(warn.type)}`}>
-                    {warn.type}
-                  </span>
+                  <StatusBadge status={warn.type} />
                 </td>
                 <td className="py-3 px-4 text-[13px] text-[#555]">
                   {warn.message}

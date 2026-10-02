@@ -56,7 +56,7 @@ export const SuratPKSModal: React.FC<SuratPKSModalProps> = ({ contract, onClose 
             <div>
               <h3 className="font-bold text-[15px] leading-tight flex items-center gap-2">
                 Surat Perjanjian Kerja Sama (PKS)
-                <span className="bg-white/20 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-none border border-white/30 font-semibold">
+                <span className="bg-white/20 text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border border-white/30 font-semibold">
                   {contract.contract_type || 'Sewa Ruangan'}
                 </span>
               </h3>
@@ -79,7 +79,7 @@ export const SuratPKSModal: React.FC<SuratPKSModalProps> = ({ contract, onClose 
               type="button"
               onClick={handleDownloadPDF}
               disabled={downloading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-none text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60"
+              className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-3.5 py-1.5 rounded-none text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-60"
             >
               {downloading ? (
                 <>

@@ -1,10 +1,11 @@
 import React from 'react';
 import { 
-  Plane, Loader2, CheckSquare, Square, ShieldCheck, Camera, FileText 
+  Plane, Loader2, CheckSquare, Square, ShieldCheck, Camera, FileText, CheckCircle2, Clock 
 } from 'lucide-react';
 import { UnbilledHanggarLog } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 interface UnbilledHanggarTableProps {
   readonly isLoading: boolean;
@@ -93,13 +94,26 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3">
-                    <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
+                    <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5 flex-wrap">
                       <Plane className="w-3.5 h-3.5 text-[#3c8dbc]" />
                       {log.registration_number}
+                      {log.is_emergency && (
+                        <StatusBadge status="danger" label="DARURAT" className="text-[9px] px-1.5 py-0.2" />
+                      )}
+                      {log.exit_time ? (
+                        <StatusBadge status="Billed" label="SUDAH CHECKOUT" className="text-[9px] px-1.5 py-0.2" />
+                      ) : (
+                        <StatusBadge status="Unbilled" label="SEDANG INAP" className="text-[9px] px-1.5 py-0.2" />
+                      )}
                     </div>
                     <div className="text-[11px] text-slate-500 font-medium">
                       {log.aircraft_type}
                     </div>
+                    {log.contract_number && (
+                      <div className="text-[10px] text-slate-500 font-mono">
+                        {log.contract_number}
+                      </div>
+                    )}
                   </td>
 
                   <td className="py-3 px-3 font-semibold text-slate-800">
@@ -107,18 +121,31 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
-                      log.parking_location === 'Apron'
-                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                        : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
-                    }`}>
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
                       {log.parking_location || 'Hanggar'}
                     </span>
                   </td>
 
                   <td className="py-3 px-3 text-slate-600">
-                    <div>Masuk: <span className="font-medium text-slate-800">{dayjs(log.entry_time).format('DD/MM/YYYY HH:mm')}</span></div>
-                    <div>Keluar: <span className="font-medium text-slate-800">{log.exit_time ? dayjs(log.exit_time).format('DD/MM/YYYY HH:mm') : '(Sedang Inap)'}</span></div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-400 text-[10px] uppercase font-bold w-12">Masuk:</span>
+                      <span className="font-medium text-slate-800">{dayjs(log.entry_time).format('DD/MM/YYYY HH:mm')}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-slate-400 text-[10px] uppercase font-bold w-12">Keluar:</span>
+                      {log.exit_time ? (
+                        <span className="font-bold text-emerald-700 flex items-center gap-1">
+                          {dayjs(log.exit_time).format('DD/MM/YYYY HH:mm')}
+                          <span className="text-[9px] font-semibold bg-emerald-50 text-emerald-700 px-1 py-0.2 border border-emerald-200">
+                            Checkout
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="font-medium text-amber-700 italic flex items-center gap-1">
+                          (Sedang Inap)
+                        </span>
+                      )}
+                    </div>
                   </td>
 
                   <td className="py-3 px-3 text-center">
@@ -131,8 +158,8 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                           <ShieldCheck className="w-3 h-3" /> {log.verified_nights} Tutup Hari
                         </span>
                       ) : (
-                        <span className="text-[10px] text-slate-400 italic mt-0.5">
-                          Est. Waktu
+                        <span className="text-[10px] text-slate-500 font-medium mt-0.5">
+                          {log.exit_time ? 'Durasi Final' : 'Sedang Berjalan'}
                         </span>
                       )}
                       {log.evidence_photos && log.evidence_photos.length > 0 && (
@@ -151,7 +178,7 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-right">
-                    <div className="font-mono text-sm font-bold text-orange-600">
+                    <div className="font-mono text-sm font-bold text-slate-900">
                       {formatRupiah(calculatedSubtotal)}
                     </div>
                   </td>
@@ -160,11 +187,11 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                     <button
                       type="button"
                       onClick={() => onTriggerSingle(log)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-800 text-white hover:bg-slate-900 rounded text-[11px] font-bold shadow-xs cursor-pointer"
-                      title="Terbitkan SKRD khusus untuk pergerakan pesawat ini"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded text-[11px] font-bold shadow-xs cursor-pointer transition-colors"
+                      title="Tetapkan SKRD untuk pergerakan armada ini"
                     >
                       <FileText className="w-3 h-3" />
-                      Opsi A: Tetapkan
+                      Tetapkan SKRD
                     </button>
                   </td>
                 </tr>

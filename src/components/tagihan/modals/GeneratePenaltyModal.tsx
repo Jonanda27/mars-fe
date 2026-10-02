@@ -53,7 +53,7 @@ export const GeneratePenaltyModal: React.FC<GeneratePenaltyModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-800">Penerbitan SKRD Denda Keterlambatan</h2>
-              <p className="text-xs text-slate-500">Sesuai Perda: Sanksi Administratif Bunga 2% per Bulan</p>
+              <p className="text-xs text-slate-500">Sesuai Perda: Sanksi Administratif Bunga 1% per Bulan</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 cursor-pointer">
@@ -101,7 +101,7 @@ export const GeneratePenaltyModal: React.FC<GeneratePenaltyModalProps> = ({
               onChange={(e) => setPenaltyRate(Number(e.target.value))}
               className="w-full border border-slate-300 p-2 text-sm focus:ring-1 focus:ring-amber-500 focus:outline-none"
             />
-            <p className="text-[11px] text-slate-500 mt-1">Standar regulasi retribusi daerah: 2.0% per bulan kalender.</p>
+            <p className="text-[11px] text-slate-500 mt-1">Standar regulasi retribusi daerah: 1.0% per bulan kalender.</p>
           </div>
 
           {/* Estimasi Nominal Denda */}

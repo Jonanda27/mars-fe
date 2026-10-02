@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { FileText, ShieldAlert } from 'lucide-react';
+import { FileText, TowerControl } from 'lucide-react';
 import { invoiceService } from '@/services/invoiceService';
 import { authService } from '@/services/authService';
 import { Invoice } from '@/types/invoice';
@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
 import UnbilledHanggarTab from '@/app/admin/tagihan/components/UnbilledHanggarTab';
+import UnbilledMiniAirportTab from '@/app/admin/tagihan/components/UnbilledMiniAirportTab';
 import { TagihanTable } from './TagihanTable';
 import { VerifyPaymentModal } from './modals/VerifyPaymentModal';
 import { GeneratePenaltyModal } from './modals/GeneratePenaltyModal';
@@ -21,7 +22,7 @@ interface TagihanSKRDViewProps {
 }
 
 export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin' }) => {
-  const [activeTab, setActiveTab] = useState<'terbit' | 'penetapan-hanggar'>('terbit');
+  const [activeTab, setActiveTab] = useState<'terbit' | 'penetapan-hanggar' | 'penetapan-mini-airport'>('terbit');
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -38,7 +39,7 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
   // SKRD Denda Modal State
   const [showPenaltyModal, setShowPenaltyModal] = useState(false);
   const [penaltyTargetInvoice, setPenaltyTargetInvoice] = useState<Invoice | null>(null);
-  const [penaltyRate, setPenaltyRate] = useState<number>(2);
+  const [penaltyRate, setPenaltyRate] = useState<number>(1);
   const [penaltyNotes, setPenaltyNotes] = useState<string>('');
   const [isSubmittingPenalty, setIsSubmittingPenalty] = useState(false);
 
@@ -91,7 +92,15 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
   }, [fetchUserData, fetchInvoices]);
 
   const userRole = (currentUser?.role || '').toLowerCase();
+  const isMiniAdmin = userRole === 'admin_mini_airport' || Boolean(currentUser?.mini_airport_id);
+  const isMozesAdmin = userRole === 'admin' && !isMiniAdmin;
   const isDinas = role === 'dinas' || ['dinas', 'kepala dinas'].includes(userRole);
+
+  useEffect(() => {
+    if (isMiniAdmin && activeTab === 'penetapan-hanggar') {
+      setActiveTab('penetapan-mini-airport');
+    }
+  }, [isMiniAdmin, activeTab]);
 
   const handleVerify = async (id: number) => {
     if (!confirm('Anda yakin ingin memverifikasi dan melunaskan tagihan ini?')) return;
@@ -112,7 +121,7 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
 
   const handleOpenPenaltyModal = (inv: Invoice) => {
     setPenaltyTargetInvoice(inv);
-    setPenaltyRate(2);
+    setPenaltyRate(1);
     const dueDateStr = inv.due_date ? dayjs(inv.due_date).format('DD-MM-YYYY') : '';
     setPenaltyNotes(`Denda keterlambatan atas SKRD ${inv.invoice_number} (Jatuh tempo: ${dueDateStr})`);
     setShowPenaltyModal(true);
@@ -123,7 +132,7 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
     try {
       setIsSubmittingPenalty(true);
       await invoiceService.generatePenaltyInvoice(penaltyTargetInvoice.id, {
-        rate_percent_per_month: Number(penaltyRate) || 2,
+        rate_percent_per_month: Number(penaltyRate) || 1,
         notes: penaltyNotes
       });
       toast.success('SKRD Denda Keterlambatan (4.1.4.01.01) berhasil diterbitkan!');
@@ -209,14 +218,6 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
           <h1 className="text-[24px] font-normal text-[#333]">
             Tagihan e-SKRD <small className="text-[15px] font-light text-[#777] ml-2">Manajemen &amp; Monitoring Pembayaran</small>
           </h1>
-          {isDinas && (
-            <div className="mt-1 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold px-2 py-0.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
-                Otoritas Dinas Aktif: Penerbitan SKRD Denda &amp; Pembatalan SKRD Diizinkan
-              </span>
-            </div>
-          )}
         </div>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
           <span className="mr-1">{role === 'dinas' ? 'Dinas Portal' : 'Admin Portal'}</span> / <span className="ml-1 font-medium">Tagihan e-SKRD</span>
@@ -238,18 +239,35 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
           Daftar SKRD Terbit ({invoices.length})
         </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('penetapan-hanggar')}
-          className={`py-2.5 px-5 font-bold text-xs uppercase tracking-wider transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
-            activeTab === 'penetapan-hanggar'
-              ? 'border-[#3c8dbc] text-[#3c8dbc] bg-blue-50/50'
-              : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
-        >
-          <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-          Penetapan SKRD Hanggar (Unbilled Roster)
-        </button>
+        {!isMiniAdmin && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('penetapan-hanggar')}
+            className={`py-2.5 px-5 font-bold text-xs uppercase tracking-wider transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
+              activeTab === 'penetapan-hanggar'
+                ? 'border-[#3c8dbc] text-[#3c8dbc] bg-blue-50/50'
+                : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#3c8dbc]"></span>
+            Penetapan SKRD Hanggar (Unbilled Roster)
+          </button>
+        )}
+
+        {!isMozesAdmin && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('penetapan-mini-airport')}
+            className={`py-2.5 px-5 font-bold text-xs uppercase tracking-wider transition-all border-b-2 cursor-pointer flex items-center gap-2 ${
+              activeTab === 'penetapan-mini-airport'
+                ? 'border-[#00a65a] text-[#00a65a] bg-emerald-50/50'
+                : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <TowerControl className="w-4 h-4 text-[#00a65a]" />
+            {isDinas ? 'Penetapan SKRD Mini Airport' : 'Antrean SKRD Dinas (Pasca-Checkout)'}
+          </button>
+        )}
       </div>
 
       {activeTab === 'penetapan-hanggar' ? (
@@ -259,6 +277,11 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
             setSelectedInvoice(inv);
             setShowSkrdModal(true);
           }}
+        />
+      ) : activeTab === 'penetapan-mini-airport' ? (
+        <UnbilledMiniAirportTab 
+          onInvoiceGenerated={fetchInvoices}
+          isDinas={isDinas}
         />
       ) : (
         <TagihanTable

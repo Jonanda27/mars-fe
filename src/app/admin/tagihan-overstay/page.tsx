@@ -12,6 +12,7 @@ import { OverstayLogItem } from '@/types/log';
 import { formatRupiah } from '@/utils/formatCurrency';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import StatusBadge from '@/components/StatusBadge';
 
 export default function AdminTagihanOverstayPage() {
   const [logs, setLogs] = useState<OverstayLogItem[]>([]);
@@ -99,9 +100,7 @@ export default function AdminTagihanOverstayPage() {
                     <span className="font-bold text-red-600">{log.exit_time ? dayjs(log.exit_time).format('DD MMM YYYY HH:mm') : '-'}</span>
                   </td>
                   <td className="py-4 px-5 text-center">
-                    <span className="inline-flex items-center bg-red-100 text-red-700 border border-red-200 text-[12px] px-2.5 py-1 font-bold rounded-full">
-                      {log.overstay_days} Hari
-                    </span>
+                    <StatusBadge status="danger" label={`${log.overstay_days} Hari Overstay`} />
                   </td>
                   <td className="py-4 px-5 text-center">
                      <button 

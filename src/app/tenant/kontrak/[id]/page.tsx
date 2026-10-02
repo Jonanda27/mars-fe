@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { formatRupiah } from '@/utils/formatCurrency';
 import SuratPKS from '@/components/SuratPKS';
 import SignaturePad from '@/components/SignaturePad';
+import StatusBadge from '@/components/StatusBadge';
 import html2pdf from 'html2pdf.js';
 import toast from 'react-hot-toast';
 
@@ -137,14 +138,9 @@ export default function TenantKontrakDetailPage() {
 
       {/* Action Bar */}
       <div className="bg-white p-4 shadow-sm rounded-sm border-t-[3px] border-[#3c8dbc] mb-6 flex justify-between items-center">
-        <div>
+        <div className="flex items-center">
           <span className="text-sm text-gray-500 mr-2">Status Saat Ini:</span>
-          {contract.status === 'Review' && <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> Menunggu TTE Anda</span>}
-          {(contract.status === 'Approved' || contract.status === 'Waiting Payment') && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold flex inline-flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> MENUNGGU PEMBAYARAN SKRD</span>}
-          {contract.status === 'Active' && <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">AKTIF</span>}
-          {contract.status === 'Expiring' && <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">AKAN HABIS</span>}
-          {contract.status === 'Expired' && <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">KEDALUWARSA</span>}
-          {contract.status === 'Terminated' && <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold">TERMINATED</span>}
+          <StatusBadge status={contract.status || ''} />
         </div>
         
         <div className="flex gap-2">
@@ -152,7 +148,7 @@ export default function TenantKontrakDetailPage() {
           {(contract.admin_signature && contract.tenant_signature) && (
             <button
               onClick={handleDownloadPDF}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+              className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
             >
               <Download className="w-4 h-4 mr-2" /> Download PDF PKS
             </button>
@@ -162,7 +158,7 @@ export default function TenantKontrakDetailPage() {
           {contract.status === 'Review' && (
             <button
               onClick={() => setShowSignaturePad(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+              className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
             >
               <FileSignature className="w-4 h-4 mr-2" /> Tinjau Dokumen & TTE
             </button>
@@ -176,7 +172,7 @@ export default function TenantKontrakDetailPage() {
                 setNewEndDate(defaultEnd);
                 setShowExtendModal(true);
               }}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
+              className="bg-[#00a65a] hover:bg-[#008d4c] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center"
             >
               <Calendar className="w-4 h-4 mr-2" /> Ajukan Perpanjangan
             </button>
@@ -201,10 +197,10 @@ export default function TenantKontrakDetailPage() {
       {/* Extension Modal */}
       {showExtendModal && contract && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex flex-col justify-center items-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-5 flex justify-between items-center text-white">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-[#3c8dbc] p-5 flex justify-between items-center text-white">
               <div className="flex items-center">
-                <Clock className="w-5 h-5 mr-3 text-indigo-100" />
+                <Clock className="w-5 h-5 mr-3 text-white/90" />
                 <h3 className="font-bold text-lg tracking-wide">Perpanjang Masa Sewa</h3>
               </div>
               <button onClick={() => setShowExtendModal(false)} className="text-white/70 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors">
@@ -213,21 +209,21 @@ export default function TenantKontrakDetailPage() {
             </div>
             
             <form onSubmit={handleExtendSubmit} className="p-6">
-              <div className="mb-5 bg-slate-50 border border-slate-100 rounded-xl p-4">
+              <div className="mb-5 bg-slate-50 border border-slate-100 rounded-lg p-4">
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor Kontrak Saat Ini</p>
                 <p className="font-bold text-lg text-slate-800">{contract.contract_number}</p>
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-5">
-                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-slate-300"></div>
                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Berakhir Pada</p>
                   <p className="font-bold text-slate-700 text-[15px]">{dayjs(contract.end_date).format('DD MMM YYYY')}</p>
                 </div>
-                <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 shadow-sm relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
-                  <p className="text-[11px] font-bold text-indigo-500 uppercase tracking-wider mb-1">Mulai Ekstensi</p>
-                  <p className="font-bold text-indigo-700 text-[15px]">{dayjs(contract.end_date).add(1, 'day').format('DD MMM YYYY')}</p>
+                <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-[#3c8dbc]"></div>
+                  <p className="text-[11px] font-bold text-[#3c8dbc] uppercase tracking-wider mb-1">Mulai Ekstensi</p>
+                  <p className="font-bold text-[#3c8dbc] text-[15px]">{dayjs(contract.end_date).add(1, 'day').format('DD MMM YYYY')}</p>
                 </div>
               </div>
 
@@ -239,23 +235,23 @@ export default function TenantKontrakDetailPage() {
                   min={dayjs(contract.end_date).add(2, 'day').format('YYYY-MM-DD')}
                   value={newEndDate}
                   onChange={(e) => setNewEndDate(e.target.value)}
-                  className="w-full border-2 border-slate-200 rounded-xl p-3 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700 cursor-pointer"
+                  className="w-full border-2 border-slate-200 rounded-lg p-3 outline-none focus:border-[#3c8dbc] focus:ring-2 focus:ring-[#3c8dbc]/20 transition-all font-medium text-slate-700 cursor-pointer"
                 />
                 
                 {newEndDate && (
-                  <div className="mt-4 bg-green-50 border border-green-200 p-4 rounded-xl flex items-center justify-between">
+                  <div className="mt-4 bg-emerald-50 border border-emerald-200 p-4 rounded-lg flex items-center justify-between">
                     <div>
-                      <p className="text-[11px] font-bold text-green-600 uppercase tracking-wider mb-0.5">Total Durasi Perpanjangan</p>
-                      <p className="text-sm text-green-700">Akan diperpanjang hingga {dayjs(newEndDate).format('DD MMM YYYY')}</p>
+                      <p className="text-[11px] font-bold text-[#00a65a] uppercase tracking-wider mb-0.5">Total Durasi Perpanjangan</p>
+                      <p className="text-sm text-slate-700">Akan diperpanjang hingga {dayjs(newEndDate).format('DD MMM YYYY')}</p>
                     </div>
-                    <div className="bg-green-100 text-green-800 font-bold px-3 py-1.5 rounded-lg text-lg border border-green-200 shadow-sm">
+                    <div className="bg-white text-[#00a65a] font-bold px-3 py-1.5 rounded text-lg border border-emerald-200 shadow-sm">
                       {Math.max(0, dayjs(newEndDate).diff(dayjs(contract.end_date).add(1, 'day'), 'day'))} Malam
                     </div>
                   </div>
                 )}
                 
                 <p className="text-[12px] text-slate-500 mt-3 flex items-start">
-                  <AlertCircle className="w-4 h-4 mr-1.5 text-indigo-400 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 mr-1.5 text-[#3c8dbc] flex-shrink-0 mt-0.5" />
                   Permohonan ini akan diteruskan ke Admin UPBU untuk ditinjau ulang sebelum SKRD baru diterbitkan.
                 </p>
               </div>
@@ -264,14 +260,14 @@ export default function TenantKontrakDetailPage() {
                 <button 
                   type="button" 
                   onClick={() => setShowExtendModal(false)}
-                  className="px-5 py-2.5 bg-white border border-slate-300 text-slate-600 font-bold rounded-xl hover:bg-slate-50 hover:text-slate-800 transition-colors"
+                  className="px-5 py-2.5 bg-white border border-slate-300 text-slate-600 font-bold rounded-lg hover:bg-slate-50 hover:text-slate-800 transition-colors"
                 >
                   Batal
                 </button>
                 <button 
                   type="submit" 
                   disabled={isExtending || !newEndDate}
-                  className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-md shadow-indigo-200"
+                  className="px-5 py-2.5 bg-[#3c8dbc] text-white font-bold rounded-lg hover:bg-[#367fa9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-md shadow-blue-100"
                 >
                   {isExtending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Memproses...</> : 'Ajukan Perpanjangan Sekarang'}
                 </button>

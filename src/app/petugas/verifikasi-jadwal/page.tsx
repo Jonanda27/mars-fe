@@ -10,6 +10,7 @@ import {
 import { flightScheduleService } from '@/services/flightScheduleService';
 import { FlightSchedule } from '@/types/flightSchedule';
 import { JadwalVerifikasiModal } from '../components/JadwalVerifikasiModal';
+import StatusBadge from '@/components/StatusBadge';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
 
@@ -47,6 +48,19 @@ export default function PetugasVerifikasiJadwalPage() {
   const checkedInCount = schedules.filter(s => s.status === 'Checked-In').length;
 
   const filteredSchedules = schedules.filter(s => {
+    // Pastikan hanya jadwal Bandara Mozes Kilangin (Hanggar / Apron) dan bukan Mini Airport
+    const loc = (s.parking_location || '').toLowerCase();
+    const purpose = (s.purpose || '').toLowerCase();
+    if (
+      loc.includes('stand') || 
+      loc.includes('mini') || 
+      loc.includes('airstrip') || 
+      purpose.includes('mini airport') ||
+      purpose.includes('perintis')
+    ) {
+      return false;
+    }
+
     // Status Filter
     if (statusFilter !== 'ALL' && s.status !== statusFilter) {
       return false;
@@ -65,61 +79,22 @@ export default function PetugasVerifikasiJadwalPage() {
     return true;
   });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Menunggu Verifikasi Petugas':
-        return (
-          <span className="bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 border border-amber-200 inline-flex items-center gap-1 shadow-2xs animate-pulse">
-            <Clock className="w-3 h-3" /> Menunggu Verifikasi
-          </span>
-        );
-      case 'Disetujui':
-        return (
-          <span className="bg-blue-50 text-[#3c8dbc] text-[11px] font-bold px-2 py-0.5 border border-blue-200 inline-flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> Disetujui
-          </span>
-        );
-      case 'Ditolak':
-        return (
-          <span className="bg-red-100 text-red-800 text-[11px] font-bold px-2 py-0.5 border border-red-200 inline-flex items-center gap-1">
-            <XCircle className="w-3 h-3" /> Ditolak
-          </span>
-        );
-      case 'Checked-In':
-        return (
-          <span className="bg-blue-100 text-blue-800 text-[11px] font-bold px-2 py-0.5 border border-blue-200 inline-flex items-center gap-1">
-            <Plane className="w-3 h-3" /> Checked-In
-          </span>
-        );
-      case 'Completed':
-      case 'Selesai':
-        return (
-          <span className="bg-slate-100 text-slate-700 text-[11px] font-bold px-2 py-0.5 border border-slate-300 inline-flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" /> Selesai
-          </span>
-        );
-      default:
-        return (
-          <span className="bg-slate-100 text-slate-700 text-[11px] font-bold px-2 py-0.5 border border-slate-200">
-            {status}
-          </span>
-        );
-    }
-  };
-
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full space-y-4 font-sans">
       
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
-            Verifikasi Jadwal Masuk{' '}
-            <span className="text-[15px] font-light text-[#777] ml-2">Persetujuan Rencana Kedatangan Pesawat Hanggar</span>
+          <h1 className="text-[20px] font-normal text-[#333] uppercase flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-[#3c8dbc]" />
+            Verifikasi Jadwal Masuk (Bandara Mozes Kilangin)
           </h1>
+          <p className="text-[12px] text-[#777] mt-0.5">
+            Persetujuan Rencana Kedatangan Armada Hanggar &amp; Apron Bandara Mozes Kilangin Timika
+          </p>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <span className="mr-1">Petugas</span> / <span className="ml-1 font-medium text-slate-800">Verifikasi Jadwal Masuk</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-white border border-[#e0e0e0] py-1 px-3 shadow-2xs">
+          <span className="mr-1">Petugas Mozes Kilangin</span> / <span className="ml-1 font-bold text-slate-800">Verifikasi Jadwal Masuk</span>
         </div>
       </header>
 
@@ -301,7 +276,7 @@ export default function PetugasVerifikasiJadwalPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3.5">
-                      {getStatusBadge(schedule.status)}
+                      <StatusBadge status={schedule.status} />
                     </td>
                     <td className="px-4 py-3.5 text-center">
                       {schedule.status === 'Menunggu Verifikasi Petugas' ? (

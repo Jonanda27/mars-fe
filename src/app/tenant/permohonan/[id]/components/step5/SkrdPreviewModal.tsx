@@ -48,7 +48,7 @@ export const SkrdPreviewModal: React.FC<SkrdPreviewModalProps> = ({
             <button 
               type="button"
               onClick={handleDownloadPdf}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-none text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-3.5 py-1.5 rounded-none text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" /> Unduh PDF
             </button>

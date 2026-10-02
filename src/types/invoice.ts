@@ -34,6 +34,9 @@ export interface UnbilledHanggarLog {
   evidence_photos: string[];
   tenant_id: number;
   tenant_name: string;
+  is_emergency?: boolean;
+  contract_type?: string;
+  contract_number?: string | null;
 }
 
 export interface Invoice {

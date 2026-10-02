@@ -1,10 +1,11 @@
-import React from 'react';
 import { 
   Building2, Plane, AlertTriangle, FileText, 
-  CheckCircle2, FileEdit, Ban, Loader2 
+  CheckCircle2, FileEdit, Ban, Loader2, ShieldAlert, Link as LinkIcon, TowerControl 
 } from 'lucide-react';
 import { Invoice } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
+import StatusBadge from '@/components/StatusBadge';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
 interface TagihanTableProps {
@@ -28,47 +29,6 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
   onOpenReissue,
   onOpenCancel,
 }) => {
-  const renderStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Paid':
-        return (
-          <span className="inline-flex items-center bg-[#00a65a]/10 text-[#00a65a] border border-[#00a65a]/20 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-            Lunas
-          </span>
-        );
-      case 'Pending Verification':
-        return (
-          <span className="inline-flex items-center bg-blue-100 text-blue-700 border border-blue-200 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-            Menunggu Verifikasi
-          </span>
-        );
-      case 'Scheduled':
-        return (
-          <span className="inline-flex items-center bg-slate-100 text-slate-600 border border-slate-200 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-            Terjadwal
-          </span>
-        );
-      case 'Overdue':
-        return (
-          <span className="inline-flex items-center bg-red-100 text-red-700 border border-red-200 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-            Menunggak
-          </span>
-        );
-      case 'Cancelled':
-      case 'Dibatalkan':
-        return (
-          <span className="inline-flex items-center bg-gray-100 text-gray-700 border border-gray-300 text-[11px] px-2 py-1 font-bold uppercase tracking-wider line-through">
-            Dibatalkan
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center bg-[#dd4b39]/10 text-[#dd4b39] border border-[#dd4b39]/20 text-[11px] px-2 py-1 font-bold uppercase tracking-wider">
-            Belum Lunas
-          </span>
-        );
-    }
-  };
 
   return (
     <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
@@ -108,6 +68,12 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                   item.contracts?.contract_number?.includes('PKS-RG')
                 );
 
+                const isEmergency = !isDenda && Boolean(
+                  item.invoice_type === 'Pendaratan Darurat' ||
+                  item.invoice_number?.startsWith('SKRD-EMG') ||
+                  item.contracts?.contract_type === 'PKS Pendaratan Darurat'
+                );
+
                 const isOverdueState = item.status === 'Overdue' || (
                   (item.status === 'Unpaid' || item.status === 'Belum Lunas') &&
                   item.due_date &&
@@ -117,6 +83,12 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                 const isCancellable = isDinas && item.status !== 'Paid' && item.status !== 'Cancelled' && item.status !== 'Dibatalkan';
                 const canIssuePenalty = isDinas && !isDenda && isOverdueState && item.status !== 'Paid' && item.status !== 'Cancelled';
 
+                const isMiniAirport = !isDenda && Boolean(
+                  item.invoice_type === 'Mini Airport' ||
+                  item.invoice_number?.startsWith('SKRD-MAP') ||
+                  (item.details && typeof item.details === 'object' && (item.details as any).service_type === 'Mini Airport')
+                );
+
                 return (
                   <tr key={item.id} className="border-b border-[#f4f4f4] hover:bg-slate-50">
                     <td className="py-4 px-5">
@@ -125,6 +97,14 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                         {isDenda ? (
                           <span className="inline-flex items-center gap-1 bg-red-50 text-red-800 border border-red-200 text-[10px] font-bold px-1.5 py-0.5">
                             <AlertTriangle className="w-3 h-3 text-red-600" /> SKRD Denda (4.1.4.01.01)
+                          </span>
+                        ) : isEmergency ? (
+                          <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.5">
+                            <ShieldAlert className="w-3 h-3 text-amber-600" /> Pendaratan Darurat (4.1.2.02)
+                          </span>
+                        ) : isMiniAirport ? (
+                          <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-800 border border-purple-300 text-[10px] font-bold px-1.5 py-0.5">
+                            <TowerControl className="w-3 h-3 text-purple-600" /> Mini Airport (4.1.2.02.03)
                           </span>
                         ) : isRuangan ? (
                           <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.5">
@@ -171,7 +151,7 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                       )}
                     </td>
                     <td className="py-4 px-5 text-center">
-                      {renderStatusBadge(item.status)}
+                      <StatusBadge status={item.status} />
                     </td>
                     <td className="py-4 px-5 text-center">
                       <div className="flex items-center justify-center gap-1.5 flex-wrap">
@@ -193,12 +173,34 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                           <FileText className="w-3.5 h-3.5 mr-1 text-[#3c8dbc]" /> Lihat
                         </button>
 
+                        {/* Tombol Salin Link Bayar Khusus Pendaratan Darurat */}
+                        {isEmergency && (() => {
+                          const details = typeof item.details === 'string' ? JSON.parse(item.details) : (item.details || []);
+                          const detailItem = Array.isArray(details) ? details[0] : details;
+                          const token = detailItem?.emergency_payment_token;
+                          if (!token) return null;
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const url = `${window.location.origin}/pembayaran-darurat/${token}`;
+                                navigator.clipboard.writeText(url);
+                                toast.success('Link pembayaran darurat disalin');
+                              }}
+                              className="bg-amber-50 border border-amber-300 text-amber-800 hover:bg-amber-100 px-2 py-1 text-[11px] font-bold inline-flex items-center justify-center shadow-xs cursor-pointer"
+                              title="Salin Tautan Pembayaran Darurat untuk Maskapai"
+                            >
+                              <LinkIcon className="w-3.5 h-3.5 mr-1 text-amber-600" /> Link Bayar
+                            </button>
+                          );
+                        })()}
+
                         {/* Aksi Otoritas Dinas: Terbitkan SKRD Denda */}
                         {canIssuePenalty && (
                           <button
                             onClick={() => onOpenPenalty(item)}
                             className="bg-amber-50 border border-amber-400 text-amber-800 hover:bg-amber-100 px-2 py-1 text-[11px] font-bold inline-flex items-center justify-center shadow-xs cursor-pointer"
-                            title="Terbitkan SKRD Denda 2%/bulan (Slide 6 PPT)"
+                            title="Terbitkan SKRD Denda 1%/bulan (Slide 6 PPT)"
                           >
                             <AlertTriangle className="w-3.5 h-3.5 mr-1 text-amber-600" /> + SKRD Denda
                           </button>

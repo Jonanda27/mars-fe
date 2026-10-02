@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { RentalApplication } from '@/types/rental';
 import { Asset } from '@/types/asset';
 import StatusBadge from '@/components/StatusBadge';
@@ -7,6 +7,9 @@ import { calculateHangarRentalTotal } from '@/utils/aircraftTariff';
 import { CheckCircle2, Loader2, Info, X, ArrowDown, Warehouse, Plane, AlertTriangle } from 'lucide-react';
 import dayjs from 'dayjs';
 import Link from 'next/link';
+
+import { useAuthStore } from '@/store/useAuthStore';
+import { rentalService, StandAvailability } from '@/services/rentalService';
 
 interface AdminReviewActionPanelProps {
   app: RentalApplication;
@@ -23,7 +26,7 @@ interface AdminReviewActionPanelProps {
   isOverCapacity?: boolean | null;
   requiredArea: number;
   handleVerifyLetter: (status: string) => Promise<void>;
-  handleAction: (status: string) => Promise<void>;
+  handleAction: (status: string, extraData?: any) => Promise<void>;
 }
 
 export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
@@ -43,10 +46,96 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
   handleVerifyLetter,
   handleAction,
 }) => {
-  const roleLower = userRole?.toLowerCase();
-  const isKadis = roleLower === 'kadis' || roleLower === 'kepala dinas' || roleLower === 'dinas';
-  const isAdmin = roleLower === 'admin' || roleLower === 'superadmin';
-  const canValidate = isAdmin || isKadis;
+  const { user: currentUser } = useAuthStore();
+  const effectiveRole = (userRole || currentUser?.role || '').toLowerCase();
+  const isKadis = effectiveRole === 'kadis' || effectiveRole === 'kepala dinas' || effectiveRole === 'dinas';
+  const isMiniAdmin = effectiveRole === 'admin_mini_airport' || Boolean(currentUser?.mini_airport_id);
+  const isAdmin = effectiveRole === 'admin' || effectiveRole === 'admin_mini_airport' || effectiveRole === 'superadmin' || isMiniAdmin;
+
+  const spec = typeof app.specific_needs === 'string'
+    ? (() => { try { return JSON.parse(app.specific_needs); } catch (e) { return {}; } })()
+    : (app.specific_needs || {});
+
+  const [selectedStand, setSelectedStand] = useState<string>(
+    spec?.allocated_stand || 'STAND 01'
+  );
+
+  const [standsAvailability, setStandsAvailability] = useState<StandAvailability[]>([]);
+  const [fetchingStands, setFetchingStands] = useState<boolean>(false);
+
+  const isMini = Boolean(
+    app.application_type?.toLowerCase().includes('mini') ||
+    spec?.service_type === 'Mini Airport' ||
+    Boolean(spec?.airport_id || spec?.mini_airport_id || spec?.airport_name)
+  );
+
+  const targetMiniId = spec?.airport_id || spec?.mini_airport_id;
+  const targetMiniName = spec?.airport_name || 'Lapangan Terbang Perintis';
+  const targetMiniCode = spec?.airport_code || '';
+
+  // Fetch real-time stand availability for Mini Airport
+  useEffect(() => {
+    if (isMini && targetMiniId) {
+      const fetchStands = async () => {
+        setFetchingStands(true);
+        try {
+          const standsData = await rentalService.getMiniAirportStandAvailability(
+            Number(targetMiniId),
+            spec?.landing_date,
+            app.id
+          );
+          setStandsAvailability(standsData);
+
+          // Cek apakah stand yang tersimpan sebelumnya masih kosong
+          const currentlyAllocated = spec?.allocated_stand;
+          const matchAllocated = standsData.find(s => s.stand === currentlyAllocated);
+
+          if (matchAllocated && !matchAllocated.is_occupied) {
+            setSelectedStand(currentlyAllocated);
+          } else {
+            // Pilih stand kosong pertama yang tersedia
+            const firstAvailable = standsData.find(s => !s.is_occupied);
+            if (firstAvailable) {
+              setSelectedStand(firstAvailable.stand);
+            } else {
+              setSelectedStand('');
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching stand availability:', err);
+        } finally {
+          setFetchingStands(false);
+        }
+      };
+      fetchStands();
+    }
+  }, [isMini, targetMiniId, spec?.landing_date, app.id]);
+
+  const selectedStandInfo = standsAvailability.find(s => s.stand === selectedStand);
+  const isSelectedStandOccupied = selectedStandInfo?.is_occupied || false;
+  const areAllStandsOccupied = isMini && standsAvailability.length > 0 && standsAvailability.every(s => s.is_occupied);
+
+  const isGlobalRole = ['superadmin', 'kepala dinas', 'dinas'].includes(effectiveRole);
+  
+  // Check if admin is authorized for this airport
+  let isAuthorizedForAirport = true;
+  let unauthorizedReason = '';
+
+  if (!isGlobalRole) {
+    if (isMini) {
+      if (currentUser?.mini_airport_id && targetMiniId && Number(currentUser.mini_airport_id) !== Number(targetMiniId)) {
+        isAuthorizedForAirport = false;
+        unauthorizedReason = `Permohonan ini ditujukan khusus ke ${targetMiniName}${targetMiniCode ? ` (${targetMiniCode})` : ''}. Validasi hanya dapat dilakukan oleh Administrator ${targetMiniName}.`;
+      }
+    } else {
+      if (currentUser?.mini_airport_id) {
+        isAuthorizedForAirport = false;
+        unauthorizedReason = `Permohonan sewa ini berada di bawah pengelolaan Bandara Mozes Kilangin Timika dan tidak dapat divalidasi oleh Administrator Mini Airport.`;
+      }
+    }
+  }
+
+  const canValidate = (isAdmin || isKadis) && isAuthorizedForAirport;
 
   const isHangar = Boolean(
     app.application_type?.toLowerCase().includes('hanggar') ||
@@ -108,7 +197,154 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
           </div>
         )}
 
-        {(isAdminStep || currentStep > 3) && (
+        {/* Khusus Mini Airport: Verifikasi Rencana Pendaratan & Stand Apron */}
+        {isMini && (isAdminStep || currentStep > 3) && (
+          <div className="mb-6 space-y-3">
+            <label className="block text-sm font-bold text-slate-800">
+              Verifikasi Operasional Mini Airport
+            </label>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              Sebagai Pengelola Lapangan Terbang Perintis yang dituju, verifikasi rencana pendaratan dan konfirmasi kesiapan stand apron.
+            </p>
+            <div className="bg-slate-50 border border-slate-200 p-4 space-y-2.5 text-xs">
+              <div className="flex justify-between border-b border-slate-200 pb-2">
+                <span className="text-slate-500">Mini Airport Tujuan:</span>
+                <span className="font-bold text-[#3c8dbc]">
+                  {spec?.airport_name || 'Lapangan Terbang Perintis'} ({spec?.airport_code || '-'})
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-slate-200 pb-2">
+                <span className="text-slate-500">Armada Pesawat:</span>
+                <span className="font-mono font-bold text-slate-800">
+                  {spec?.registration_number || '-'} ({spec?.aircraft_type || 'Perintis'})
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-slate-200 pb-2">
+                <span className="text-slate-500">Waktu Pendaratan:</span>
+                <span className="font-bold text-slate-700">
+                  {spec?.landing_date ? dayjs(spec.landing_date).format('DD MMMM YYYY') : '-'} Pukul {spec?.landing_time || '-'} WIT
+                </span>
+              </div>
+              {/* Alokasi Stand Apron oleh Admin */}
+              {isAdminStep && canValidate ? (
+                <div className="pt-2.5 border-t border-slate-200 space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-700 font-bold text-xs flex items-center gap-1.5">
+                      Tetapkan Stand Apron <span className="text-red-500">*</span>:
+                    </span>
+                    {selectedStand && !isSelectedStandOccupied ? (
+                      <StatusBadge status="Aktif" label={`Pilihan: ${selectedStand}`} />
+                    ) : selectedStand && isSelectedStandOccupied ? (
+                      <StatusBadge status="Ditolak" label={`${selectedStand} (TERISI)`} />
+                    ) : (
+                      <StatusBadge status="Menunggu" label="Belum Dipilih" />
+                    )}
+                  </div>
+
+                  {fetchingStands ? (
+                    <div className="p-3 text-center text-xs text-slate-500 bg-white border border-slate-200 flex items-center justify-center gap-2">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#3c8dbc]" />
+                      <span>Memeriksa ketersediaan stand apron real-time...</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        {(standsAvailability.length > 0 ? standsAvailability : [
+                          { stand: 'STAND 01', name: 'Apron Utama', is_occupied: false, occupied_by: null, aircraft_type: null, status: 'Tersedia', source: null, notes: '' },
+                          { stand: 'STAND 02', name: 'Apron Cadangan', is_occupied: false, occupied_by: null, aircraft_type: null, status: 'Tersedia', source: null, notes: '' }
+                        ]).map((st) => {
+                          const isOccupied = st.is_occupied;
+                          const isSelected = selectedStand === st.stand;
+
+                          return (
+                            <button
+                              key={st.stand}
+                              type="button"
+                              onClick={() => {
+                                if (!isOccupied) setSelectedStand(st.stand);
+                              }}
+                              disabled={saving || isOccupied}
+                              className={`p-2.5 text-left border transition-all relative flex flex-col justify-between min-h-[82px] ${
+                                isOccupied
+                                  ? 'bg-rose-50/80 border-rose-300 cursor-not-allowed opacity-95'
+                                  : isSelected
+                                  ? 'bg-[#3c8dbc] text-white border-[#3c8dbc] shadow-xs cursor-pointer'
+                                  : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50 cursor-pointer hover:border-[#3c8dbc]'
+                              }`}
+                            >
+                              <div className="flex justify-between items-center w-full mb-1">
+                                <span className={`font-mono font-bold text-xs ${
+                                  isOccupied ? 'text-rose-900 line-through' : isSelected ? 'text-white' : 'text-slate-800'
+                                }`}>
+                                  {st.stand}
+                                </span>
+                                <span className={`text-[9px] font-bold px-1.5 py-0.5 border ${
+                                  isOccupied
+                                    ? 'bg-rose-100 text-rose-800 border-rose-300'
+                                    : isSelected
+                                    ? 'bg-white/20 text-white border-white/40'
+                                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                }`}>
+                                  {isOccupied ? 'TERISI' : 'KOSONG'}
+                                </span>
+                              </div>
+
+                              <div>
+                                <span className={`block text-[11px] font-bold leading-tight ${
+                                  isOccupied
+                                    ? 'text-rose-700'
+                                    : isSelected
+                                    ? 'text-white'
+                                    : 'text-slate-700'
+                                }`}>
+                                  {isOccupied ? (st.occupied_by ? `${st.occupied_by}` : 'Terisi') : st.name}
+                                </span>
+                                {isOccupied ? (
+                                  <span className="block text-[9px] text-rose-600 truncate mt-0.5 font-medium">
+                                    {st.aircraft_type ? `${st.aircraft_type}` : st.status}
+                                  </span>
+                                ) : (
+                                  <span className={`block text-[9px] mt-0.5 ${isSelected ? 'text-blue-100' : 'text-emerald-600'}`}>
+                                    Siap digunakan
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Notifikasi Peringatan jika semua stand penuh */}
+                      {areAllStandsOccupied && (
+                        <div className="bg-rose-50 border border-rose-300 p-2.5 text-xs text-rose-900 mt-2">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="block font-semibold">Semua Stand Apron Penuh</strong>
+                              <p className="text-[11px] leading-relaxed text-rose-800">
+                                Seluruh stand apron di {targetMiniName} sedang terisi pada tanggal ini. Permohonan tidak dapat disetujui sampai ada stand yang kosong atau jadwal pendaratan disesuaikan.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex justify-between items-center pt-1 border-t border-slate-200">
+                  <span className="text-slate-500">Alokasi Stand Apron:</span>
+                  <span className="font-bold text-[#00a65a] bg-emerald-50 px-2.5 py-0.5 border border-emerald-200 font-mono text-xs">
+                    {(app.specific_needs as any)?.allocated_stand || selectedStand || 'STAND 01'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Khusus Non-Mini Airport: Penetapan Alokasi Aset Ruangan/Hanggar */}
+        {!isMini && (isAdminStep || currentStep > 3) && (
           <div className="mb-6">
             <label htmlFor="alokasi-aset-select" className="block text-sm font-bold text-slate-800 mb-1">
               Alokasikan Aset <span className="text-red-500">*</span>
@@ -121,7 +357,7 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
                 id="alokasi-aset-select"
                 value={selectedAssetId} 
                 onChange={handleAssetSelect} 
-                disabled={!isAdminStep || saving || (roleLower !== 'admin' && isAdminStep)}
+                disabled={!isAdminStep || saving || !canValidate}
                 className="w-full border-2 border-slate-200 px-3 py-2.5 rounded-none text-sm outline-none focus:border-[#3c8dbc] focus:ring-4 focus:ring-blue-50 bg-white disabled:bg-slate-100 disabled:text-slate-500 transition-all font-medium appearance-none"
               >
                 <option value="">-- Silakan Pilih Aset --</option>
@@ -280,13 +516,35 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
 
         {isAdminStep && canValidate && (
           <div className="space-y-3 pt-4 border-t border-slate-100">
+            {isMini && (
+              <div className="bg-emerald-50 border border-emerald-200 p-2.5 text-xs text-emerald-900 mb-2 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>Terverifikasi sebagai <strong>Administrator {targetMiniName}</strong>.</span>
+              </div>
+            )}
             <button 
-              onClick={() => handleAction(isHangar ? 'Aktif' : 'Draft Kontrak')} 
-              disabled={saving || !!isOverCapacity} 
-              className={`w-full text-white py-3 px-4 rounded-none font-bold transition-all flex justify-center items-center shadow-sm disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-md cursor-pointer ${isOverCapacity ? 'bg-slate-400' : 'bg-green-600 hover:bg-green-700'}`}
+              onClick={() => handleAction(isMini ? 'Aktif' : (isHangar ? 'Aktif' : 'Draft Kontrak'), selectedStand)} 
+              disabled={
+                saving || 
+                (!isMini && !!isOverCapacity) || 
+                (isMini && (areAllStandsOccupied || !selectedStand || isSelectedStandOccupied))
+              } 
+              className={`w-full text-white py-3 px-4 rounded-none font-bold transition-all flex justify-center items-center shadow-sm disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-md cursor-pointer ${
+                (!isMini && isOverCapacity) || (isMini && (areAllStandsOccupied || !selectedStand || isSelectedStandOccupied))
+                  ? 'bg-slate-400' 
+                  : 'bg-green-600 hover:bg-green-700'
+              }`}
             >
               {saving && <Loader2 className="w-5 h-5 animate-spin mr-2" />}
-              {isHangar ? 'Validasi & Setujui Sewa Hanggar' : 'Validasi & Terbitkan Kontrak Sewa (Surat PKS)'}
+              {isMini 
+                ? (areAllStandsOccupied 
+                    ? 'Stand Apron Penuh' 
+                    : isSelectedStandOccupied 
+                    ? 'Stand Terisi - Pilih Stand Kosong' 
+                    : !selectedStand 
+                    ? 'Pilih Stand Apron Terlebih Dahulu' 
+                    : 'Validasi & Terbitkan Izin Pendaratan Aktif') 
+                : (isHangar ? 'Validasi & Setujui Sewa Hanggar' : 'Validasi & Terbitkan Kontrak Sewa (Surat PKS)')}
             </button>
             
             <button 
@@ -301,8 +559,22 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
         )}
 
         {isAdminStep && !canValidate && (
-          <div className="text-center p-4">
-            <p className="text-sm text-slate-500 font-medium">Menunggu Validasi oleh Admin / Kadis</p>
+          <div className="p-4 border-t border-slate-100">
+            {!isAuthorizedForAirport ? (
+              <div className="bg-amber-50 border border-amber-200 p-3.5 text-xs text-amber-900 text-left">
+                <div className="flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="block font-semibold mb-1 text-amber-950">Wewenang Validasi Terbatas</strong>
+                    <p className="leading-relaxed text-[11px]">{unauthorizedReason}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-sm text-slate-500 font-medium">Menunggu Validasi oleh Admin / Kadis</p>
+              </div>
+            )}
           </div>
         )}
 

@@ -23,3 +23,4 @@ export const ApplicationDetailHeader: React.FC<ApplicationDetailHeaderProps> = (
     </>
   );
 };
+

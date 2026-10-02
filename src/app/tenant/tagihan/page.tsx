@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { invoiceService } from '@/services/invoiceService';
 import { Invoice } from '@/types/invoice';
 import { 
-  Banknote, AlertTriangle, Building2, Plane, Loader2 
+  Banknote, AlertTriangle, Building2, Plane, Compass, Loader2 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -19,7 +19,7 @@ export default function TenantTagihanPage() {
   const [isPaying, setIsPaying] = useState(false);
   
   // Filter state
-  const [serviceFilter, setServiceFilter] = useState<'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA'>('ALL');
+  const [serviceFilter, setServiceFilter] = useState<'ALL' | 'HANGGAR' | 'RUANGAN' | 'MINI_AIRPORT' | 'DENDA'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Payment Modal state
@@ -57,8 +57,17 @@ export default function TenantTagihanPage() {
     );
   };
 
+  const isInvoiceMiniAirport = (invoice: Invoice) => {
+    return Boolean(
+      invoice.invoice_type === 'Mini Airport' ||
+      invoice.invoice_number?.includes('MAP') ||
+      invoice.details?.type === 'MINI_AIRPORT_LANDING' ||
+      invoice.details?.airport_code
+    );
+  };
+
   const isInvoiceRuangan = (invoice: Invoice) => {
-    if (isInvoiceDenda(invoice)) return false;
+    if (isInvoiceDenda(invoice) || isInvoiceMiniAirport(invoice)) return false;
     return Boolean(
       invoice.invoice_type === 'Sewa Ruangan' ||
       invoice.contracts?.jenis_pemanfaatan?.toLowerCase().includes('ruang') ||
@@ -97,17 +106,20 @@ export default function TenantTagihanPage() {
 
   // Counts for tabs
   const dendaCount = invoices.filter(inv => isInvoiceDenda(inv)).length;
-  const hanggarCount = invoices.filter(inv => !isInvoiceRuangan(inv) && !isInvoiceDenda(inv)).length;
+  const miniAirportCount = invoices.filter(inv => isInvoiceMiniAirport(inv)).length;
   const ruanganCount = invoices.filter(inv => isInvoiceRuangan(inv)).length;
+  const hanggarCount = invoices.filter(inv => !isInvoiceRuangan(inv) && !isInvoiceDenda(inv) && !isInvoiceMiniAirport(inv)).length;
 
   // Filtered invoices
   const filteredInvoices = invoices.filter(inv => {
     const isDenda = isInvoiceDenda(inv);
+    const isMiniAirport = isInvoiceMiniAirport(inv);
     const isRuangan = isInvoiceRuangan(inv);
 
     if (serviceFilter === 'DENDA' && !isDenda) return false;
-    if (serviceFilter === 'HANGGAR' && (isRuangan || isDenda)) return false;
-    if (serviceFilter === 'RUANGAN' && (!isRuangan || isDenda)) return false;
+    if (serviceFilter === 'MINI_AIRPORT' && !isMiniAirport) return false;
+    if (serviceFilter === 'HANGGAR' && (isRuangan || isDenda || isMiniAirport)) return false;
+    if (serviceFilter === 'RUANGAN' && (!isRuangan || isDenda || isMiniAirport)) return false;
 
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
@@ -153,15 +165,21 @@ export default function TenantTagihanPage() {
     // Grouping by contract or independent billing
     const groupedInvoices = filteredInvoices.reduce((acc, invoice) => {
       const isDenda = isInvoiceDenda(invoice);
+      const isMiniAirport = isInvoiceMiniAirport(invoice);
       const isRuangan = isInvoiceRuangan(invoice);
       let groupKey = '';
       let groupTitle = '';
-      let groupType: 'denda' | 'room' | 'hanggar' = 'hanggar';
+      let groupType: 'denda' | 'room' | 'mini_airport' | 'hanggar' = 'hanggar';
 
       if (isDenda) {
         groupKey = 'DENDA_GROUP';
         groupTitle = 'Tagihan Denda Keterlambatan Retribusi Daerah (4.1.4.01.01)';
         groupType = 'denda';
+      } else if (isMiniAirport) {
+        const aptName = invoice.details?.airport_name || 'Mini Airport Perintis';
+        groupKey = `MINI_AIRPORT_${invoice.details?.airport_code || 'GENERIC'}`;
+        groupTitle = `Retribusi Pelayanan & Pendaratan ${aptName}`;
+        groupType = 'mini_airport';
       } else if (invoice.contracts?.contract_number) {
         groupKey = invoice.contracts.contract_number;
         groupTitle = `Kontrak: ${invoice.contracts.contract_number}`;
@@ -193,13 +211,14 @@ export default function TenantTagihanPage() {
       }
       acc[groupKey].invoices.push(invoice);
       return acc;
-    }, {} as Record<string, { title: string; groupType: 'denda' | 'room' | 'hanggar'; invoices: Invoice[] }>);
+    }, {} as Record<string, { title: string; groupType: 'denda' | 'room' | 'mini_airport' | 'hanggar'; invoices: Invoice[] }>);
 
     return (
       <div className="space-y-6">
         {Object.entries(groupedInvoices).map(([groupKey, group]) => {
           const isDendaGroup = group.groupType === 'denda';
           const isRoomGroup = group.groupType === 'room';
+          const isMiniAirportGroup = group.groupType === 'mini_airport';
 
           return (
             <div key={groupKey} className="bg-white border border-slate-200 shadow-2xs overflow-hidden">
@@ -207,6 +226,8 @@ export default function TenantTagihanPage() {
               <div className={`px-4 py-3 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 ${
                 isDendaGroup
                   ? 'bg-red-50/80 border-red-200'
+                  : isMiniAirportGroup
+                  ? 'bg-amber-50/80 border-amber-200'
                   : isRoomGroup 
                   ? 'bg-emerald-50/70 border-emerald-200' 
                   : 'bg-blue-50/70 border-blue-200'
@@ -215,6 +236,10 @@ export default function TenantTagihanPage() {
                   {isDendaGroup ? (
                     <div className="p-1 bg-red-600 text-white rounded-none">
                       <AlertTriangle className="w-4 h-4" />
+                    </div>
+                  ) : isMiniAirportGroup ? (
+                    <div className="p-1 bg-amber-600 text-white rounded-none">
+                      <Compass className="w-4 h-4" />
                     </div>
                   ) : isRoomGroup ? (
                     <div className="p-1 bg-emerald-600 text-white rounded-none">
@@ -228,6 +253,8 @@ export default function TenantTagihanPage() {
                   <span className={
                     isDendaGroup 
                       ? 'text-red-950' 
+                      : isMiniAirportGroup
+                      ? 'text-amber-950'
                       : isRoomGroup 
                       ? 'text-emerald-950' 
                       : 'text-blue-950'
@@ -239,6 +266,8 @@ export default function TenantTagihanPage() {
                 <span className={`text-[11px] font-bold px-2 py-0.5 border ${
                   isDendaGroup
                     ? 'bg-white text-red-800 border-red-300'
+                    : isMiniAirportGroup
+                    ? 'bg-white text-amber-800 border-amber-300'
                     : isRoomGroup 
                     ? 'bg-white text-emerald-800 border-emerald-300' 
                     : 'bg-white text-blue-800 border-blue-300'
@@ -255,6 +284,7 @@ export default function TenantTagihanPage() {
                     invoice={invoice}
                     isDenda={isInvoiceDenda(invoice)}
                     isRuangan={isInvoiceRuangan(invoice)}
+                    isMiniAirport={isInvoiceMiniAirport(invoice)}
                     onOpenSkrd={(inv) => {
                       setSelectedInvoice(inv);
                       setShowSkrdModal(true);
@@ -296,6 +326,7 @@ export default function TenantTagihanPage() {
           totalCount={invoices.length}
           hanggarCount={hanggarCount}
           ruanganCount={ruanganCount}
+          miniAirportCount={miniAirportCount}
           dendaCount={dendaCount}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}

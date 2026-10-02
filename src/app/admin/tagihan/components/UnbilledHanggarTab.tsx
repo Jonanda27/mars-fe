@@ -192,7 +192,12 @@ export default function UnbilledHanggarTab({ onInvoiceGenerated, onViewInvoice }
         customRates={customRates}
         onSelectAll={handleSelectAll}
         onToggleSelect={handleToggleSelect}
-        onTriggerSingle={(log) => setConfirmModal({ isOpen: true, mode: 'single', targetLog: log })}
+        onTriggerSingle={(log) => {
+          if (!log.exit_time) {
+            toast('Perhatian: Armada ini belum melakukan checkout di lapangan', { icon: '⚠️' });
+          }
+          setConfirmModal({ isOpen: true, mode: 'single', targetLog: log });
+        }}
       />
 
       {/* Floating Bottom Batch Action Bar */}

@@ -114,13 +114,11 @@ export const InvoiceSearchPanel: React.FC<InvoiceSearchPanelProps> = ({
                 {Number(selectedInvoice.penalty_amount || 0) > 0 && (
                   <tr className="border-b border-[#f4f4f4] bg-red-50/50">
                     <td className="py-3 px-2 text-red-700">
-                      <div className="font-bold">Denda Keterlambatan (Sanksi 2%/Bulan)</div>
+                      <div className="font-bold">Denda Keterlambatan (Sanksi 1%/Bulan)</div>
                       <div className="text-[11px] text-red-500">Kode Rekening: 4.1.4.01.01</div>
                     </td>
                     <td className="py-3 px-2 text-center text-red-700">
-                      <span className="bg-red-100 text-red-800 px-2 py-0.5 text-xs font-bold">
-                        Sanksi Denda
-                      </span>
+                      <StatusBadge status="danger" label="Sanksi Denda" />
                     </td>
                     <td className="py-3 px-2 text-right font-mono font-bold text-red-700">
                       {formatRupiah(Number(selectedInvoice.penalty_amount))}

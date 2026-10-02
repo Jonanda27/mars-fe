@@ -108,7 +108,25 @@ export default function EksekutifKontrakDetailPage() {
                          s.includes('review') ||
                          s === 'draft';
   const isAktif = s === 'aktif' || s === 'active';
-  const isPayung = contract.contract_type === 'Payung';
+  const isMiniAirport = contract.contract_type === 'PKS Payung Mini Airport' || 
+    Boolean(
+      contract.fasilitas && 
+      typeof contract.fasilitas === 'object' && 
+      ((contract.fasilitas as any).category === 'Mini Airport' || 
+       (contract.fasilitas as any).mini_airport_id || 
+       (contract.fasilitas as any).airport_code)
+    ) ||
+    Boolean(contract.contract_number && contract.contract_number.startsWith('PKS-PAYUNG/'));
+
+  const isHanggar = !isMiniAirport && (
+    contract.contract_type === 'Payung' || 
+    contract.contract_type === 'PKS Payung Mozes Kilangin' || 
+    (contract.assets?.jenis_aset || '').toLowerCase().includes('hanggar')
+  );
+
+  const miniFasilitas = (contract.fasilitas as any) || {};
+  const miniAirportName = miniFasilitas.airport_name || 'Mini Airport Perintis';
+  const miniAirportCode = miniFasilitas.airport_code || '';
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-[calc(100vh-60px)]">
@@ -129,7 +147,13 @@ export default function EksekutifKontrakDetailPage() {
             Pengesahan Kontrak <small className="text-[14px] font-mono text-[#777] font-light">#{contract.contract_number}</small>
           </h1>
           <p className="text-[12px] text-[#777] mt-0.5">
-            Dokumen Perjanjian Kerja Sama (PKS) {isPayung ? 'Kontrak Payung Hanggar' : 'Sewa Ruangan'}
+            Dokumen Perjanjian Kerja Sama (PKS) {
+              isMiniAirport 
+                ? `Kontrak Payung Pelayanan Bandara ${miniAirportName} (${miniAirportCode})` 
+                : isHanggar 
+                ? 'Kontrak Payung Hanggar Mozes Kilangin' 
+                : 'Sewa Ruangan'
+            }
           </p>
         </div>
         <StatusBadge status={contract.status || 'Draft'} />
@@ -231,17 +255,33 @@ export default function EksekutifKontrakDetailPage() {
           {/* Card Objek Sewa & Ketentuan */}
           <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm p-4">
             <h3 className="text-[14px] font-bold text-[#333] border-b border-slate-100 pb-2 mb-3 flex items-center gap-2">
-              {isPayung ? <Plane className="w-4 h-4 text-blue-600" /> : <Building2 className="w-4 h-4 text-purple-600" />}
+              {isMiniAirport ? (
+                <Plane className="w-4 h-4 text-sky-600" />
+              ) : isHanggar ? (
+                <Plane className="w-4 h-4 text-blue-600" />
+              ) : (
+                <Building2 className="w-4 h-4 text-purple-600" />
+              )}
               Objek Perjanjian
             </h3>
             <div className="space-y-2.5 text-xs">
               <div>
                 <span className="text-slate-400 block text-[11px]">Jenis Kontrak</span>
-                <span className="font-bold text-slate-800">{isPayung ? 'Kontrak Payung Induk (Hanggar)' : 'Sewa Ruangan'}</span>
+                <span className="font-bold text-slate-800">
+                  {isMiniAirport 
+                    ? 'PKS Payung Mini Airport (Perintis)' 
+                    : isHanggar 
+                    ? 'Kontrak Payung Induk (Hanggar)' 
+                    : 'Sewa Ruangan'}
+                </span>
               </div>
               <div>
                 <span className="text-slate-400 block text-[11px]">Nama Aset / Objek</span>
-                <span className="font-bold text-slate-800">{contract.assets?.nama_aset || contract.jenis_pemanfaatan || 'Seluruh Fasilitas Hanggar'}</span>
+                <span className="font-bold text-slate-800">
+                  {isMiniAirport 
+                    ? `Pelayanan Kebandarudaraan Bandara ${miniAirportName} (${miniAirportCode})`
+                    : contract.assets?.nama_aset || contract.jenis_pemanfaatan || 'Seluruh Fasilitas Hanggar'}
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
@@ -253,7 +293,15 @@ export default function EksekutifKontrakDetailPage() {
                   <span className="font-medium text-slate-800">{contract.end_date ? dayjs(contract.end_date).format('DD/MM/YYYY') : '-'}</span>
                 </div>
               </div>
-              {!isPayung && contract.total_amount && (
+              {isMiniAirport && (
+                <div>
+                  <span className="text-slate-400 block text-[11px]">Ketentuan Retribusi</span>
+                  <span className="font-medium text-slate-700 text-xs">
+                    SKRD Resmi Pasca-Flight (Lampiran Master Tax)
+                  </span>
+                </div>
+              )}
+              {!isMiniAirport && !isHanggar && contract.total_amount && (
                 <div>
                   <span className="text-slate-400 block text-[11px]">Total Nilai Retribusi</span>
                   <span className="font-bold font-mono text-emerald-700 text-sm">

@@ -13,6 +13,11 @@ interface RentalPlanCardProps {
 }
 
 export const RentalPlanCard: React.FC<RentalPlanCardProps> = ({ app, currentStep }) => {
+  const isMini = Boolean(
+    app.application_type?.toLowerCase().includes('mini') ||
+    (app.specific_needs && typeof app.specific_needs === 'object' && 'airport_name' in app.specific_needs)
+  );
+
   const isHangar = Boolean(
     app.application_type?.toLowerCase().includes('hanggar') ||
     app.assets?.kategori?.toLowerCase().includes('hanggar') ||
@@ -43,7 +48,7 @@ export const RentalPlanCard: React.FC<RentalPlanCardProps> = ({ app, currentStep
     <div className="bg-white rounded-none shadow-sm border border-slate-200 overflow-hidden">
       <div className="bg-[#3c8dbc] px-5 py-4 flex items-center gap-3">
         <FileText className="w-5 h-5 text-white" />
-        <h2 className="text-white font-semibold tracking-wide">Rencana Sewa & Spesifikasi</h2>
+        <h2 className="text-white font-semibold tracking-wide">Rencana Sewa &amp; Spesifikasi</h2>
       </div>
       
       <div className="p-6">
@@ -70,7 +75,7 @@ export const RentalPlanCard: React.FC<RentalPlanCardProps> = ({ app, currentStep
         )}
 
         {/* Khusus untuk sewa selain Hanggar (seperti Ruangan), tampilkan dokumen PKS jika telah diunggah */}
-        {!isHangar && app.contracts?.signed_document_url && (
+        {!isHangar && !isMini && app.contracts?.signed_document_url && (
           <div className="mb-6 bg-emerald-50 border border-emerald-200 rounded-none p-4 flex justify-between items-center">
             <div>
               <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mb-1">Dokumen PKS (Telah Ditandatangani Tenant)</p>
@@ -115,18 +120,69 @@ export const RentalPlanCard: React.FC<RentalPlanCardProps> = ({ app, currentStep
                   </p>
                 </div>
                 <div className="w-36 bg-[#3c8dbc] text-white p-3 rounded-none shadow-sm flex flex-col items-center justify-center flex-shrink-0">
-                  <p className="text-[10px] text-white/80 uppercase tracking-wider mb-0.5">Durasi Sewa</p>
+                  <p className="text-[10px] text-white/80 uppercase tracking-wider mb-0.5">Durasi</p>
                   <p className="font-bold text-lg leading-tight">
                     {durasiMalam} Malam
                   </p>
-                  {!isHangar && (
+                  {!isHangar && !isMini && (
                     <span className="text-[11px] text-white/90 font-semibold mt-0.5">({durasiBulan} Bulan)</span>
                   )}
                 </div>
               </div>
             </div>
 
-            {isHangar ? (
+            {isMini ? (
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center">
+                    <Plane className="w-4 h-4 mr-1.5 text-[#3c8dbc]" /> Rincian Rencana Pendaratan &amp; Stand Apron Mini Airport
+                  </p>
+                  <div className="bg-slate-50 border border-slate-200 p-5 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                      <div className="bg-white p-3.5 border border-slate-200">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Mini Airport Tujuan</span>
+                        <div className="font-bold text-slate-900 text-sm">
+                          {(app.specific_needs as any)?.airport_name || 'Lapangan Terbang Perintis'}
+                        </div>
+                        <div className="text-[11px] text-[#3c8dbc] font-mono font-bold mt-0.5">
+                          Kode: {(app.specific_needs as any)?.airport_code || '-'} • {(app.specific_needs as any)?.airport_location || 'Papua Tengah'}
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-3.5 border border-slate-200">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Armada Pesawat</span>
+                        <div className="font-bold text-[#3c8dbc] text-sm font-mono">
+                          {(app.specific_needs as any)?.registration_number || '-'}
+                        </div>
+                        <div className="text-[11px] text-slate-600 mt-0.5">
+                          {(app.specific_needs as any)?.aircraft_type || 'Pesawat Perintis'} • Maks. {(app.specific_needs as any)?.aircraft_capacity || '-'} Pax
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-3.5 border border-slate-200">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Jadwal &amp; Stand Apron</span>
+                        <div className="font-bold text-slate-900 text-sm">
+                          {(app.specific_needs as any)?.landing_date ? dayjs((app.specific_needs as any).landing_date).format('DD MMMM YYYY') : '-'}
+                        </div>
+                        <div className="text-[11px] text-emerald-700 font-semibold mt-0.5">
+                          Pukul {(app.specific_needs as any)?.landing_time || '-'} WIT • Posisi: {(app.specific_needs as any)?.allocated_stand || 'Menunggu Penetapan Admin'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 bg-blue-50/60 border border-blue-100 flex items-center justify-between text-xs">
+                      <div>
+                        <span className="text-slate-500 font-medium">Manifes Penumpang: </span>
+                        <strong className="text-slate-800">{(app.specific_needs as any)?.passengers_count || '-'} Orang Penumpang</strong>
+                      </div>
+                      <div className="text-slate-500 font-medium">
+                        Keperluan: <strong className="text-slate-800">{(app.specific_needs as any)?.purpose || app.purpose || '-'}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : isHangar ? (
               <div className="grid grid-cols-1 gap-8">
                 <div>
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center">
@@ -148,7 +204,7 @@ export const RentalPlanCard: React.FC<RentalPlanCardProps> = ({ app, currentStep
                                     <div className="flex justify-between items-start mb-1">
                                       <span className="font-bold text-[#3c8dbc]">{ac.registration_number}</span>
                                       {ac.aircraft_types?.luas_efektif_m2 && (
-                                        <span className="text-[10px] text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-none border border-slate-200 font-semibold">
+                                        <span className="text-[10px] text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 font-semibold">
                                           {ac.aircraft_types.luas_efektif_m2} m²
                                         </span>
                                       )}

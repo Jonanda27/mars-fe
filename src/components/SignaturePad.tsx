@@ -63,7 +63,7 @@ export default function SignaturePad({ onSave, onCancel }: SignaturePadProps) {
         </button>
         <button 
           onClick={handleSave}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex-1"
+          className="px-4 py-2 text-sm font-medium text-white bg-[#3c8dbc] hover:bg-[#367fa9] rounded-lg transition-colors flex-1"
         >
           Simpan TTE
         </button>

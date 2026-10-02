@@ -23,7 +23,7 @@ export interface ActionQueue {
 }
 
 export interface ParkedAircraft {
-  id: number;
+  id: number | string;
   registration_number: string;
   aircraft_type: string;
   effective_area: number;

@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buku Panduan Alur Kerja & Hak Akses Peran Sistem MARS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #1641e5;
+      --primary-blue-deep: #0e2b9e;
+      --accent-cyan: #0284c7;
+      --navy-dark: #081745;
+      --navy-deep: #040e2d;
+      --slate-dark: #0f172a;
+      --slate-body: #334155;
+      --slate-muted: #64748b;
+      --border-color: #e2e8f0;
+      --bg-light: #f8fafc;
+      --success-green: #10b981;
+      --warning-amber: #f59e0b;
+      --danger-red: #ef4444;
+      --purple-accent: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 14mm 14mm 16mm 14mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--slate-body);
+      background-color: #f1f5f9;
+      line-height: 1.55;
+      font-size: 9.5pt;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .document-wrapper {
+      max-width: 210mm;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 0;
+    }
+
+    .page-sheet {
+      background: #ffffff;
+      padding: 16mm 18mm;
+      position: relative;
+      page-break-after: always;
+      min-height: 268mm;
+      box-sizing: border-box;
+    }
+
+    .page-sheet:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Top Running Header */
+    .running-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--border-color);
+      padding-bottom: 7px;
+      margin-bottom: 18px;
+      font-size: 7.5pt;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--slate-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .running-header .sys-name {
+      color: var(--primary-blue);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .running-footer {
+      position: absolute;
+      bottom: 10mm;
+      left: 18mm;
+      right: 18mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      padding-top: 6px;
+      font-size: 7.5pt;
+      color: var(--slate-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--navy-dark);
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    h1 { font-size: 20pt; letter-spacing: -0.5px; margin-bottom: 8px; }
+    h2 { font-size: 14pt; letter-spacing: -0.3px; margin-top: 14px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; color: var(--navy-deep); }
+    h3 { font-size: 11pt; margin-top: 12px; margin-bottom: 6px; color: var(--primary-blue-deep); }
+    h4 { font-size: 9.5pt; margin-top: 8px; margin-bottom: 4px; color: var(--slate-dark); }
+
+    p { margin-bottom: 8px; }
+
+    /* Highlights & Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .badge-primary { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .badge-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .badge-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+
+    /* Tables */
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 14px 0;
+      font-size: 8.5pt;
+    }
+
+    .styled-table th {
+      background: #0f172a;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      text-align: left;
+      padding: 7px 10px;
+      border: 1px solid #0f172a;
+      font-size: 8pt;
+      letter-spacing: 0.3px;
+    }
+
+    .styled-table td {
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      vertical-align: top;
+    }
+
+    .styled-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Cards */
+    .info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--primary-blue);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 10px 0;
+    }
+
+    .alert-card {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid var(--warning-amber);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 8.5pt;
+    }
+
+    .credential-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 12px 0 16px 0;
+    }
+
+    .cred-card {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+
+    .cred-card.featured {
+      border-color: var(--primary-blue);
+      background: linear-gradient(to bottom, #ffffff, #f0f4ff);
+    }
+
+    .cred-role-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11pt;
+      font-weight: 800;
+      color: var(--navy-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .cred-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 0;
+      font-size: 8.5pt;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .cred-row:last-child {
+      border-bottom: none;
+    }
+
+    .cred-label {
+      color: var(--slate-muted);
+      font-weight: 600;
+    }
+
+    .cred-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #0f172a;
+      background: #f1f5f9;
+      padding: 1px 6px;
+      border-radius: 3px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .cred-desc {
+      font-size: 8pt;
+      color: var(--slate-muted);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+
+    /* Step Timeline Flow */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0 16px 0;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 12px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--navy-dark);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 9pt;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .step-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 9.5pt;
+      color: var(--navy-deep);
+    }
+
+    .step-desc {
+      font-size: 8.5pt;
+      color: var(--slate-body);
+      line-height: 1.4;
+    }
+
+    /* Cover Page Styles */
+    .cover-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 260mm;
+      padding: 10mm 5mm;
+    }
+
+    .cover-top-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 3px solid var(--navy-dark);
+      padding-bottom: 14px;
+    }
+
+    .cover-logo-img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+    }
+
+    .cover-gov-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 13pt;
+      color: var(--navy-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+
+    .cover-gov-sub {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 9pt;
+      color: var(--slate-muted);
+      letter-spacing: 0.3px;
+    }
+
+    .cover-body {
+      margin: 40px 0;
+    }
+
+    .cover-badge-top {
+      display: inline-block;
+      background: linear-gradient(135deg, #1641e5, #0284c7);
+      color: #ffffff;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 8.5pt;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .cover-main-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28pt;
+      font-weight: 900;
+      color: var(--navy-deep);
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      margin-bottom: 14px;
+    }
+
+    .cover-main-title span {
+      background: linear-gradient(135deg, #1641e5, #0284c7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-subtitle {
+      font-size: 11pt;
+      color: var(--slate-body);
+      line-height: 1.6;
+      max-width: 170mm;
+      margin-bottom: 24px;
+      border-left: 3px solid var(--primary-blue);
+      padding-left: 14px;
+    }
+
+    .cover-features-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .cover-feat-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .cover-feat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 14pt;
+      color: var(--primary-blue);
+      margin-bottom: 2px;
+    }
+
+    .cover-feat-label {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 8.5pt;
+      color: var(--navy-dark);
+    }
+
+    .cover-feat-desc {
+      font-size: 7.5pt;
+      color: var(--slate-muted);
+      margin-top: 3px;
+    }
+
+    .cover-meta-card {
+      background: #0f172a;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8pt;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .cover-meta-col span.label {
+      color: #94a3b8;
+      display: block;
+      font-size: 7pt;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .cover-meta-col span.val {
+      color: #f8fafc;
+      font-weight: 700;
+    }
+
+    /* Print Break Utilities */
+    .page-break {
+      page-break-before: always;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+
+<div class="document-wrapper">
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN 1: COVER DOKUMEN RESMI                                        -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet">
+    <div class="cover-container">
+      
+      <!-- Top Government Header -->
+      <div class="cover-top-brand">
+        <img src="data:image/png;base64,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" class="cover-logo-img" alt="Logo Dishub Mimika">
+        <div>
+          <div class="cover-gov-title">Pemerintah Kabupaten Mimika &bull; Dinas Perhubungan</div>
+          <div class="cover-gov-sub">Unit Pelaksana Bandar Udara (UPBU) Mozes Kilangin, Timika, Papua Tengah</div>
+        </div>
+      </div>
+
+      <!-- Main Title Body -->
+      <div class="cover-body">
+        <div class="cover-badge-top">BUKU PANDUAN RESMI (SOP) &amp; USER GUIDE</div>
+        <h1 class="cover-main-title">
+          Panduan Lengkap Alur Kerja &amp; <span>Hak Akses Peran (Role)</span>
+        </h1>
+        <p class="cover-subtitle">
+          Dokumentasi komprehensif alur proses bisnis MARS (Mimika Airport Revenue System) dari pendaftaran akun (registrasi tenant), pengajuan sewa, verifikasi teknis, persetujuan kontrak PKS &amp; TTE Kepala Dinas, penagihan e-SKRD otomatis, operasional apron/hanggar, denda overstay, hingga rekonsiliasi Kasda Bank Papua.
+        </p>
+
+        <div class="cover-features-row">
+          <div class="cover-feat-box">
+            <div class="cover-feat-num">5 PILAR</div>
+            <div class="cover-feat-label">Hak Akses Terintegrasi</div>
+            <div class="cover-feat-desc">Role-based access control dari Petugas, Admin, Dinas, hingga Kadis.</div>
+          </div>
+          <div class="cover-feat-box">
+            <div class="cover-feat-num">12 TAHAP</div>
+            <div class="cover-feat-label">Siklus Hidup Aset</div>
+            <div class="cover-feat-desc">End-to-end tanpa celah birokrasi, transparan, dan realtime.</div>
+          </div>
+          <div class="cover-feat-box">
+            <div class="cover-feat-num">100% KASDA</div>
+            <div class="cover-feat-label">Non-Tunai &amp; Otomasi</div>
+            <div class="cover-feat-desc">Terhubung e-SKRD QRIS/VA Bank Papua dan audit BPK/BPKP.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Metadata Footer Box -->
+      <div class="cover-meta-card">
+        <div class="cover-meta-col">
+          <span class="label">Sistem Aplikasi</span>
+          <span class="val">MARS v2.4 (Enterprise Edition)</span>
+        </div>
+        <div class="cover-meta-col">
+          <span class="label">Dasar Hukum</span>
+          <span class="val">Perda No. 35/2023 &amp; UU 1/2009</span>
+        </div>
+        <div class="cover-meta-col">
+          <span class="label">Klasifikasi Dokumen</span>
+          <span class="val">Petunjuk Teknis / User Manual</span>
+        </div>
+        <div class="cover-meta-col">
+          <span class="label">Tanggal Terbit</span>
+          <span class="val">September 2026</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN 2: DAFTAR KREDENSIAL LOGIN SETIAP ROLE (KECUALI TENANT)       -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet">
+    <div class="running-header">
+      <span class="sys-name">MARS &bull; MIMIKA AIRPORT REVENUE SYSTEM</span>
+      <span>BAGIAN 1: KREDENSIAL LOGIN ROLE</span>
+    </div>
+
+    <h2>1. Daftar Kredensial &amp; Hak Akses Role (Kecuali Tenant)</h2>
+    <p>
+      Berikut adalah daftar akun kredensial bawaan (*seeded credentials*) yang telah disiapkan di database sistem MARS. Rekan Anda dapat langsung menggunakan username dan password di bawah ini untuk menguji setiap hak akses dan alur kerja sesuai dengan kewenangan masing-masing peran:
+    </p>
+
+    <!-- Credential Cards Grid -->
+    <div class="credential-grid">
+      
+      <!-- 1. Admin UPBU -->
+      <div class="cred-card featured">
+        <div class="cred-role-title">
+          <span>Admin UPBU / Sistem</span>
+          <span class="badge badge-primary">Admin Utama</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Username:</span>
+          <span class="cred-value">admin</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Password:</span>
+          <span class="cred-value">password123</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">URL Portal:</span>
+          <span class="cred-value">/admin</span>
+        </div>
+        <div class="cred-desc">
+          <strong>Wewenang:</strong> Manajemen master aset bandara (apron, hangar, counter), pembuatan draf kontrak PKS, verifikasi pembayaran, penagihan e-SKRD, rekonsiliasi bank, dan ekspor laporan realisasi PAD.
+        </div>
+      </div>
+
+      <!-- 2. Dinas Perhubungan -->
+      <div class="cred-card">
+        <div class="cred-role-title">
+          <span>Dinas Perhubungan</span>
+          <span class="badge badge-warning">Verifikator Teknis</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Username:</span>
+          <span class="cred-value">dinas</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Password:</span>
+          <span class="cred-value">password123</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">URL Portal:</span>
+          <span class="cred-value">/dinas</span>
+        </div>
+        <div class="cred-desc">
+          <strong>Wewenang:</strong> Verifikasi kelayakan dokumen legalitas permohonan sewa, validasi ketaatan tarif retribusi daerah (Perda 35/2023), rekomendasi teknis PKS, dan penerbitan Surat Peringatan (SP1, SP2, SP3).
+        </div>
+      </div>
+
+      <!-- 3. Kepala Dinas -->
+      <div class="cred-card featured">
+        <div class="cred-role-title">
+          <span>Kepala Dinas (Kadishub)</span>
+          <span class="badge badge-purple">Eksekutif / Approver</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Username:</span>
+          <span class="cred-value">kepaladinas</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Password:</span>
+          <span class="cred-value">password123</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">URL Portal:</span>
+          <span class="cred-value">/eksekutif</span>
+        </div>
+        <div class="cred-desc">
+          <strong>Wewenang:</strong> Pemantauan dashboard eksekutif capaian PAD riil, penetapan disposisi persetujuan permohonan sewa aset, dan otorisasi Tanda Tangan Elektronik (TTE) pada naskah Kontrak PKS.
+        </div>
+      </div>
+
+      <!-- 4. Petugas Lapangan -->
+      <div class="cred-card">
+        <div class="cred-role-title">
+          <span>Petugas Lapangan</span>
+          <span class="badge badge-success">Ground Operations</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Username:</span>
+          <span class="cred-value">petugas</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Password:</span>
+          <span class="cred-value">password123</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">URL Portal:</span>
+          <span class="cred-value">/petugas</span>
+        </div>
+        <div class="cred-desc">
+          <strong>Wewenang:</strong> Operasional apron/hanggar: pencatatan waktu actual Block-In (kedatangan pesawat) beserta foto bukti, Block-Out (keberangkatan), deteksi overstay menit presisi, dan laporan roster tutup hari.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Additional Super Admin Info -->
+    <div class="info-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:800; font-size:9.5pt; color:var(--navy-dark);">Akun Pengelola Tingkat Sistem (Super Admin):</span>
+        <span class="badge badge-primary">Superadmin System</span>
+      </div>
+      <p style="margin-top:4px; font-size:8.5pt;">
+        Username: <code class="cred-value">super_admin</code> &bull; Password: <code class="cred-value">password123</code> &bull; Digunakan untuk konfigurasi global, manajemen database multi-bandara, master akun pengguna, dan audit trail log menyeluruh.
+      </p>
+    </div>
+
+    <!-- Summary Table of Credentials -->
+    <h3>Tabel Ringkasan Akses Kredensial Cepat</h3>
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Role / Jabatan</th>
+          <th>Username</th>
+          <th>Password Default</th>
+          <th>Rute Halaman Utama</th>
+          <th>Fungsi Utama Dalam Alur</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Super Admin</strong></td>
+          <td><code>super_admin</code></td>
+          <td><code>password123</code></td>
+          <td><code>/admin</code></td>
+          <td>Konfigurasi global sistem &amp; master database</td>
+        </tr>
+        <tr>
+          <td><strong>Admin UPBU</strong></td>
+          <td><code>admin</code></td>
+          <td><code>password123</code></td>
+          <td><code>/admin/dashboard</code></td>
+          <td>Pengelola aset, draf kontrak, penagihan, &amp; keuangan</td>
+        </tr>
+        <tr>
+          <td><strong>Verifikator Dinas</strong></td>
+          <td><code>dinas</code></td>
+          <td><code>password123</code></td>
+          <td><code>/dinas</code></td>
+          <td>Verifikasi kepatuhan hukum, berkas &amp; tarif Perda</td>
+        </tr>
+        <tr>
+          <td><strong>Kepala Dinas</strong></td>
+          <td><code>kepaladinas</code></td>
+          <td><code>password123</code></td>
+          <td><code>/eksekutif</code></td>
+          <td>Disposisi persetujuan sewa &amp; TTE Kontrak PKS sah</td>
+        </tr>
+        <tr>
+          <td><strong>Petugas Lapangan</strong></td>
+          <td><code>petugas</code></td>
+          <td><code>password123</code></td>
+          <td><code>/petugas</code></td>
+          <td>Check-in block-in, foto bukti fisik, &amp; deteksi overstay</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert-card">
+      <strong>Catatan Keamanan:</strong> Seluruh password akun bawaan demo di atas adalah <code>password123</code>. Pada implementasi server produksi Dishub Mimika, seluruh staf wajib memperbarui kata sandi dengan kombinasi alfanumerik yang kuat.
+    </div>
+
+    <div class="running-footer">
+      <span>MARS PANDUAN ALUR KERJA SISTEM</span>
+      <span>HALAMAN 2</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN 3: ALUR KERJA UTAMA END-TO-END (TAHAP 1 S/D 6)                 -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet">
+    <div class="running-header">
+      <span class="sys-name">MARS &bull; MIMIKA AIRPORT REVENUE SYSTEM</span>
+      <span>BAGIAN 2: ALUR KERJA END-TO-END (FASE 1 - PENGAJUAN & KONTRAK)</span>
+    </div>
+
+    <h2>2. Alur Kerja End-to-End: Dari Registrasi s/d Kontrak Sah</h2>
+    <p>
+      Sistem MARS menghubungkan seluruh siklus hidup penyewaan aset bandara dalam ekosistem digital tanpa kertas (*paperless*), menghilangkan perantara birokrasi berbelit, dan memastikan setiap langkah tercatat dengan jejak audit (*audit trail*) yang tidak dapat dimanipulasi.
+    </p>
+
+    <div class="step-list">
+      
+      <!-- Step 1 -->
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Registrasi Akun Tenant Mandiri</span>
+            <span class="badge badge-primary">Tenant Maskapai / MRO</span>
+          </div>
+          <div class="step-desc">
+            Calon penyewa (Maskapai, Operator Charter, MRO, Kargo, GSE) membuka portal di <code>/register</code>. Mengisi nama perusahaan, jenis tenant, Nomor Induk Berusaha (NIB), NPWP, alamat kantor, nama PIC, nomor WhatsApp, serta password. Akun tenant langsung aktif untuk login.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Pendaftaran Armada Pesawat (Aircraft Fleet)</span>
+            <span class="badge badge-primary">Tenant Maskapai</span>
+          </div>
+          <div class="step-desc">
+            Sebelum mengajukan sewa apron/hanggar, tenant masuk ke menu <code>/tenant/pesawat</code> untuk mendaftarkan armada pesawat: Nomor Registrasi (Tail Number e.g. PK-ABC), Tipe Pesawat (ATR-72, B737, Twin Otter, Cessna), MTOW (berat maksimal tinggal landas), kapasitas kursi, dan foto pesawat.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Pengajuan Permohonan Sewa Aset (Wizard 5 Langkah)</span>
+            <span class="badge badge-primary">Tenant Portal</span>
+          </div>
+          <div class="step-desc">
+            Tenant membuat permohonan baru di <code>/tenant/permohonan/create</code> melalui panduan 5 langkah terstruktur:
+            <ul style="margin: 4px 0 0 16px; font-size:8pt; line-height:1.35;">
+              <li><strong>Step 1:</strong> Data Identitas Pemohon &amp; Profil Perusahaan.</li>
+              <li><strong>Step 2:</strong> Pemilihan Objek Aset Bandara (Apron Stand 1-12, Hangar MRO, Check-in Counter, Kargo, GSE).</li>
+              <li><strong>Step 3:</strong> Durasi Sewa, Tanggal Mulai-Selesai, serta Jadwal Penerbangan (Flight Schedule).</li>
+              <li><strong>Step 4:</strong> Unggah Dokumen Legalitas (Surat Permohonan Resmi bertandatangan, NIB, SIUAU/AOC).</li>
+              <li><strong>Step 5:</strong> Persetujuan Aturan Penagihan (Billing Rules: Grace period 30 menit, tarif dasar Perda, formula denda overstay).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Verifikasi Teknis &amp; Kelayakan Berkas</span>
+            <span class="badge badge-warning">Dinas Perhubungan</span>
+          </div>
+          <div class="step-desc">
+            Petugas Dinas masuk ke <code>/dinas/verifikasi</code>. Memeriksa validitas kelengkapan dokumen pendukung, kesesuaian izin terbang, kapasitas daya tampung apron/hanggar, dan formula tarif sesuai Perda No. 35/2023. Jika sesuai, Dinas memberikan status <strong>Verified</strong> dan menerbitkan Rekomendasi Teknis.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Disposisi &amp; Persetujuan Eksekutif</span>
+            <span class="badge badge-purple">Kepala Dinas (Kadishub)</span>
+          </div>
+          <div class="step-desc">
+            Kepala Dinas meninjau antrean permohonan di <code>/eksekutif/permohonan</code>. Kadishub melihat ringkasan pemohon, rekomendasi teknis Dinas, nilai potensi PAD, dan memberikan catatan disposisi persetujuan (Approval) secara digital.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Penyusunan Kontrak PKS &amp; Tanda Tangan Elektronik (TTE)</span>
+            <span class="badge badge-primary">Admin &amp; Kadis</span>
+          </div>
+          <div class="step-desc">
+            Admin UPBU di <code>/admin/kontrak</code> menerbitkan draf resmi Kontrak Perjanjian Kerja Sama (PKS Payung / Sewa Rutin). Draf dikirim ke Tenant untuk ditandatangani secara digital, kemudian Kepala Dinas memberikan pengesahan akhir melalui Tanda Tangan Elektronik (TTE) sah berlandaskan hukum.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="running-footer">
+      <span>MARS PANDUAN ALUR KERJA SISTEM</span>
+      <span>HALAMAN 3</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN 4: ALUR KERJA UTAMA END-TO-END (TAHAP 7 S/D 12)                -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet">
+    <div class="running-header">
+      <span class="sys-name">MARS &bull; MIMIKA AIRPORT REVENUE SYSTEM</span>
+      <span>BAGIAN 2: ALUR KERJA END-TO-END (FASE 2 - BILLING & OPERASIONAL)</span>
+    </div>
+
+    <h2>2. Alur Kerja End-to-End: Billing, Operasional &amp; Rekonsiliasi</h2>
+    <p>
+      Setelah kontrak PKS berstatus sah dan aktif, sistem secara otomatis mengelola penagihan, pengawasan operasional fisik di apron bandara, denda keterlambatan (*overstay*), hingga pelaporan PAD terpadu.
+    </p>
+
+    <div class="step-list">
+      
+      <!-- Step 7 -->
+      <div class="step-item">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Penerbitan e-SKRD Otomatis</span>
+            <span class="badge badge-primary">Sistem MARS &amp; Admin</span>
+          </div>
+          <div class="step-desc">
+            Berdasarkan klausul kontrak PKS atau pemakaian aset, sistem MARS menerbitkan dokumen Surat Ketetapan Retribusi Daerah elektronik (e-SKRD) ber-barcode resmi lengkap dengan Nomor Ketetapan, rincian biaya pokok, deposit jaminan, dan batas jatuh tempo (*due date*).
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="step-item">
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Pembayaran Non-Tunai Kasda Bank Papua</span>
+            <span class="badge badge-success">Tenant &amp; Bendahara</span>
+          </div>
+          <div class="step-desc">
+            Tenant melihat tagihan di <code>/tenant/pembayaran</code> dan melakukan transfer pembayaran non-tunai melalui QRIS Dinamis atau Virtual Account Bank Papua Kas Daerah Mimika. Dana masuk langsung 100% ke Kasda Mimika tanpa penampungan pihak ketiga (*Zero Leak*). Admin memverifikasi bukti bayar dan e-SSRD diterbitkan.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 9 -->
+      <div class="step-item">
+        <div class="step-num">9</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Operasional Ground Apron &amp; Check-In Pesawat</span>
+            <span class="badge badge-success">Petugas Lapangan</span>
+          </div>
+          <div class="step-desc">
+            Saat pesawat mendarat di bandara Mozes Kilangin, Petugas Lapangan membuka <code>/petugas</code> via tablet/smartphone:
+            <ul style="margin: 4px 0 0 16px; font-size:8pt; line-height:1.35;">
+              <li><strong>Check-In (Block-In):</strong> Memilih jadwal penerbangan / armada pesawat, mencatat jam tepat roda berhenti (*block-in*), lokasi stand parkir (Apron/Hanggar), dan mengunggah foto visual pesawat di lokasi.</li>
+              <li><strong>Check-Out (Block-Out):</strong> Saat pesawat siap berangkat, petugas mencatat jam roda bergerak keluar (*block-out*). Sistem menghitung durasi aktual parkir secara otomatis.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 10 -->
+      <div class="step-item">
+        <div class="step-num">10</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Deteksi Overstay &amp; e-SKRD Denda Otomatis</span>
+            <span class="badge badge-danger">Engine Otomatis MARS</span>
+          </div>
+          <div class="step-desc">
+            Sistem MARS membandingkan durasi parkir aktual dengan hak sewa kontrak. Berlaku masa toleransi (*grace period*) 30 menit. Jika pesawat melebihi batas waktu toleransi, engine sistem secara instan menerbitkan <strong>e-SKRD Denda Overstay</strong> yang langsung ditagihkan ke portal tenant secara transparan.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 11 -->
+      <div class="step-item">
+        <div class="step-num">11</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Pengendalian Piutang &amp; Surat Peringatan (SP)</span>
+            <span class="badge badge-warning">Dinas &amp; Admin</span>
+          </div>
+          <div class="step-desc">
+            Jika tenant belum melunasi tagihan hingga jatuh tempo, modul piutang di <code>/admin/piutang</code> dan <code>/dinas/peringatan</code> secara berjenjang menerbitkan Surat Peringatan:
+            <strong>SP 1</strong> (Lewat 7 hari), <strong>SP 2</strong> (Lewat 14 hari), hingga <strong>SP 3</strong> (Lewat 21 hari dengan sanksi pembekuan izin operasional slot parkir/hanggar).
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 12 -->
+      <div class="step-item">
+        <div class="step-num">12</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Rekonsiliasi Kasda &amp; Audit Trail Pelaporan PAD</span>
+            <span class="badge badge-primary">Admin &amp; Eksekutif</span>
+          </div>
+          <div class="step-desc">
+            Setiap akhir hari/bulan, Admin melakukan rekonsiliasi mutasi rekening Kasda Bank Papua vs total e-SKRD terbayar di <code>/admin/rekonsiliasi</code>. Data disajikan dalam Dashboard Eksekutif Kadishub dan siap diekspor untuk audit berkala BPK RI dan BPKP.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="running-footer">
+      <span>MARS PANDUAN ALUR KERJA SISTEM</span>
+      <span>HALAMAN 4</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN 5: PANDUAN KERJA PER ROLE (ADMIN, DINAS, KADIS)                -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet">
+    <div class="running-header">
+      <span class="sys-name">MARS &bull; MIMIKA AIRPORT REVENUE SYSTEM</span>
+      <span>BAGIAN 3: PANDUAN DETAIL TUGAS SETIAP ROLE (1)</span>
+    </div>
+
+    <h2>3. Panduan Tugas &amp; Penggunaan Setiap Role</h2>
+
+    <!-- ROLE 1: ADMIN -->
+    <div class="info-card" style="border-left-color: var(--primary-blue);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:11pt; color:var(--primary-blue);">Role 1: Admin UPBU / Pengelola Sistem (Username: admin)</h3>
+        <span class="badge badge-primary">Admin Central Hub</span>
+      </div>
+      <p style="margin-top:6px; font-size:8.5pt;">
+        <strong>Peran Utama:</strong> Sebagai pengendali utama data master operasional dan administrasi kontrak pada unit pengelola bandara Mozes Kilangin.
+      </p>
+      <table class="styled-table" style="margin-top:6px;">
+        <thead>
+          <tr>
+            <th style="width:25%;">Menu Aplikasi</th>
+            <th style="width:40%;">Tindakan / Tugas Spesifik</th>
+            <th style="width:35%;">Hasil / Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/admin/dashboard</code></td>
+            <td>Memantau statistik aset terisi, permohonan pending, dan ringkasan tagihan.</td>
+            <td>Gambaran umum status bandara</td>
+          </tr>
+          <tr>
+            <td><code>/admin/aset</code></td>
+            <td>Mendaftarkan stand apron 1-12, hangar, ruangan, counter, dan tarif dasar.</td>
+            <td>Katalog aset bandara siap sewa</td>
+          </tr>
+          <tr>
+            <td><code>/admin/permohonan</code></td>
+            <td>Meninjau berkas sewa masuk dari tenant sebelum diproses ke draf kontrak.</td>
+            <td>Status permohonan diperbarui</td>
+          </tr>
+          <tr>
+            <td><code>/admin/kontrak</code></td>
+            <td>Membuat nomor registrasi kontrak PKS resmi, klausul pasal, dan nilai sewa.</td>
+            <td>Draf PKS berformat legal sah</td>
+          </tr>
+          <tr>
+            <td><code>/admin/tagihan</code></td>
+            <td>Menerbitkan e-SKRD sewa, deposit, serta monitoring pembayaran tenant.</td>
+            <td>Surat Ketetapan Retribusi Daerah</td>
+          </tr>
+          <tr>
+            <td><code>/admin/rekonsiliasi</code></td>
+            <td>Pencocokan mutasi kas masuk Bank Papua dengan transaksi e-SKRD.</td>
+            <td>Berita Acara Rekonsiliasi Kasda</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ROLE 2: DINAS -->
+    <div class="info-card" style="border-left-color: var(--warning-amber);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:11pt; color:#b45309;">Role 2: Verifikator Dinas Perhubungan (Username: dinas)</h3>
+        <span class="badge badge-warning">Technical & Legal Verifier</span>
+      </div>
+      <p style="margin-top:6px; font-size:8.5pt;">
+        <strong>Peran Utama:</strong> Melakukan audit kepatuhan hukum, ketaatan tarif retribusi daerah (Perda 35/2023), serta validasi kelayakan teknis permohonan.
+      </p>
+      <table class="styled-table" style="margin-top:6px;">
+        <thead>
+          <tr>
+            <th style="width:25%;">Menu Aplikasi</th>
+            <th style="width:40%;">Tindakan / Tugas Spesifik</th>
+            <th style="width:35%;">Hasil / Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/dinas</code></td>
+            <td>Melihat Action Queue Hub antrean verifikasi mendesak dan tagihan jatuh tempo.</td>
+            <td>Prioritas kerja harian tim dinas</td>
+          </tr>
+          <tr>
+            <td><code>/dinas/verifikasi</code></td>
+            <td>Memeriksa kelengkapan berkas legalitas: NIB, NPWP, SIUAU/AOC, dan surat resmi.</td>
+            <td>Rekomendasi teknis: Layak / Tolak</td>
+          </tr>
+          <tr>
+            <td><code>/dinas/peringatan</code></td>
+            <td>Memvalidasi daftar tenant menunggak dan mengotorisasi penerbitan SP 1, SP 2, SP 3.</td>
+            <td>Surat Teguran Resmi berkop Dishub</td>
+          </tr>
+          <tr>
+            <td><code>/dinas/laporan</code></td>
+            <td>Menganalisis laporan kepatuhan pendapatan retribusi per objek dan per maskapai.</td>
+            <td>Laporan Evaluasi PAD Triwulanan</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ROLE 3: KEPALA DINAS -->
+    <div class="info-card" style="border-left-color: var(--purple-accent);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:11pt; color:#6b21a8;">Role 3: Kepala Dinas / Eksekutif (Username: kepaladinas)</h3>
+        <span class="badge badge-purple">Executive Approver & Signer</span>
+      </div>
+      <p style="margin-top:6px; font-size:8.5pt;">
+        <strong>Peran Utama:</strong> Pengambil keputusan tertinggi, pemberi izin pemanfaatan kekayaan daerah, serta penandatangan resmi Kontrak PKS dengan TTE.
+      </p>
+      <table class="styled-table" style="margin-top:6px;">
+        <thead>
+          <tr>
+            <th style="width:25%;">Menu Aplikasi</th>
+            <th style="width:40%;">Tindakan / Tugas Spesifik</th>
+            <th style="width:35%;">Hasil / Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/eksekutif</code></td>
+            <td>Dashboard eksekutif: Realisasi PAD aktual vs target APBD, tingkat okupansi apron.</td>
+            <td>Executive insight berbasis data riil</td>
+          </tr>
+          <tr>
+            <td><code>/eksekutif/permohonan</code></td>
+            <td>Meninjau dan memberikan disposisi persetujuan akhir permohonan sewa aset.</td>
+            <td>Disposisi persetujuan izin sewa</td>
+          </tr>
+          <tr>
+            <td><code>/eksekutif/kontrak</code></td>
+            <td>Membubuhkan Tanda Tangan Elektronik (TTE) sah pada naskah Kontrak PKS.</td>
+            <td>Kontrak PKS Sah berkekuatan hukum</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="running-footer">
+      <span>MARS PANDUAN ALUR KERJA SISTEM</span>
+      <span>HALAMAN 5</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- HALAMAN 6: PANDUAN PETUGAS LAPANGAN & WALKTHROUGH SIMULASI            -->
+  <!-- ===================================================================== -->
+  <div class="page-sheet">
+    <div class="running-header">
+      <span class="sys-name">MARS &bull; MIMIKA AIRPORT REVENUE SYSTEM</span>
+      <span>BAGIAN 3: PANDUAN ROLE PETUGAS & SKENARIO SIMULASI</span>
+    </div>
+
+    <!-- ROLE 4: PETUGAS LAPANGAN -->
+    <div class="info-card" style="border-left-color: var(--success-green);">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:11pt; color:#15803d;">Role 4: Petugas Lapangan / Ground Operations (Username: petugas)</h3>
+        <span class="badge badge-success">Ground Apron Controller</span>
+      </div>
+      <p style="margin-top:6px; font-size:8.5pt;">
+        <strong>Peran Utama:</strong> Garda terdepan di apron dan hanggar bandara Mozes Kilangin yang bertugas memvalidasi kedatangan fisik pesawat dan mencatat waktu aktual operasional.
+      </p>
+      <table class="styled-table" style="margin-top:6px;">
+        <thead>
+          <tr>
+            <th style="width:25%;">Fitur / Tombol</th>
+            <th style="width:40%;">Langkah Prosedur Operasional</th>
+            <th style="width:35%;">Dampak ke Sistem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Check-In Jadwal</strong></td>
+            <td>Klik "Check-In" pada daftar penerbangan terjadwal hari ini saat pesawat mendarat.</td>
+            <td>Waktu Block-In tercatat otomatis</td>
+          </tr>
+          <tr>
+            <td><strong>Upload Foto Bukti</strong></td>
+            <td>Mengambil foto kamera langsung pesawat yang sedang parkir di stand apron/hanggar.</td>
+            <td>Bukti otentik anti-sengketa tagihan</td>
+          </tr>
+          <tr>
+            <td><strong>Check-Out Armada</strong></td>
+            <td>Klik "Check-Out" saat pesawat meninggalkan stand apron (Block-Out).</td>
+            <td>Menghitung total durasi &amp; overstay</td>
+          </tr>
+          <tr>
+            <td><strong>Roster Tutup Hari</strong></td>
+            <td>Mengunci data pesawat yang menginap (*overnight*) pada pukul 18:00 WIT.</td>
+            <td>Dasar penerbitan e-SKRD inap</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>4. Skenario Uji Coba Cepat (Walkthrough untuk Rekan Anda)</h2>
+    <p>
+      Berikan skenario berikut kepada rekan Anda agar dapat langsung mempraktikkan alur kerja lengkap dari hulu ke hilir hanya dalam waktu 10 menit:
+    </p>
+
+    <div class="step-list">
+      
+      <div class="step-item">
+        <div class="step-num">A</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Login Petugas: Uji Operasional Apron</span>
+            <span class="badge badge-success">petugas / password123</span>
+          </div>
+          <div class="step-desc">
+            Buka <code>/login</code> &rarr; Masuk sebagai <code>petugas</code> &rarr; Masuk ke <code>/petugas</code> &rarr; Lihat tabel kedatangan pesawat hari ini &rarr; Klik tombol <strong>Check-In</strong> pada salah satu pesawat atau buat Check-In Manual &rarr; Amati status pesawat berubah menjadi aktif di apron.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">B</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Login Dinas: Uji Verifikasi Berkas</span>
+            <span class="badge badge-warning">dinas / password123</span>
+          </div>
+          <div class="step-desc">
+            Buka <code>/login</code> &rarr; Masuk sebagai <code>dinas</code> &rarr; Buka menu <code>/dinas/verifikasi</code> &rarr; Pilih salah satu permohonan sewa &rarr; Periksa dokumen legalitas &rarr; Klik <strong>Verifikasi &amp; Rekomendasikan</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">C</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Login Kepala Dinas: Uji Disposisi &amp; TTE Kontrak</span>
+            <span class="badge badge-purple">kepaladinas / password123</span>
+          </div>
+          <div class="step-desc">
+            Buka <code>/login</code> &rarr; Masuk sebagai <code>kepaladinas</code> &rarr; Buka <code>/eksekutif</code> untuk melihat data PAD &rarr; Masuk ke <code>/eksekutif/permohonan</code> untuk memberi Disposisi Setuju &rarr; Masuk ke <code>/eksekutif/kontrak</code> untuk membubuhkan TTE pengesahan PKS.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">D</div>
+        <div class="step-content">
+          <div class="step-header">
+            <span class="step-title">Login Admin: Uji Penerbitan e-SKRD &amp; Kasda</span>
+            <span class="badge badge-primary">admin / password123</span>
+          </div>
+          <div class="step-desc">
+            Buka <code>/login</code> &rarr; Masuk sebagai <code>admin</code> &rarr; Masuk ke <code>/admin/tagihan</code> &rarr; Lihat invoice e-SKRD otomatis yang terbit dengan kode bayar QRIS / VA Bank Papua &rarr; Buka <code>/admin/rekonsiliasi</code> untuk simulasi rekonsiliasi kas masuk daerah.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-card" style="background:#f0fdf4; border-color:#bbf7d0; border-left-color:var(--success-green); margin-top:12px;">
+      <strong style="color:#166534;">Hasil Pengujian:</strong> Dengan mencoba urutan di atas, rekan Anda akan langsung memahami bagaimana seluruh divisi bekerja sama tanpa sekat birokrasi, tanpa dokumen kertas yang tercecer, dan dengan akuntabilitas 100% transparan.
+    </div>
+
+    <div class="running-footer">
+      <span>MARS PANDUAN ALUR KERJA SISTEM</span>
+      <span>HALAMAN 6</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

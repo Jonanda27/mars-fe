@@ -71,15 +71,43 @@ export const TutupHariForm: React.FC<TutupHariFormProps> = ({ onSuccess }) => {
       const data: DraftRosterResponse = await overnightReportService.getTodayDraftRoster(date);
       setIsAlreadySubmitted(data.is_already_submitted);
       
-      const initialItems: OvernightItem[] = (data.candidate_roster || []).map((item) => ({
-        ...item,
-        photo_file: null,
-        photo_preview: item.initial_evidence_photo || null,
-        is_staying: true,
-        notes: ''
-      }));
+      if (data.is_already_submitted && data.existing_report) {
+        // Jika laporan tanggal ini sudah pernah disubmit, tampilkan data yang tersimpan di database
+        const submittedItems: OvernightItem[] = (data.existing_report.items || []).map((item: any) => ({
+          operational_log_id: item.operational_log_id,
+          registration_number: item.registration_number,
+          tenant_id: item.tenant_id,
+          tenant_name: item.tenant?.nama_perusahaan || item.tenant_name || '-',
+          asset_id: item.asset_id,
+          asset_name: item.asset?.nama_aset || item.asset_name || '-',
+          parking_location: item.parking_location,
+          aircraft_type: item.aircraft_type,
+          is_adhoc: item.is_adhoc,
+          is_staying: true,
+          photo_file: null,
+          photo_preview: item.evidence_photo || null,
+          evidence_photo: item.evidence_photo,
+          notes: item.notes || ''
+        }));
+        setRosterItems(submittedItems);
+        setGeneralNotes(data.existing_report.general_notes || '');
+        setGeneralPhotoPreview(data.existing_report.general_evidence_photo || null);
+      } else {
+        // Untuk draft tutup hari baru: foto fisik setiap hari wajib baru (jangan lampirkan foto kemarin/sebelumnya)
+        const initialItems: OvernightItem[] = (data.candidate_roster || []).map((item) => ({
+          ...item,
+          photo_file: null,
+          photo_preview: null,
+          evidence_photo: null,
+          is_staying: true,
+          notes: ''
+        }));
 
-      setRosterItems(initialItems);
+        setRosterItems(initialItems);
+        setGeneralNotes('');
+        setGeneralPhoto(null);
+        setGeneralPhotoPreview(null);
+      }
     } catch (err) {
       console.error(err);
       toast.error('Gagal memuat kandidat armada untuk tutup hari');

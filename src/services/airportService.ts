@@ -6,6 +6,11 @@ export const airportService = {
     const response = await api.get('/airports');
     return response.data;
   },
+
+  getMiniAirports: async () => {
+    const response = await api.get('/airports/mini');
+    return response.data?.data || [];
+  },
   
   getById: async (id: number) => {
     const response = await api.get(`/airports/${id}`);

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, Clock, XCircle, AlertCircle, FileCheck, Upload } from 'lucide-react';
+import StatusBadge from '@/components/StatusBadge';
 
 interface LegalDocumentsCardProps {
   tenantData: any;
@@ -53,15 +54,7 @@ const DocumentRow: React.FC<DocumentRowProps> = ({
         </div>
       </div>
       <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-        {isUploaded ? (
-          <span className="bg-[#3c8dbc]/10 text-[#3c8dbc] border border-[#3c8dbc]/20 font-bold text-[10px] px-2 py-1 uppercase tracking-wider">
-            Tersedia
-          </span>
-        ) : (
-          <span className="bg-[#f39c12]/10 text-[#f39c12] border border-[#f39c12]/20 font-bold text-[10px] px-2 py-1 uppercase tracking-wider">
-            Kosong
-          </span>
-        )}
+        <StatusBadge status={isUploaded ? 'Tersedia' : 'Kosong'} />
         <label className="bg-white border border-[#d2d6de] text-[#444] px-3 py-1.5 text-[12px] hover:bg-[#f4f4f4] flex items-center shadow-sm cursor-pointer">
           {isUploading ? (
             'Mengunggah...'

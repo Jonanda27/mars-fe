@@ -5,12 +5,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import toast from 'react-hot-toast';
 import Sidebar from './Sidebar';
+import SuperAdminSidebar from './SuperAdminSidebar';
 import DinasSidebar from './DinasSidebar';
 import TenantSidebar from './TenantSidebar';
 import PetugasSidebar from './PetugasSidebar';
 import EksekutifSidebar from './EksekutifSidebar';
 import TopNavbar from './TopNavbar';
-import { checkRouteAccess, isPublicRoute, isTenantRole, isPetugasRole, isEksekutifRole } from '@/utils/routeGuard';
+import { checkRouteAccess, isPublicRoute, isTenantRole, isPetugasRole, isEksekutifRole, isSuperAdminRole } from '@/utils/routeGuard';
 
 const emptySubscribe = () => () => {};
 
@@ -61,13 +62,17 @@ export default function LayoutWrapper({ children }: Readonly<{ children: React.R
   }
 
   const userRole = (user?.role || '').toLowerCase();
+  const isSuperAdmin = isSuperAdminRole(userRole) || (pathname.startsWith('/superadmin') && !isTenantRole(userRole));
   const isDinas = userRole === 'dinas';
-  const isAdmin = userRole === 'admin' || userRole === 'superadmin' || userRole === 'super admin';
-  const isEksekutif = isEksekutifRole(userRole) || (pathname.startsWith('/eksekutif') && !isAdmin && !isDinas);
-  const isPetugas = isPetugasRole(userRole) || (pathname.startsWith('/petugas') && !isAdmin && !isDinas);
-  const isTenant = isTenantRole(userRole) || (pathname.startsWith('/tenant') && !isAdmin && !isDinas);
+  const isAdmin = userRole === 'admin' || userRole === 'admin_mini_airport';
+  const isEksekutif = isEksekutifRole(userRole) || (pathname.startsWith('/eksekutif') && !isAdmin && !isDinas && !isSuperAdmin);
+  const isPetugas = isPetugasRole(userRole) || (pathname.startsWith('/petugas') && !isAdmin && !isDinas && !isSuperAdmin);
+  const isTenant = isTenantRole(userRole) || (pathname.startsWith('/tenant') && !isAdmin && !isDinas && !isSuperAdmin);
 
   const renderSidebar = () => {
+    if (isSuperAdmin) {
+      return <SuperAdminSidebar isOpen={isSidebarOpen} />;
+    }
     if (isDinas) {
       return <DinasSidebar isOpen={isSidebarOpen} />;
     }

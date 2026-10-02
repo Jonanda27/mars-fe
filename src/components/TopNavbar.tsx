@@ -37,7 +37,7 @@ function NotificationList({ notifications, onNotifClick }: NotificationListProps
           <div className="flex justify-between items-start mb-1">
             <div className="flex items-center gap-1.5 min-w-0 pr-2">
               {notif.is_task && (
-                <span className="text-[9px] px-1.5 py-0.5 bg-blue-100 text-[#3c8dbc] border border-blue-200 font-bold rounded-none flex-shrink-0">
+                <span className="text-[9px] px-1.5 py-0.5 bg-blue-100 text-[#3c8dbc] border border-blue-200 font-bold rounded flex-shrink-0">
                   Tindakan
                 </span>
               )}
@@ -231,7 +231,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
               </button>
               <button 
                 onClick={handleLogout}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-none transition-colors shadow-sm text-sm"
+                className="flex-1 bg-[#dd4b39] hover:bg-[#c93b2a] text-white font-bold py-2 px-4 rounded-none transition-colors shadow-sm text-sm"
               >
                 Ya, Keluar
               </button>

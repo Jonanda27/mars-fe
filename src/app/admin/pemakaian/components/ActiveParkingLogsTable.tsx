@@ -3,6 +3,7 @@ import {
   MapPin, User, Loader2, AlertCircle, Clock 
 } from 'lucide-react';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 interface ActiveParkingLogsTableProps {
   readonly isLoading: boolean;
@@ -77,10 +78,7 @@ export const ActiveParkingLogsTable: React.FC<ActiveParkingLogsTableProps> = ({
                 )}
               </td>
               <td className="px-4 py-3.5 text-center">
-                <span className="bg-blue-100 text-blue-800 px-2 py-0.5 text-[10px] font-bold border border-blue-200 inline-flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  Sedang Parkir
-                </span>
+                <StatusBadge status="Sedang Parkir" />
               </td>
             </tr>
           ))

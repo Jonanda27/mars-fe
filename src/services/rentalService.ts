@@ -32,8 +32,8 @@ export const rentalService = {
     return response.data.data;
   },
 
-  updateApplicationStatus: async (id: number, status: string, asset_id?: number): Promise<RentalApplication> => {
-    const response = await api.put(`/rentals/${id}/status`, { status, asset_id });
+  updateApplicationStatus: async (id: number, status: string, asset_id?: number, allocated_stand?: string): Promise<RentalApplication> => {
+    const response = await api.put(`/rentals/${id}/status`, { status, asset_id, allocated_stand });
     return response.data.data;
   },
 
@@ -69,5 +69,44 @@ export const rentalService = {
   getApprovedRentals: async (): Promise<RentalApplication[]> => {
     const response = await api.get('/rentals/approved');
     return response.data.data;
+  },
+
+  requestExtension: async (id: number, data: { requested_end_date: string; reason: string }): Promise<RentalApplication> => {
+    const response = await api.post(`/rentals/${id}/request-extension`, data);
+    return response.data.data;
+  },
+
+  getPendingExtensions: async (): Promise<RentalApplication[]> => {
+    const response = await api.get('/rentals/extensions/pending');
+    return response.data.data;
+  },
+
+  getAssetAvailability: async (params?: { startDate?: string; endDate?: string; excludeApplicationId?: number; category?: string }): Promise<any[]> => {
+    const response = await api.get('/rentals/assets-availability', { params });
+    return response.data.data;
+  },
+
+  reviewExtension: async (id: number, data: { action: 'APPROVE' | 'REJECT'; target_asset_id?: number; admin_notes?: string }): Promise<RentalApplication> => {
+    const response = await api.post(`/rentals/${id}/review-extension`, data);
+    return response.data.data;
+  },
+
+  getMiniAirportStandAvailability: async (airportId: number, date?: string, excludeId?: number): Promise<StandAvailability[]> => {
+    const response = await api.get('/rentals/mini-airport/stand-availability', {
+      params: { airport_id: airportId, date, exclude_id: excludeId }
+    });
+    return response.data.data;
   }
 };
+
+export interface StandAvailability {
+  stand: string;
+  name: string;
+  is_occupied: boolean;
+  occupied_by: string | null;
+  aircraft_type: string | null;
+  status: string;
+  source: string | null;
+  notes: string;
+}
+

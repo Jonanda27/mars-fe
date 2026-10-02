@@ -119,7 +119,7 @@ export default function AdminParkirPage() {
                   </td>
                   <td className="py-4 px-5 text-center">
                     <div className="font-bold text-[#555]">2 Jam 15 Menit</div>
-                    <span className="text-[10px] bg-[#00a65a] text-white px-2 py-0.5 rounded-full mt-1 inline-block">SELESAI (KELUAR)</span>
+                    <span className="text-[10px] bg-[#00a65a] text-white px-2 py-0.5 rounded font-bold mt-1 inline-block">SELESAI (KELUAR)</span>
                   </td>
                   <td className="py-4 px-5 text-right font-mono font-bold text-[#333]">Rp 10.000</td>
                   <td className="py-4 px-5 text-center">
@@ -140,7 +140,7 @@ export default function AdminParkirPage() {
                   </td>
                   <td className="py-4 px-5 text-center">
                     <div className="font-bold text-[#f39c12]">-</div>
-                    <span className="text-[10px] bg-[#f39c12] text-white px-2 py-0.5 rounded-full mt-1 inline-block animate-pulse">SEDANG PARKIR</span>
+                    <span className="text-[10px] bg-[#f39c12] text-white px-2 py-0.5 rounded font-bold mt-1 inline-block animate-pulse">SEDANG PARKIR</span>
                   </td>
                   <td className="py-4 px-5 text-right font-mono font-bold text-[#999]">-</td>
                   <td className="py-4 px-5 text-center text-[#999]">-</td>
@@ -183,7 +183,7 @@ export default function AdminParkirPage() {
                     <span className="font-mono text-[#3c8dbc] font-bold">RFID-2026-A001</span>
                   </td>
                   <td className="py-4 px-5 text-center">
-                    <span className="bg-[#ecf0f5] text-[#555] px-2 py-1 text-[11px] font-bold">Roda 4 Tahunan</span>
+                    <span className="bg-[#ecf0f5] text-[#555] px-2 py-1 text-[11px] font-bold rounded">Roda 4 Tahunan</span>
                   </td>
                   <td className="py-4 px-5 text-center">
                     <div className="text-[12px] text-[#00a65a] font-bold">Active</div>
@@ -203,7 +203,7 @@ export default function AdminParkirPage() {
                     <span className="font-mono text-[#3c8dbc] font-bold">RFID-2025-M045</span>
                   </td>
                   <td className="py-4 px-5 text-center">
-                    <span className="bg-[#ecf0f5] text-[#555] px-2 py-1 text-[11px] font-bold">Roda 2 Bulanan</span>
+                    <span className="bg-[#ecf0f5] text-[#555] px-2 py-1 text-[11px] font-bold rounded">Roda 2 Bulanan</span>
                   </td>
                   <td className="py-4 px-5 text-center">
                     <div className="text-[12px] text-[#dd4b39] font-bold flex items-center justify-center">

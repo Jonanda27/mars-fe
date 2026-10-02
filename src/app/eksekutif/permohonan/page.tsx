@@ -97,7 +97,7 @@ export default function EksekutifPermohonanPage() {
                       <td className="py-3 px-4 text-center">
                         <Link 
                           href={`/eksekutif/permohonan/${app.id}`}
-                          className="inline-flex items-center justify-center bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-3 py-1.5 rounded-sm text-xs font-bold transition-colors"
+                          className="inline-flex items-center justify-center bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-3 py-1.5 rounded-none text-xs font-bold transition-colors shadow-2xs"
                         >
                           <Eye className="w-3.5 h-3.5 mr-1" /> Ulas / Tindak Lanjuti
                         </Link>

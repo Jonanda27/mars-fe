@@ -1,12 +1,13 @@
 import React from 'react';
-import { Plane, Building2, AlertTriangle, Search, RefreshCw } from 'lucide-react';
+import { Plane, Building2, AlertTriangle, Compass, Search, RefreshCw } from 'lucide-react';
 
 interface TenantInvoiceFilterBarProps {
-  readonly serviceFilter: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA';
-  readonly setServiceFilter: (val: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA') => void;
+  readonly serviceFilter: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'MINI_AIRPORT' | 'DENDA';
+  readonly setServiceFilter: (val: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'MINI_AIRPORT' | 'DENDA') => void;
   readonly totalCount: number;
   readonly hanggarCount: number;
   readonly ruanganCount: number;
+  readonly miniAirportCount: number;
   readonly dendaCount: number;
   readonly searchTerm: string;
   readonly setSearchTerm: (val: string) => void;
@@ -19,6 +20,7 @@ export const TenantInvoiceFilterBar: React.FC<TenantInvoiceFilterBarProps> = ({
   totalCount,
   hanggarCount,
   ruanganCount,
+  miniAirportCount,
   dendaCount,
   searchTerm,
   setSearchTerm,
@@ -63,6 +65,18 @@ export const TenantInvoiceFilterBar: React.FC<TenantInvoiceFilterBarProps> = ({
           Retribusi Sewa Ruangan ({ruanganCount})
         </button>
 
+        <button
+          onClick={() => setServiceFilter('MINI_AIRPORT')}
+          className={`px-4 py-2.5 text-xs font-bold border-b-2 flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap ${
+            serviceFilter === 'MINI_AIRPORT'
+              ? 'border-amber-600 text-amber-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+          }`}
+        >
+          <Compass className="w-4 h-4 text-amber-600" />
+          Mini Airport ({miniAirportCount})
+        </button>
+
         {dendaCount > 0 && (
           <button
             onClick={() => setServiceFilter('DENDA')}
@@ -85,7 +99,7 @@ export const TenantInvoiceFilterBar: React.FC<TenantInvoiceFilterBarProps> = ({
             Daftar Ketetapan Retribusi (Surat Ketetapan Retribusi Daerah)
           </h2>
           <p className="text-[11px] text-slate-500">
-            Pantau seluruh tagihan SKRD sewa hanggar pesawat, sewa ruangan terminal, dan SKRD denda Anda.
+            Pantau seluruh tagihan SKRD sewa hanggar pesawat, ruangan terminal, pelayanan mini airport, dan sanksi denda Anda.
           </p>
         </div>
 

@@ -13,8 +13,14 @@ import { PemakaianSearchToolbar } from './components/PemakaianSearchToolbar';
 import { OvernightReportsTable } from './components/OvernightReportsTable';
 import { ActiveParkingLogsTable } from './components/ActiveParkingLogsTable';
 import { CheckoutLogsTable } from './components/CheckoutLogsTable';
+import { useAuthStore } from '@/store/useAuthStore';
+import { MiniAirportPemakaianView } from './components/MiniAirportPemakaianView';
 
 export default function AdminPemakaianPage() {
+  const { user } = useAuthStore();
+  const userRole = (user?.role || '').toLowerCase();
+  const isMiniAdmin = userRole === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
+
   const [activeTab, setActiveTab] = useState<PemakaianTabType>('overnight');
 
   // State Overnight Reports
@@ -56,9 +62,19 @@ export default function AdminPemakaianPage() {
   };
 
   useEffect(() => {
-    fetchOvernightReports();
-    fetchLogs();
-  }, []);
+    if (!isMiniAdmin) {
+      fetchOvernightReports();
+      fetchLogs();
+    }
+  }, [isMiniAdmin]);
+
+  if (isMiniAdmin) {
+    return (
+      <div className="p-4 bg-[#ecf0f5] min-h-full">
+        <MiniAirportPemakaianView user={user} />
+      </div>
+    );
+  }
 
   const activeLogs = allLogs.filter((log) => !log.exit_time);
   const checkoutLogs = allLogs.filter((log) => log.exit_time !== null);
