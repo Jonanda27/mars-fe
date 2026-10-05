@@ -205,7 +205,7 @@ export default function TenantMiniAirportDetailPage() {
           <Link href="/tenant/mini-airport" className="mx-1 hover:text-[#3c8dbc]">
             Mini Airport
           </Link>{' '}
-          / <span className="ml-1 font-medium text-slate-800">Detail Permohonan</span>
+          / <span className="ml-1 font-medium">Detail Permohonan</span>
         </div>
       </header>
 

@@ -211,8 +211,6 @@ export default function PengajuanKontrakPayungPage() {
     }
   };
 
-  // Hitung jumlah status
-  const pendingTtdCount = allPayungContracts.filter((c) => c.status === 'Menunggu TTD Tenant').length;
 
   if (isLoading) {
     return (
@@ -228,38 +226,14 @@ export default function PengajuanKontrakPayungPage() {
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-2">
         <div>
-          <h1 className="text-[22px] font-normal text-[#333] flex items-center gap-2 flex-wrap">
-            Perjanjian Kerja Sama (PKS) Kontrak Payung
-            <span className="text-[12px] font-bold bg-[#3c8dbc] text-white px-2 py-0.5">
-              {allPayungContracts.length} PKS Terbit
-            </span>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Perjanjian Kerja Sama <span className="text-[15px] font-light text-[#777] ml-2">Kontrak Payung</span>
           </h1>
-          <p className="text-[12px] text-[#777] mt-0.5">
-            Daftar Kontrak Payung Induk Aktif &amp; Legalitas Operasional — Bandara Mozes Kilangin &amp; Seluruh Mini Airport Papua Tengah
-          </p>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2 hidden sm:flex">
-          <span className="mr-1">Tenant Portal</span> / <span className="ml-1 font-bold text-slate-800">Kontrak Payung</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Kontrak Payung</span>
         </div>
       </header>
-
-
-      {/* Banner Peringatan jika ada PKS yang butuh TTD Basah */}
-      {pendingTtdCount > 0 && (
-        <div className="mb-4 bg-amber-50 border-l-4 border-l-[#f39c12] p-3.5 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-          <div className="flex items-start gap-2.5">
-            <AlertCircle className="w-5 h-5 text-[#f39c12] shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-bold text-amber-900 text-xs">
-                Perhatian: Terdapat {pendingTtdCount} Dokumen PKS Payung Menunggu Tanda Tangan Anda!
-              </h4>
-              <p className="text-[11px] text-amber-800 mt-0.5">
-                Silakan unduh dokumen PKS, bubuhkan tanda tangan basah dan meterai Rp 10.000, lalu unggah kembali scan dokumen untuk diverifikasi Admin UPBU.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Konten Utama */}
       {allPayungContracts.length === 0 ? (

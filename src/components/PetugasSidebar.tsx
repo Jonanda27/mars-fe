@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import BaseSidebar, { NavItem } from './BaseSidebar';
 import { Plane, User, Circle, ShieldCheck, Clock, History, AlertTriangle, TowerControl, MapPin } from 'lucide-react';
 
-export default function PetugasSidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
+export default function PetugasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
   const { user } = useAuthStore();
   const role = (user?.role || '').toLowerCase();
   const isMiniPetugas = role === 'petugas_mini_airport' || role === 'petugas lapangan mini airport' || Boolean(user?.mini_airport_id);
@@ -70,6 +70,7 @@ export default function PetugasSidebar({ isOpen }: Readonly<{ isOpen: boolean }>
   return (
     <BaseSidebar
       isOpen={isOpen}
+      onToggle={onToggle}
       userName={user?.username || 'Petugas'}
       userAvatar={user?.username?.charAt(0).toUpperCase() || <User className="w-5 h-5" />}
       userStatus={userStatusElement}

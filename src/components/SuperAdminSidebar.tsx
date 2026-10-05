@@ -10,7 +10,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
-export default function SuperAdminSidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
+export default function SuperAdminSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
   const { user } = useAuthStore();
 
   const navItems: NavItem[] = [
@@ -20,6 +20,7 @@ export default function SuperAdminSidebar({ isOpen }: Readonly<{ isOpen: boolean
   return (
     <BaseSidebar
       isOpen={isOpen}
+      onToggle={onToggle}
       userName={user?.username || 'Super Admin'}
       userAvatar={user?.username?.charAt(0) || <ShieldCheck className="w-5 h-5 text-amber-500" />}
       userStatus={

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Users, Activity, 
   TrendingUp, MapPin, AlertCircle, Info, Plane,
-  Loader2, RefreshCw, CheckCircle2, Clock, ShieldAlert,
+  Loader2, CheckCircle2, Clock, ShieldAlert,
   ArrowRight, ExternalLink, Building2
 } from 'lucide-react';
 import RupiahIcon from '@/components/icons/RupiahIcon';
@@ -62,31 +62,19 @@ export default function AdminExecutiveDashboard() {
     );
   }
 
-  const { kpi, action_queue, visual_assets, expiring_contracts, master_tariffs } = data;
+  const { kpi, visual_assets, expiring_contracts, master_tariffs } = data;
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
       {/* Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[20px] font-normal text-[#333] uppercase flex items-center gap-2">
-            Dashboard Operasional &amp; Aset
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Dashboard Admin <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
           </h1>
-          <p className="text-[12px] text-[#777] mt-0.5">
-            Monitoring Utilisasi Fasilitas, Peta Spasial Hanggar &amp; Log Lapangan Bandara Mozes Kilangin
-          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={fetchDashboardData}
-            title="Refresh Data"
-            className="p-1.5 bg-white border border-[#d2d6de] hover:bg-slate-50 text-slate-600 transition-colors shadow-2xs rounded-none flex items-center gap-1 text-xs font-bold cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5 text-[#3c8dbc]" /> Refresh
-          </button>
-          <div className="text-[12px] text-[#777] items-center bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-2xs hidden sm:flex">
-            <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-bold text-slate-800">Dashboard Operasional</span>
-          </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Dashboard</span>
         </div>
       </header>
 
@@ -161,84 +149,6 @@ export default function AdminExecutiveDashboard() {
         </div>
       </div>
 
-      {/* Baris 1.5: Antrean Tindakan Cepat Admin (Action Hub - Tema Konsisten Biru #3c8dbc) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <Link 
-          href="/admin/tenants" 
-          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Verifikasi Mitra</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              {action_queue.pendingTenants} Mitra Baru Menunggu
-            </p>
-          </div>
-          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
-            action_queue.pendingTenants > 0 
-              ? 'bg-amber-50 text-[#f39c12] border border-amber-200' 
-              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
-          }`}>
-            {action_queue.pendingTenants}
-          </span>
-        </Link>
-
-        <Link 
-          href="/admin/tagihan" 
-          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">SKRD Hanggar Siap</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              {action_queue.unbilledHanggarLogs} Log Pesawat Siap Tagih
-            </p>
-          </div>
-          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
-            action_queue.unbilledHanggarLogs > 0 
-              ? 'bg-blue-100 text-[#3c8dbc] border border-blue-300' 
-              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
-          }`}>
-            {action_queue.unbilledHanggarLogs}
-          </span>
-        </Link>
-
-        <Link 
-          href="/admin/tagihan" 
-          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Verifikasi Pembayaran</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              {action_queue.pendingPaymentReceipts} Bukti Transfer Masuk
-            </p>
-          </div>
-          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
-            action_queue.pendingPaymentReceipts > 0 
-              ? 'bg-amber-50 text-[#f39c12] border border-amber-200' 
-              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
-          }`}>
-            {action_queue.pendingPaymentReceipts}
-          </span>
-        </Link>
-
-        <Link 
-          href="/petugas/verifikasi-jadwal" 
-          className="bg-white p-3 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[11px] font-bold text-slate-500 uppercase">Jadwal Pesawat</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              {action_queue.pendingFlightSchedules} Rencana Menunggu Respon
-            </p>
-          </div>
-          <span className={`w-7 h-7 rounded-none flex items-center justify-center font-bold text-xs ${
-            action_queue.pendingFlightSchedules > 0 
-              ? 'bg-amber-50 text-[#f39c12] border border-amber-200' 
-              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
-          }`}>
-            {action_queue.pendingFlightSchedules}
-          </span>
-        </Link>
-      </div>
 
       {/* Baris 2: Layout 2 Kolom (Peta Visual Aset & Kolom Kanan Monitoring) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

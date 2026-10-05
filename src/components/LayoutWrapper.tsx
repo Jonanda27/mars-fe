@@ -70,25 +70,26 @@ export default function LayoutWrapper({ children }: Readonly<{ children: React.R
   const isTenant = isTenantRole(userRole) || (pathname.startsWith('/tenant') && !isAdmin && !isDinas && !isSuperAdmin);
 
   const renderSidebar = () => {
+    const handleToggleSidebar = () => setIsSidebarOpen(prev => !prev);
     if (isSuperAdmin) {
-      return <SuperAdminSidebar isOpen={isSidebarOpen} />;
+      return <SuperAdminSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
     }
     if (isDinas) {
-      return <DinasSidebar isOpen={isSidebarOpen} />;
+      return <DinasSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
     }
     if (isAdmin) {
-      return <Sidebar isOpen={isSidebarOpen} />;
+      return <Sidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
     }
     if (isTenant) {
-      return <TenantSidebar isOpen={isSidebarOpen} />;
+      return <TenantSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
     }
     if (isPetugas) {
-      return <PetugasSidebar isOpen={isSidebarOpen} />;
+      return <PetugasSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
     }
     if (isEksekutif) {
-      return <EksekutifSidebar isOpen={isSidebarOpen} />;
+      return <EksekutifSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
     }
-    return <Sidebar isOpen={isSidebarOpen} />;
+    return <Sidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
   };
 
   return (

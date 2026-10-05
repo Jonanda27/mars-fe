@@ -17,7 +17,7 @@ import {
   Receipt
 } from 'lucide-react';
 
-export default function Sidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
+export default function Sidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
   const { user } = useAuthStore();
 
   const userRole = (user?.role || '').toLowerCase();
@@ -50,6 +50,7 @@ export default function Sidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
   return (
     <BaseSidebar
       isOpen={isOpen}
+      onToggle={onToggle}
       userName={user?.username || (isMiniAdmin ? 'Admin Mini Airport' : 'Admin Mozes Kilangin')}
       userAvatar={user?.username?.charAt(0) || <User className="w-5 h-5" />}
       userStatus={

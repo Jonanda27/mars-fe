@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface NavItem {
   href: string;
@@ -14,6 +15,7 @@ export interface NavItem {
 
 interface BaseSidebarProps {
   readonly isOpen: boolean;
+  readonly onToggle?: () => void;
   readonly userAvatar?: React.ReactNode;
   readonly userName?: string;
   readonly userStatus?: React.ReactNode;
@@ -24,6 +26,7 @@ interface BaseSidebarProps {
 
 export default function BaseSidebar({
   isOpen,
+  onToggle,
   userAvatar,
   userName = 'User',
   userStatus,
@@ -35,27 +38,44 @@ export default function BaseSidebar({
 
   return (
     <aside
-      className={`${
+      className={`relative ${
         isOpen ? 'w-56' : 'w-16'
-      } bg-[#222d32] text-white flex-shrink-0 flex flex-col h-full z-20 overflow-hidden transition-all duration-300`}
+      } bg-[#222d32] text-white flex-shrink-0 flex flex-col h-full z-30 transition-all duration-300`}
     >
+      {/* Tombol Panah Buka / Tutup di Bagian Atas Garis Tepi Sidebar (Sejajar Header Judul / Tenant Portal) */}
+      {onToggle && (
+        <button
+          type="button"
+          onClick={onToggle}
+          title={isOpen ? "Tutup Sidebar" : "Buka Sidebar"}
+          aria-label={isOpen ? "Tutup Sidebar" : "Buka Sidebar"}
+          className="absolute -right-3.5 top-[92px] -translate-y-1/2 z-40 w-7 h-7 rounded-full bg-[#1a2226] hover:bg-[#3c8dbc] text-slate-300 hover:text-white border border-slate-600 hover:border-[#3c8dbc] shadow-md flex items-center justify-center transition-all duration-200 cursor-pointer focus:outline-none"
+        >
+          {isOpen ? (
+            <ChevronLeft className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+        </button>
+      )}
+
       <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4">
         {/* User Panel */}
         <div
-          className={`flex items-center pb-4 whitespace-nowrap ${
-            isOpen ? 'px-4' : 'justify-center'
+          className={`flex items-center pb-4 transition-all duration-300 ${
+            isOpen ? 'px-4' : 'justify-center px-2'
           }`}
         >
           <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-700 flex-shrink-0 overflow-hidden uppercase font-bold text-lg">
             {userAvatar}
           </div>
           {isOpen && (
-            <div className="ml-3 overflow-hidden">
-              <p className="font-semibold text-[14px] truncate max-w-[130px] capitalize">
+            <div className="ml-3 overflow-hidden flex-1 min-w-0 pr-1">
+              <p className="font-semibold text-[14px] text-white truncate capitalize leading-tight">
                 {userName}
               </p>
               {userStatus && (
-                <div className="text-[11px] text-slate-300 mt-1">
+                <div className="text-[11px] text-slate-300 mt-1.5 flex items-center gap-1.5 leading-none">
                   {userStatus}
                 </div>
               )}

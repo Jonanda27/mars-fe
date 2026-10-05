@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { LoginPayload } from '@/types/auth';
@@ -49,112 +50,140 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row font-sans">
       
-      {/* Simple Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#3c8dbc] flex items-center justify-center">
-              <span className="text-white font-bold text-xl">M</span>
-            </div>
-            <span className="text-xl font-black tracking-tighter text-gray-900">MARS</span>
-          </div>
-          <button 
-            onClick={() => router.push('/')}
-            className="text-sm font-bold text-gray-500 hover:text-[#3c8dbc] uppercase tracking-widest transition-colors"
-          >
-            Kembali ke Beranda
-          </button>
-        </div>
-      </header>
+      {/* 1. SISI KIRI (FOTO TERMINAL BANDARA - BERSIH & ESTETIK) */}
+      <div className="relative hidden lg:block lg:w-1/2 xl:w-7/12 bg-slate-900 select-none overflow-hidden">
+        <img
+          src="/images/bandara/mozes-kilangin-terminal.jpg"
+          alt="Bandara Mozes Kilangin Terminal"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6">
-        <div className="w-full max-w-md bg-white border border-gray-200 shadow-sm p-8 md:p-12">
+        <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+          <h2 className="text-2xl xl:text-3xl font-bold tracking-tight">Bandara Mozes Kilangin</h2>
+          <p className="text-white/80 text-sm mt-1">UPBU Mozes Kilangin • Dinas Perhubungan Kabupaten Mimika</p>
+        </div>
+      </div>
+
+      {/* 2. SISI KANAN (FORMULIR LOGIN SIMPEL) */}
+      <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 xl:p-12 bg-white min-h-screen lg:min-h-0">
+        
+        {/* Header: Logo & Navigasi Kembali */}
+        <div className="flex items-center justify-between pb-6 border-b border-gray-100">
+          <Link href="/" className="flex items-center shrink-0">
+            <img
+              src="/images/mars-logo.png"
+              alt="MARS - Mimika Airport Revenue System"
+              className="h-9 sm:h-10 w-auto object-contain"
+            />
+          </Link>
+
+          <Link
+            href="/"
+            className="text-xs font-bold text-gray-500 hover:text-[#3c8dbc] uppercase tracking-wider transition-colors"
+          >
+            Beranda
+          </Link>
+        </div>
+
+        {/* Form Container */}
+        <div className="w-full max-w-sm mx-auto my-auto py-8">
           
-          <div className="mb-10 text-center">
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Login Portal</h1>
-            <p className="text-gray-500 font-light">Masuk untuk mengelola operasional Anda.</p>
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
+              Login Portal
+            </h1>
+            <p className="text-gray-500 text-sm">
+              Masukkan username dan password Anda.
+            </p>
           </div>
 
           {error && (
-            <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-600 text-red-800 text-sm font-medium">
+            <div className="mb-5 p-3.5 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             
+            {/* Username */}
             <div>
-              <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Username</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                Username
+              </label>
               <input
                 type="text"
                 name="username"
                 required
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full border border-gray-300 bg-gray-50 p-3 text-gray-900 focus:outline-none focus:border-[#3c8dbc] focus:bg-white transition-colors rounded-none"
+                className="w-full px-3.5 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:bg-white transition-all"
                 placeholder="Masukkan username"
               />
             </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:outline-none focus:border-[#3c8dbc] focus:bg-white transition-colors rounded-none"
-                    placeholder="Masukkan password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-[#3c8dbc] transition-colors"
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
 
-            {/* Submit Area */}
-            <div className="pt-6 mt-8 border-t border-gray-200">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`w-full font-bold py-4 px-8 tracking-widest uppercase text-sm rounded-none transition-colors ${
-                  isLoading 
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                  : 'bg-[#3c8dbc] text-white hover:bg-[#367fa9]'
-                }`}
-              >
-                {isLoading ? 'Memproses...' : 'Masuk Portal'}
-              </button>
-              
-              <div className="text-center mt-6">
-                <span className="text-gray-500 text-sm font-light">Belum menjadi mitra? </span>
-                <button 
-                  type="button" 
-                  onClick={() => router.push('/register')} 
-                  className="text-[#3c8dbc] font-bold text-sm hover:underline transition-colors ml-1"
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-3 pr-11 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:bg-white transition-all"
+                  placeholder="Masukkan password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
                 >
-                  Daftar Sekarang
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-          </form>
-        </div>
-      </main>
+            {/* Tombol Masuk */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {isLoading ? 'Memverifikasi...' : 'Masuk Portal'}
+              </button>
+            </div>
 
-      {/* Simple Footer */}
-      <footer className="py-6 text-center text-sm text-gray-400">
-        &copy; 2026 Dinas Perhubungan Kabupaten Mimika
-      </footer>
+            {/* Tautan Daftar */}
+            <div className="text-center pt-3 text-sm text-gray-500">
+              <span>Belum memiliki akun mitra? </span>
+              <Link 
+                href="/register" 
+                className="text-[#3c8dbc] font-bold hover:underline ml-1"
+              >
+                Daftar Sekarang
+              </Link>
+            </div>
+
+          </form>
+
+        </div>
+
+        {/* Footer */}
+        <div className="pt-4 text-center text-xs text-gray-400">
+          &copy; {new Date().getFullYear()} Dinas Perhubungan Kabupaten Mimika
+        </div>
+
+      </div>
+
     </div>
   );
 }

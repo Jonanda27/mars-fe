@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import RupiahIcon from './icons/RupiahIcon';
 
-export default function DinasSidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
+export default function DinasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
   const { user } = useAuthStore();
 
   const navItems: NavItem[] = [
@@ -31,6 +31,7 @@ export default function DinasSidebar({ isOpen }: Readonly<{ isOpen: boolean }>) 
   return (
     <BaseSidebar
       isOpen={isOpen}
+      onToggle={onToggle}
       userName={user?.username || 'Dinas Perhubungan'}
       userAvatar={user?.username?.charAt(0) || <User className="w-5 h-5" />}
       userStatus={

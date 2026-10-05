@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import RupiahIcon from './icons/RupiahIcon';
 
-export default function TenantSidebar({ isOpen }: Readonly<{ isOpen: boolean }>) {
+export default function TenantSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
   const { user } = useAuthStore();
   const isVerified = user?.status_verifikasi === 'Verified';
 
@@ -44,17 +44,20 @@ export default function TenantSidebar({ isOpen }: Readonly<{ isOpen: boolean }>)
   return (
     <BaseSidebar
       isOpen={isOpen}
+      onToggle={onToggle}
       userName={user?.nama_perusahaan || 'Tenant'}
       userAvatar={<User className="w-5 h-5" />}
       userStatus={
         !isVerified ? (
-          <>
-            <Circle className="w-[10px] h-[10px] mr-1 fill-yellow-500 text-yellow-500" /> Pending/Unverified
-          </>
+          <span className="inline-flex items-center gap-1.5 text-amber-400 font-medium leading-none">
+            <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse" />
+            <span>Pending/Unverified</span>
+          </span>
         ) : (
-          <>
-            <Circle className="w-[10px] h-[10px] mr-1 fill-[#3c8dbc] text-[#3c8dbc]" /> Verified Tenant
-          </>
+          <span className="inline-flex items-center gap-1.5 text-[#3c8dbc] font-medium leading-none">
+            <span className="w-2 h-2 rounded-full bg-[#3c8dbc] shrink-0" />
+            <span>Verified Tenant</span>
+          </span>
         )
       }
       headerTitle="Tenant Portal"

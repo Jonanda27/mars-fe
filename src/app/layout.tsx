@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Roboto, Oswald } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { Toaster } from 'react-hot-toast';
@@ -10,14 +10,28 @@ const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
 });
 
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "MARS",
-  description: "AdminLTE style layout",
+  description: "Mimika Airport Revenue System",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${roboto.variable} h-full antialiased font-sans`}>
+    <html lang="en" className={`${roboto.variable} ${oswald.variable} h-full antialiased font-sans`}>
       <body className="bg-[#ecf0f5] text-[#333] m-0 font-sans">
         <LayoutWrapper>
           {children}

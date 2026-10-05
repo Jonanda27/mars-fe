@@ -162,7 +162,7 @@ export default function StatusBadge({ status, className = '', label }: Readonly<
 
   return (
     <span
-      className={`inline-flex items-center justify-center px-2.5 py-1 text-[11px] font-bold text-white ${hasCustomRadius ? '' : 'rounded'} shadow-2xs tracking-wide text-center leading-tight whitespace-nowrap transition-all ${colorClass} ${className}`}
+      className={`inline-flex items-center justify-center px-3 py-0.5 text-[11px] font-bold text-white ${hasCustomRadius ? '' : 'rounded-full'} shadow-2xs tracking-wide text-center leading-tight whitespace-nowrap transition-all ${colorClass} ${className}`}
     >
       {displayText}
     </span>

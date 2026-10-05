@@ -329,8 +329,8 @@ export default function TenantJadwalHanggarPage() {
             <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium text-slate-800">Jadwal Hanggar</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Jadwal Hanggar</span>
         </div>
       </header>
 

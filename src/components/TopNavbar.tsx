@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, Bell, LogOut, Inbox } from 'lucide-react';
+import { Bell, LogOut, Inbox } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { useNotificationStore, Notification } from '@/store/useNotificationStore';
 
 interface TopNavbarProps {
-  readonly onToggleSidebar: () => void;
+  readonly onToggleSidebar?: () => void;
 }
 
 interface NotificationListProps {
@@ -148,12 +148,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
 
   return (
     <>
-      <header className="bg-[#222d32] h-12 flex items-center justify-between text-white flex-shrink-0 shadow-sm z-50 border-b border-[#1a2226] relative">
-        <div className="flex items-center h-full">
-          <button onClick={onToggleSidebar} className="h-full px-4 hover:bg-[#1a2226] text-[#b8c7ce] hover:text-white transition-colors focus:outline-none border-r border-[#1a2226]">
-            <Menu className="w-5 h-5" />
-          </button>
-        </div>
+      <header className="bg-[#222d32] h-12 flex items-center justify-end text-white flex-shrink-0 shadow-sm z-50 border-b border-[#1a2226] relative">
         <div className="flex items-center h-full relative">
           
           {/* Notification Bell */}
