@@ -285,8 +285,8 @@ export default function ChatWidget() {
           <div
             className={`z-50 bg-white rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col transition-all duration-300 ease-in-out ${
               isChatMaximized
-                ? 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[94vw] sm:w-[680px] md:w-[740px] h-[640px] sm:h-[680px] max-h-[92vh] animate-in zoom-in-95 duration-300 ring-1 ring-white/20'
-                : 'fixed bottom-3 sm:bottom-6 right-3 sm:right-6 w-[92vw] sm:w-[370px] h-[525px] max-h-[calc(100vh-28px)] animate-in fade-in slide-in-from-bottom-4 duration-300'
+                ? 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] sm:w-[680px] md:w-[740px] h-[90vh] sm:h-[680px] max-h-[92vh] animate-in zoom-in-95 duration-300 ring-1 ring-white/20'
+                : 'fixed bottom-2 sm:bottom-6 right-2 sm:right-6 left-2 sm:left-auto w-auto sm:w-[370px] h-[490px] sm:h-[525px] max-h-[85vh] sm:max-h-[calc(100vh-28px)] animate-in fade-in slide-in-from-bottom-4 duration-300'
             }`}
           >
             {/* Header Chat Warna Biru MARS */}
@@ -544,7 +544,7 @@ export default function ChatWidget() {
 
                     {/* 6 KOTAK OTP INPUT (BOX INPUT ELEGAN) */}
                     <div 
-                      className="flex items-center justify-center gap-2 sm:gap-3 my-1" 
+                      className="flex items-center justify-center gap-1.5 sm:gap-2.5 my-1" 
                       onPaste={handleOtpPaste}
                     >
                       {otpBoxes.map((digit, idx) => (
@@ -562,7 +562,7 @@ export default function ChatWidget() {
                           onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                           onFocus={(e) => e.target.select()}
                           aria-label={`Digit OTP ${idx + 1}`}
-                          className={`w-11 sm:w-12 h-12 sm:h-13 text-center font-mono font-bold text-xl sm:text-2xl rounded-xl border-2 transition-all duration-150 outline-none select-none ${
+                          className={`w-9 sm:w-11 md:w-12 h-11 sm:h-12 md:h-13 text-center font-mono font-bold text-lg sm:text-2xl rounded-xl border-2 transition-all duration-150 outline-none select-none ${
                             digit
                               ? 'bg-sky-50/80 border-[#008db9] text-[#008db9] shadow-xs'
                               : 'bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-300 focus:bg-white focus:border-[#008db9] focus:ring-4 focus:ring-[#008db9]/15'
@@ -689,7 +689,7 @@ export default function ChatWidget() {
               <img
                 src="/images/cs-officer-cutout.png?v=2"
                 alt="Petugas Customer Service Formal Headset"
-                className={`h-48 sm:h-60 lg:h-[268px] w-auto object-contain object-bottom drop-shadow-xl transition-all duration-300 ${
+                className={`h-36 sm:h-52 lg:h-[268px] w-auto object-contain object-bottom drop-shadow-xl transition-all duration-300 ${
                   isOfficerHovered ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'
                 }`}
               />
@@ -698,7 +698,7 @@ export default function ChatWidget() {
               <img
                 src="/images/cs-officer-salam.png?v=2"
                 alt="Petugas Memberikan Salam Hormat"
-                className={`absolute bottom-0 h-48 sm:h-60 lg:h-[268px] w-auto object-contain object-bottom drop-shadow-xl transition-all duration-300 ${
+                className={`absolute bottom-0 h-36 sm:h-52 lg:h-[268px] w-auto object-contain object-bottom drop-shadow-xl transition-all duration-300 ${
                   isOfficerHovered ? 'opacity-100 scale-[1.02]' : 'opacity-0 scale-95 pointer-events-none'
                 }`}
               />
@@ -708,13 +708,13 @@ export default function ChatWidget() {
             <button
               type="button"
               onClick={() => setIsChatOpen(true)}
-              className="absolute bottom-2 sm:bottom-2.5 right-0.5 sm:right-1.5 z-20 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1d4ed8] hover:bg-[#1e40af] text-white shadow-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 group focus:outline-none"
+              className="absolute bottom-1 sm:bottom-2.5 right-0 sm:right-1.5 z-20 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full bg-[#1d4ed8] hover:bg-[#1e40af] text-white shadow-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 group focus:outline-none"
               aria-label="Buka Live Chat"
             >
               <span className="absolute inset-0 rounded-full bg-blue-500/25 animate-ping pointer-events-none" />
               <div className="relative">
-                <MessageSquare className="w-6 h-6 text-white fill-white group-hover:scale-105 transition-transform" />
-                <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#1d4ed8]" />
+                <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white group-hover:scale-105 transition-transform" />
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400 border-2 border-[#1d4ed8]" />
               </div>
             </button>
           </div>

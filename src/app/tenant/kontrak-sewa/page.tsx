@@ -37,6 +37,8 @@ export default function TenantKontrakSewaPage() {
   const [contractToUpload, setContractToUpload] = useState<Contract | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounterRef = useRef(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchContracts = async () => {
@@ -82,12 +84,65 @@ export default function TenantKontrakSewaPage() {
   const handleOpenUploadModal = (contract: Contract) => {
     setContractToUpload(contract);
     setSelectedFile(null);
+    setIsDragging(false);
+    dragCounterRef.current = 0;
     setIsUploadModalOpen(true);
+  };
+
+  const validateAndSetFile = (file: File) => {
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPdf) {
+      toast.error('Format berkas harus berupa file PDF (.pdf)');
+      return false;
+    }
+    const maxSize = 5 * 1024 * 1024; // 5 MB
+    if (file.size > maxSize) {
+      toast.error('Ukuran berkas melebihi batas maksimal 5 MB');
+      return false;
+    }
+    setSelectedFile(file);
+    return true;
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      setSelectedFile(e.target.files[0]);
+      validateAndSetFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current += 1;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounterRef.current = 0;
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      validateAndSetFile(file);
     }
   };
 
@@ -346,7 +401,18 @@ export default function TenantKontrakSewaPage() {
                 <label htmlFor="file-upload-modal-sewa" className="block text-xs font-bold text-slate-800 mb-2">
                   Pilih Dokumen PDF Surat PKS <span className="text-red-500">*</span>
                 </label>
-                <div className="border-2 border-slate-200 border-dashed rounded-none p-6 text-center hover:bg-slate-50 transition-colors group">
+                <div 
+                  onDragEnter={handleDragEnter}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-none p-6 text-center transition-all cursor-pointer group select-none ${
+                    isDragging 
+                      ? 'border-[#3c8dbc] bg-blue-50/90 ring-4 ring-blue-100 scale-[1.01]' 
+                      : 'border-slate-300 hover:border-[#3c8dbc] hover:bg-slate-50'
+                  }`}
+                >
                   <input 
                     type="file" 
                     id="file-upload-modal-sewa"
@@ -355,18 +421,59 @@ export default function TenantKontrakSewaPage() {
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  <label htmlFor="file-upload-modal-sewa" className="cursor-pointer flex flex-col items-center">
-                    <div className="w-12 h-12 bg-blue-50 text-[#3c8dbc] rounded-none flex items-center justify-center mb-3 group-hover:scale-105 transition-transform border border-blue-100">
-                      <Upload className="w-6 h-6" />
-                    </div>
-                    <span className="font-bold text-xs text-[#3c8dbc] hover:text-[#367fa9] mb-1">Pilih File PDF</span>
-                    <span className="text-[11px] text-slate-500">Maksimal ukuran file 5MB</span>
-                  </label>
                   
-                  {selectedFile && (
-                    <div className="mt-4 p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-none text-xs font-bold flex items-center justify-center">
-                      <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-emerald-600" />
-                      <span className="truncate max-w-[220px]">{selectedFile.name}</span>
+                  <div className="flex flex-col items-center pointer-events-none">
+                    <div className={`w-12 h-12 rounded-none flex items-center justify-center mb-2 transition-all duration-200 border ${
+                      isDragging 
+                        ? 'bg-[#3c8dbc] text-white border-[#3c8dbc] scale-110 shadow-md ring-4 ring-blue-200' 
+                        : 'bg-blue-50 text-[#3c8dbc] border-blue-100 group-hover:scale-110'
+                    }`}>
+                      <Upload className={`w-5 h-5 ${isDragging ? 'animate-bounce' : ''}`} />
+                    </div>
+                    
+                    {isDragging ? (
+                      <>
+                        <span className="font-bold text-xs text-[#3c8dbc] mb-0.5">Lepaskan Berkas PDF di Sini</span>
+                        <span className="text-[10px] text-blue-600 font-medium">Berkas akan langsung dipilih untuk diunggah</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-bold text-xs text-[#3c8dbc] group-hover:text-[#367fa9] mb-0.5">
+                          Tarik & Lepas (Drag & Drop) atau <span className="underline">Pilih File PDF</span>
+                        </span>
+                        <span className="text-[10px] text-slate-500">Maksimal ukuran file 5 MB (format .pdf)</span>
+                      </>
+                    )}
+                  </div>
+                  
+                  {selectedFile && !isDragging && (
+                    <div 
+                      className="mt-3.5 p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-none text-xs flex items-center justify-between"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-center min-w-0 mr-2 text-left">
+                        <FileText className="w-4 h-4 mr-2 flex-shrink-0 text-emerald-600" />
+                        <div className="min-w-0">
+                          <div className="font-bold text-slate-800 truncate max-w-[200px]" title={selectedFile.name}>
+                            {selectedFile.name}
+                          </div>
+                          <div className="text-[10px] text-slate-500">
+                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB &bull; Siap dikirim
+                          </div>
+                        </div>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedFile(null);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 transition-colors cursor-pointer"
+                        title="Batalkan pilihan file"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                   )}
                 </div>

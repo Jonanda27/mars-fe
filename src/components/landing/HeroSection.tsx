@@ -107,10 +107,10 @@ export default function HeroSection() {
         type="button"
         onClick={prevHeroSlide}
         disabled={isTransitioning}
-        className="absolute left-3 sm:left-6 lg:left-10 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/35 hover:bg-black/65 text-white border border-white/25 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 shadow-2xl cursor-pointer group disabled:opacity-40 disabled:cursor-not-allowed"
+        className="absolute left-2 sm:left-6 lg:left-10 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 lg:w-13 lg:h-13 rounded-full bg-black/35 hover:bg-black/65 text-white border border-white/25 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 shadow-2xl cursor-pointer group disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="Previous Slide"
       >
-        <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform" />
       </button>
 
       {/* Tombol Navigasi Panah Kanan (>) */}
@@ -118,17 +118,17 @@ export default function HeroSection() {
         type="button"
         onClick={nextHeroSlide}
         disabled={isTransitioning}
-        className="absolute right-3 sm:right-6 lg:right-10 top-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/35 hover:bg-black/65 text-white border border-white/25 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 shadow-2xl cursor-pointer group disabled:opacity-40 disabled:cursor-not-allowed"
+        className="absolute right-2 sm:right-6 lg:right-10 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 lg:w-13 lg:h-13 rounded-full bg-black/35 hover:bg-black/65 text-white border border-white/25 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 shadow-2xl cursor-pointer group disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="Next Slide"
       >
-        <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform" />
       </button>
 
-      {/* Konten Utama Hero: Penempatan & Tipografi Sama Persis (Oswald Font, Single-Line, Centered Block) */}
-      <div className="relative z-10 w-full px-6 sm:px-12 pb-24 sm:pb-28 lg:pb-32 flex justify-center items-center select-none">
-        <div className="flex flex-col items-start text-left w-fit max-w-full">
+      {/* Konten Utama Hero: Penempatan & Tipografi Responsif */}
+      <div className="relative z-10 w-full px-4 sm:px-12 pb-20 sm:pb-28 lg:pb-32 flex justify-center items-center select-none">
+        <div className="flex flex-col items-center sm:items-start text-center sm:text-left w-fit max-w-full">
           <span 
-            className="text-xl sm:text-2xl md:text-[28px] lg:text-[32px] font-normal text-white tracking-normal mb-1 leading-tight"
+            className="text-base sm:text-2xl md:text-[28px] lg:text-[32px] font-normal text-white tracking-normal mb-1 leading-tight"
             style={{ 
               fontFamily: 'var(--font-oswald), "Oswald", "Arial Narrow", sans-serif',
               textShadow: '0 2px 4px rgba(0, 0, 0, 0.9), 0 0 2px rgba(0, 0, 0, 0.8)' 
@@ -137,7 +137,7 @@ export default function HeroSection() {
             Welcome to
           </span>
           <h1 
-            className="text-2xl sm:text-4xl md:text-[40px] lg:text-[46px] xl:text-[50px] font-bold text-white uppercase tracking-[0.02em] leading-none whitespace-nowrap"
+            className="text-xl sm:text-3xl md:text-[40px] lg:text-[46px] xl:text-[50px] font-bold text-white uppercase tracking-[0.02em] leading-tight sm:leading-none sm:whitespace-nowrap"
             style={{ 
               fontFamily: 'var(--font-oswald), "Oswald", "Arial Narrow", sans-serif',
               textShadow: '0 3px 6px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.85)' 
@@ -148,8 +148,8 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Indikator Titik Slide (Titik Bulat Bersih Seperti Gambar) */}
-      <div className="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+      {/* Indikator Titik Slide */}
+      <div className="absolute bottom-6 sm:bottom-10 md:bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5 sm:gap-3">
         {heroVideoSlides.map((slide, idx) => (
           <button
             key={slide.id}

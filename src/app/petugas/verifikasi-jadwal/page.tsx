@@ -5,11 +5,12 @@ import {
   ShieldCheck, Search, Filter, RefreshCw, 
   CheckCircle2, XCircle, Clock, Calendar, 
   Plane, Building2, MapPin, Loader2, Eye,
-  AlertCircle, FileText
+  AlertCircle, FileText, MessageSquare
 } from 'lucide-react';
 import { flightScheduleService } from '@/services/flightScheduleService';
 import { FlightSchedule } from '@/types/flightSchedule';
 import { JadwalVerifikasiModal } from '../components/JadwalVerifikasiModal';
+import { KirimWhatsAppModal } from '../components/KirimWhatsAppModal';
 import StatusBadge from '@/components/StatusBadge';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
@@ -24,6 +25,7 @@ export default function PetugasVerifikasiJadwalPage() {
   
   // Modal state
   const [selectedSchedule, setSelectedSchedule] = useState<FlightSchedule | null>(null);
+  const [selectedScheduleForWhatsApp, setSelectedScheduleForWhatsApp] = useState<FlightSchedule | null>(null);
 
   useEffect(() => {
     fetchSchedules();
@@ -62,8 +64,14 @@ export default function PetugasVerifikasiJadwalPage() {
     }
 
     // Status Filter
-    if (statusFilter !== 'ALL' && s.status !== statusFilter) {
-      return false;
+    if (statusFilter !== 'ALL') {
+      if (statusFilter === 'Checked-Out') {
+        if (s.status !== 'Checked-Out' && s.status !== 'Selesai' && s.status !== 'Completed') {
+          return false;
+        }
+      } else if (s.status !== statusFilter) {
+        return false;
+      }
     }
     // Search filter
     if (searchTerm) {
@@ -188,8 +196,8 @@ export default function PetugasVerifikasiJadwalPage() {
               <option value="Menunggu Verifikasi Petugas">Menunggu Verifikasi</option>
               <option value="Disetujui">Disetujui</option>
               <option value="Checked-In">Checked-In</option>
+              <option value="Checked-Out">Checked-Out</option>
               <option value="Ditolak">Ditolak</option>
-              <option value="Completed">Selesai</option>
             </select>
 
             {/* Refresh Button */}
@@ -247,7 +255,7 @@ export default function PetugasVerifikasiJadwalPage() {
                         {schedule.tenant?.nama_perusahaan || '-'}
                       </div>
                       <div className="text-[11px] text-slate-500">
-                        ID: {schedule.tenant?.tenant_id_str || `TENANT-${schedule.tenant_id}`}
+                        ID: {schedule.tenant?.tenant_id_str || (schedule.tenant_id ? `T-${new Date(schedule.created_at || Date.now()).getFullYear()}-${String(schedule.tenant_id).padStart(4, '0')}` : '-')}
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
@@ -288,13 +296,26 @@ export default function PetugasVerifikasiJadwalPage() {
                           Verifikasi
                         </button>
                       ) : (
-                        <button
-                          onClick={() => setSelectedSchedule(schedule)}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs flex items-center justify-center gap-1 border border-slate-300 cursor-pointer w-full transition-colors"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          Detail
-                        </button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => setSelectedSchedule(schedule)}
+                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs flex items-center justify-center gap-1 border border-slate-300 cursor-pointer transition-colors"
+                            title="Lihat Detail Verifikasi"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            Detail
+                          </button>
+                          {['Disetujui', 'Checked-In', 'Checked-Out', 'Selesai', 'Completed'].includes(schedule.status) && (
+                            <button
+                              onClick={() => setSelectedScheduleForWhatsApp(schedule)}
+                              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-2xs cursor-pointer transition-colors"
+                              title="Kirim Tiket & Konfirmasi ke WhatsApp Tenant"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              WhatsApp
+                            </button>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -320,6 +341,14 @@ export default function PetugasVerifikasiJadwalPage() {
             fetchSchedules();
             setSelectedSchedule(null);
           }}
+        />
+      )}
+
+      {/* Modal Kirim WhatsApp */}
+      {selectedScheduleForWhatsApp && (
+        <KirimWhatsAppModal
+          schedule={selectedScheduleForWhatsApp}
+          onClose={() => setSelectedScheduleForWhatsApp(null)}
         />
       )}
     </div>

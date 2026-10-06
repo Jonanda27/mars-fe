@@ -32,6 +32,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [countdown, setCountdown] = useState(0);
   const [otpArray, setOtpArray] = useState<string[]>(Array(6).fill(''));
 
@@ -63,6 +65,40 @@ export default function RegisterPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError('');
+  };
+
+  // 1. Format Validasi Email (Gmail / Korporat)
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const isEmailValid = emailRegex.test(formData.email.trim());
+
+  // 2. Format Validasi Password (Min 8 karakter, kombinasi huruf & angka)
+  const isPasswordMinLength = formData.password.length >= 8;
+  const hasPasswordLetter = /[a-zA-Z]/.test(formData.password);
+  const hasPasswordNumber = /[0-9]/.test(formData.password);
+  const hasPasswordSpecial = /[^a-zA-Z0-9]/.test(formData.password);
+  const isPasswordValid = isPasswordMinLength && hasPasswordLetter && hasPasswordNumber;
+
+  // 3. Format Validasi Nomor Telepon (Diawali 08, panjang 10-13 digit angka)
+  const rawPhoneDigits = formData.nomor_telepon.replace(/\D/g, '');
+  const isPhoneValid = rawPhoneDigits.startsWith('08') && rawPhoneDigits.length >= 10 && rawPhoneDigits.length <= 13;
+
+  // Formatter Otomatis Nomor Telepon (contoh: 0812-3456-7890)
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let rawDigits = e.target.value.replace(/\D/g, '');
+    if (rawDigits.startsWith('628')) {
+      rawDigits = '0' + rawDigits.slice(2);
+    }
+    if (rawDigits.length > 13) rawDigits = rawDigits.slice(0, 13);
+
+    let formatted = rawDigits;
+    if (rawDigits.length > 8) {
+      formatted = `${rawDigits.slice(0, 4)}-${rawDigits.slice(4, 8)}-${rawDigits.slice(8)}`;
+    } else if (rawDigits.length > 4) {
+      formatted = `${rawDigits.slice(0, 4)}-${rawDigits.slice(4)}`;
+    }
+
+    setFormData(prev => ({ ...prev, nomor_telepon: formatted }));
     if (error) setError('');
   };
 
@@ -103,15 +139,58 @@ export default function RegisterPage() {
 
   const handleRequestOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (formData.password.length < 6) {
-      setError('Password minimal harus 6 karakter');
+
+    // Validasi Kelengkapan dan Format Formulir
+    if (!formData.username.trim() || formData.username.trim().length < 3) {
+      setError('Username minimal harus 3 karakter');
       return;
     }
+
+    if (!formData.email.trim()) {
+      setError('Alamat email wajib diisi');
+      return;
+    }
+    if (!isEmailValid) {
+      setError('Format email tidak valid. Gunakan format yang benar (contoh: nama@gmail.com)');
+      return;
+    }
+
+    if (!isPasswordMinLength) {
+      setError('Password minimal harus 8 karakter');
+      return;
+    }
+    if (!hasPasswordLetter || !hasPasswordNumber) {
+      setError('Password harus mengandung kombinasi huruf dan angka');
+      return;
+    }
+    if (formData.password !== confirmPassword) {
+      setError('Ulangi password tidak cocok dengan password yang dimasukkan');
+      return;
+    }
+
+    if (!formData.nama_perusahaan.trim()) {
+      setError('Nama lengkap perusahaan wajib diisi');
+      return;
+    }
+    if (!formData.pic.trim()) {
+      setError('Nama penanggung jawab (PIC) wajib diisi');
+      return;
+    }
+
+    if (!formData.nomor_telepon.trim()) {
+      setError('Nomor telepon wajib diisi');
+      return;
+    }
+    if (!isPhoneValid) {
+      setError('Nomor telepon tidak valid. Pastikan diawali 08 dengan 10–13 digit angka (contoh: 0812-3456-7890)');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
-      await authService.requestOtp(formData.email);
+      await authService.requestOtp(formData.email.trim());
       setSuccess('Kode OTP verifikasi berhasil dikirimkan ke email Anda.');
       setCountdown(60);
       setStep(2);
@@ -124,6 +203,11 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.password !== confirmPassword) {
+      setError('Ulangi password tidak cocok dengan password yang dimasukkan');
+      setStep(1);
+      return;
+    }
     setError('');
     setSuccess('');
     setLoading(true);
@@ -266,6 +350,36 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
+                  {/* Email */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                      Alamat Email Resmi <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`w-full pl-10 pr-3.5 py-3 bg-gray-50 border rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                          formData.email
+                            ? isEmailValid
+                              ? 'border-green-400 focus:ring-green-400'
+                              : 'border-amber-300 focus:ring-amber-400'
+                            : 'border-gray-300 focus:ring-[#3c8dbc]'
+                        }`}
+                        placeholder="alamat.email@perusahaan.com"
+                      />
+                    </div>
+                    {formData.email && !isEmailValid && (
+                      <p className="text-[11px] text-amber-600 mt-1">
+                        Alamat email belum valid
+                      </p>
+                    )}
+                  </div>
+
                   {/* Password */}
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
@@ -279,8 +393,14 @@ export default function RegisterPage() {
                         required
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-11 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:bg-white transition-all"
-                        placeholder="Minimal 6 karakter"
+                        className={`w-full pl-10 pr-11 py-3 bg-gray-50 border rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                          formData.password
+                            ? isPasswordValid
+                              ? 'border-green-400 focus:ring-green-400'
+                              : 'border-amber-300 focus:ring-amber-400'
+                            : 'border-gray-300 focus:ring-[#3c8dbc]'
+                        }`}
+                        placeholder="Min. 8 karakter (huruf & angka)"
                       />
                       <button
                         type="button"
@@ -291,28 +411,59 @@ export default function RegisterPage() {
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
+
+                    {/* Format Password Checklist (hanya tampil jika belum valid) */}
+                    {formData.password && !isPasswordValid && (
+                      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] mt-2">
+                        <span className={`flex items-center gap-1 ${isPasswordMinLength ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+                          <CheckCircle2 className={`w-3 h-3 ${isPasswordMinLength ? 'text-green-600' : 'text-gray-300'}`} /> Min. 8 karakter
+                        </span>
+                        <span className={`flex items-center gap-1 ${hasPasswordLetter && hasPasswordNumber ? 'text-green-600 font-medium' : 'text-gray-400'}`}>
+                          <CheckCircle2 className={`w-3 h-3 ${hasPasswordLetter && hasPasswordNumber ? 'text-green-600' : 'text-gray-300'}`} /> Huruf & angka
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Email */}
-                  <div className="md:col-span-2">
+                  {/* Retype Password */}
+                  <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                      Alamat Email Resmi <span className="text-red-500">*</span>
+                      Ulangi Password <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
-                        type="email"
-                        name="email"
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirm_password"
                         required
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-3.5 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:bg-white transition-all"
-                        placeholder="alamat.email@perusahaan.com"
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setConfirmPassword(e.target.value);
+                          if (error) setError('');
+                        }}
+                        className={`w-full pl-10 pr-11 py-3 bg-gray-50 border rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                          confirmPassword && confirmPassword !== formData.password
+                            ? 'border-red-300 focus:ring-red-400'
+                            : confirmPassword && confirmPassword === formData.password
+                            ? 'border-green-400 focus:ring-green-400'
+                            : 'border-gray-300 focus:ring-[#3c8dbc]'
+                        }`}
+                        placeholder="Ketik ulang password"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
-                    <p className="text-[11px] text-gray-400 mt-1">
-                      Kode OTP verifikasi akan dikirimkan langsung ke alamat email ini.
-                    </p>
+                    {confirmPassword && confirmPassword !== formData.password && (
+                      <p className="text-[11px] text-red-500 mt-1">
+                        Password tidak cocok
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -445,11 +596,22 @@ export default function RegisterPage() {
                         name="nomor_telepon"
                         required
                         value={formData.nomor_telepon}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-3.5 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:bg-white transition-all"
-                        placeholder="0812-XXXX-XXXX"
+                        onChange={handlePhoneChange}
+                        className={`w-full pl-10 pr-3.5 py-3 bg-gray-50 border rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                          formData.nomor_telepon
+                            ? isPhoneValid
+                              ? 'border-green-400 focus:ring-green-400'
+                              : 'border-amber-300 focus:ring-amber-400'
+                            : 'border-gray-300 focus:ring-[#3c8dbc]'
+                        }`}
+                        placeholder="0812-3456-7890"
                       />
                     </div>
+                    {formData.nomor_telepon && !isPhoneValid && (
+                      <p className="text-[11px] text-amber-600 mt-1">
+                        Harus diawali 08 (10–13 digit angka)
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

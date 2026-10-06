@@ -87,12 +87,17 @@ export default function AdminPenyewaDetailPage() {
             Detail Penyewa <small className="text-[15px] text-[#777] ml-2 font-light">{tenant.tenant_id_str || '(Pending ID)'}</small>
           </h1>
         </div>
-        <Link 
-          href="/admin/penyewa"
-          className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded shadow-sm flex items-center text-sm"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Kembali
-        </Link>
+        <div className="flex items-center gap-2">
+          <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+            <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Detail Penyewa</span>
+          </div>
+          <Link 
+            href="/admin/penyewa"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded shadow-sm flex items-center text-sm"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" /> Kembali
+          </Link>
+        </div>
       </header>
 
       {/* Action Bar */}

@@ -39,19 +39,19 @@ export const TenantAlertBanners: React.FC<TenantAlertBannersProps> = ({
         </div>
       )}
 
-      {/* 2. Alert: Surat Peringatan (SP) Aktif */}
+      {/* 2. Alert: Surat Pemberitahuan / Teguran Penagihan Aktif */}
       {activeWarnings.length > 0 && (
         <div className="p-4 bg-red-50 border-l-4 border-[#dd4b39] text-red-900 shadow-2xs flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-[#dd4b39] flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="font-bold text-sm flex items-center gap-2">
-                <span>Perhatian: Terdapat {activeWarnings.length} Surat Peringatan (SP) Terbit dari Dinas</span>
+                <span>Perhatian: Terdapat {activeWarnings.length} Naskah Dinas Penagihan Terbit dari Dinas</span>
                 <span className="bg-[#dd4b39] text-white text-[10px] px-2 py-0.5 font-bold uppercase">Wajib Diselesaikan</span>
               </h4>
               <p className="text-xs text-red-800 mt-0.5 leading-relaxed">
                 {activeWarnings.map(w => `${w.type} (${w.warning_number} - ${w.invoices?.invoice_number || 'Tagihan Retribusi'})`).join(', ')}.
-                Harap segera melakukan pelunasan tagihan e-SKRD untuk menghindari pengenaan sanksi penertiban atau denda berjalan.
+                Harap segera melakukan pelunasan tagihan SKRD melalui Kas Daerah (Bank Papua) untuk menghindari sanksi bunga 1%/bulan dan penerbitan STRD.
               </p>
             </div>
           </div>

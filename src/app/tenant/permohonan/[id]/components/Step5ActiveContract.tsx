@@ -27,7 +27,9 @@ export const Step5ActiveContract: React.FC<Step5ActiveContractProps> = ({
   const isHangar = useMemo(() => Boolean(
     app.application_type?.toLowerCase().includes('hanggar') ||
     app.assets?.kategori?.toLowerCase().includes('hanggar') ||
-    app.contracts?.contract_type === 'Payung'
+    app.contracts?.contract_type === 'Payung' ||
+    app.contracts?.contract_type === 'PKS Payung Mozes Kilangin' ||
+    Boolean(app.contracts?.contract_type?.toLowerCase().includes('payung'))
   ), [app.application_type, app.assets?.kategori, app.contracts?.contract_type]);
 
   const skrdInvoice = useMemo(() => {

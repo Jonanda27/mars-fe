@@ -30,12 +30,14 @@ export default function DinasPermohonanPage() {
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
-      <header className="flex justify-between items-end mb-4">
-        <h1 className="text-[24px] font-normal text-[#333]">
-          Permohonan Sewa Masuk <small className="text-[15px] font-light text-[#777] ml-2">Telaah Berkas &amp; Persetujuan Dinas</small>
-        </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Dinas Portal</span> / <span className="ml-1 font-medium">Permohonan Sewa</span>
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
+        <div>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Permohonan Masuk <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
+          </h1>
+        </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Permohonan</span>
         </div>
       </header>
 
@@ -105,7 +107,7 @@ export default function DinasPermohonanPage() {
                             className="bg-[#3c8dbc] text-white p-1.5 hover:bg-[#367fa9] shadow-sm rounded-none inline-flex items-center gap-1 text-xs font-bold px-2.5" 
                             title="Tinjau & Verifikasi"
                           >
-                            <Eye className="w-3.5 h-3.5" /> Telaah
+                            <Eye className="w-3.5 h-3.5" /> Detail
                           </Link>
                         </div>
                       </td>

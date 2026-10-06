@@ -64,12 +64,12 @@ export default function BillCheckSection() {
           <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             Cek Tagihan &amp; Status e-SKRD
           </h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-xl mx-auto">
             Masukkan Nomor SKRD atau Nomor Invoice untuk melihat rincian tagihan dan nomor pembayaran Virtual Account Bank Papua.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-7 shadow-sm">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-7 shadow-sm">
           
           <form onSubmit={handleSearch} className="space-y-4">
             <label htmlFor={searchInputId} className="sr-only">
@@ -79,21 +79,21 @@ export default function BillCheckSection() {
             <div className="flex flex-col sm:flex-row gap-2.5">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <FileText className="w-5 h-5 text-gray-400" />
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 </div>
                 <input
                   id={searchInputId}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Masukkan Nomor SKRD atau Invoice (contoh: SKRD-2026-02-0145)..."
-                  className="w-full pl-11 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:border-transparent transition-all"
+                  placeholder="Nomor SKRD atau Invoice (contoh: SKRD-2026-02-0145)..."
+                  className="w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#3c8dbc] focus:border-transparent transition-all"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isSearching}
-                className="px-6 py-3 bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 cursor-pointer"
               >
                 {isSearching ? (
                   <>
@@ -164,13 +164,13 @@ export default function BillCheckSection() {
                 <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <span className="text-[11px] text-gray-500 block mb-0.5">Total Tagihan:</span>
-                    <span className="text-2xl font-black text-gray-900">
+                    <span className="text-xl sm:text-2xl font-black text-gray-900">
                       Rp {searchResult.totalTagihan.toLocaleString('id-ID')}
                     </span>
                   </div>
 
                   {searchResult.status === 'PAID' ? (
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <span className="text-[11px] text-gray-500 block mb-0.5">Nomor Transaksi Kasda:</span>
                       <span className="font-mono text-xs font-bold text-emerald-700">{searchResult.ntb}</span>
                     </div>
@@ -184,7 +184,7 @@ export default function BillCheckSection() {
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs pt-1">
                   <span className="text-gray-500 italic text-[11px]">
                     {searchResult.keterangan}
                   </span>
@@ -192,7 +192,7 @@ export default function BillCheckSection() {
                   {searchResult.status === 'PAID' ? (
                     <Link
                       href="/cetak/skrd/sample"
-                      className="px-3.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                      className="w-full sm:w-auto justify-center px-3.5 py-2 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>Cetak Bukti</span>
@@ -200,7 +200,7 @@ export default function BillCheckSection() {
                   ) : searchResult.tokenDarurat ? (
                     <Link
                       href={`/pembayaran-darurat/${searchResult.tokenDarurat}`}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                      className="w-full sm:w-auto justify-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
                     >
                       <CreditCard className="w-3.5 h-3.5" />
                       <span>Bayar Sekarang (QRIS / VA)</span>
@@ -208,7 +208,7 @@ export default function BillCheckSection() {
                   ) : (
                     <Link
                       href="/login"
-                      className="px-4 py-2 bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
+                      className="w-full sm:w-auto justify-center px-4 py-2.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5"
                     >
                       <span>Masuk Portal untuk Bayar</span>
                       <ArrowRight className="w-3.5 h-3.5" />

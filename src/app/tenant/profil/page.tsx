@@ -15,9 +15,17 @@ export default function ProfilLegalitasPage() {
   const [tenantData, setTenantData] = useState<any>(null);
   const actualStatus = tenantData?.status_verifikasi || user?.status_verifikasi;
 
+  const isMaskapai = tenantData?.jenis_tenant === 'Maskapai';
+  const requiredDocs = isMaskapai ? ['nib', 'npwp', 'akta', 'aoc'] : ['nib', 'npwp', 'akta'];
+  const uploadedDocsCount = tenantData?.legalitas
+    ? requiredDocs.filter((doc) => Boolean(tenantData.legalitas[doc])).length
+    : 0;
+  const isLegalitasComplete = requiredDocs.length > 0 && uploadedDocsCount === requiredDocs.length;
+
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [editForm, setEditForm] = useState<EditProfileFormData>({
     nib: '',
     npwp: '',
@@ -26,6 +34,39 @@ export default function ProfilLegalitasPage() {
     email: '',
     alamat: '',
   });
+
+  const firstIncompleteDoc = requiredDocs.find((doc) => !tenantData?.legalitas?.[doc]) || 'nib';
+
+  useEffect(() => {
+    if (!tenantData) return;
+    // Cek apakah user pertama kali masuk ke halaman ini dan dokumen belum lengkap
+    const hasSeenTutorial = localStorage.getItem('mars_profile_tutorial_seen');
+    if (!hasSeenTutorial && !isLegalitasComplete) {
+      const timer = setTimeout(() => {
+        setIsTutorialActive(true);
+        const el = document.getElementById('tutorial-upload-target');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [tenantData, isLegalitasComplete]);
+
+  const handleStartTutorial = () => {
+    setIsTutorialActive(true);
+    setTimeout(() => {
+      const el = document.getElementById('tutorial-upload-target');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  };
+
+  const handleDismissTutorial = () => {
+    localStorage.setItem('mars_profile_tutorial_seen', 'true');
+    setIsTutorialActive(false);
+  };
 
   useEffect(() => {
     if (user?.tenant_id) {
@@ -68,6 +109,17 @@ export default function ProfilLegalitasPage() {
     const file = e.target.files?.[0];
     if (!file || !user?.tenant_id) return;
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Ukuran file terlalu besar. Maksimal ukuran file adalah 5 MB.');
+      e.target.value = '';
+      return;
+    }
+
+    if (isTutorialActive) {
+      handleDismissTutorial();
+    }
+
     setIsUploading(docType);
     try {
       await tenantService.uploadLegalitas(user.tenant_id, docType, file);
@@ -98,6 +150,10 @@ export default function ProfilLegalitasPage() {
       <ProfileStatusAlert
         status={actualStatus}
         alasanPenolakan={tenantData?.alasan_penolakan}
+        isLegalitasComplete={isLegalitasComplete}
+        uploadedDocsCount={uploadedDocsCount}
+        totalDocsCount={requiredDocs.length}
+        onStartTutorial={handleStartTutorial}
       />
 
       <div className="flex flex-col lg:flex-row gap-4 mt-2">
@@ -117,6 +173,10 @@ export default function ProfilLegalitasPage() {
             statusVerifikasi={tenantData?.status_verifikasi}
             isUploading={isUploading}
             onFileUpload={handleFileUpload}
+            isLegalitasComplete={isLegalitasComplete}
+            tutorialDocType={firstIncompleteDoc}
+            isTutorialActive={isTutorialActive}
+            onDismissTutorial={handleDismissTutorial}
           />
         </div>
       </div>

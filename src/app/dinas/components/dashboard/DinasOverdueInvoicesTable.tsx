@@ -15,11 +15,11 @@ export const DinasOverdueInvoicesTable: React.FC<DinasOverdueInvoicesTableProps>
     <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
       <div className="p-3.5 border-b border-[#f4f4f4] bg-slate-50 flex justify-between items-center">
         <h3 className="text-[14px] text-[#333] font-bold flex items-center">
-          <AlertTriangle className="w-4 h-4 mr-2 text-[#dd4b39]" /> 
-          Pengawasan Piutang &amp; Rekomendasi Surat Peringatan (SP)
+          <AlertTriangle className="w-4 h-4 mr-2 text-[#3c8dbc]" /> 
+          Pengawasan Piutang &amp; Penagihan Retribusi (Perbup Mimika 25/2024)
         </h3>
         <Link href="/dinas/peringatan" className="text-xs font-bold text-[#3c8dbc] hover:underline flex items-center gap-1">
-          Kelola Surat Peringatan <ArrowRight className="w-3 h-3" />
+          Kelola Penagihan Piutang <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
       
@@ -69,7 +69,7 @@ export const DinasOverdueInvoicesTable: React.FC<DinasOverdueInvoicesTableProps>
                       href="/dinas/peringatan"
                       className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-[11px] px-2.5 py-1 transition-colors inline-block"
                     >
-                      Proses SP
+                      Proses
                     </Link>
                   </td>
                 </tr>

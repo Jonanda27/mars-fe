@@ -4,6 +4,7 @@ import { Bell, LogOut, Inbox } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { useNotificationStore, Notification } from '@/store/useNotificationStore';
+import toast from 'react-hot-toast';
 
 interface TopNavbarProps {
   readonly onToggleSidebar?: () => void;
@@ -128,6 +129,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
   };
 
   const handleLogout = () => {
+    toast.dismiss();
     logout();
     setShowLogoutModal(false);
     disconnectSSE();

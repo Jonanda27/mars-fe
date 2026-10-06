@@ -89,12 +89,14 @@ export default function DinasVerifikasiTenantPage() {
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
-      <header className="flex justify-between items-end mb-4">
-        <h1 className="text-[24px] font-normal text-[#333]">
-          Verifikasi Legalitas Mitra <small className="text-[15px] font-light text-[#777] ml-2">Pemeriksaan NIB, SIUAU, NPWP &amp; Akta</small>
-        </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Dinas Portal</span> / <span className="ml-1 font-medium">Verifikasi Mitra</span>
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
+        <div>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Verifikasi Mitra <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
+          </h1>
+        </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Verifikasi Mitra</span>
         </div>
       </header>
 

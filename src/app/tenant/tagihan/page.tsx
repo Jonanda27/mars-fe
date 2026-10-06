@@ -12,6 +12,8 @@ import { TenantInvoiceFilterBar } from './components/TenantInvoiceFilterBar';
 import { TenantInvoiceCard } from './components/TenantInvoiceCard';
 import { UploadSTSModal } from '@/components/tagihan/modals/UploadSTSModal';
 import { SKRDPreviewModal } from '@/components/tagihan/modals/SKRDPreviewModal';
+import { WarningDocModal } from '@/components/tagihan/modals/WarningDocModal';
+import { InvoiceWarning } from '@/types/invoice';
 
 export default function TenantTagihanPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -31,6 +33,11 @@ export default function TenantTagihanPage() {
   // SKRD Modal state
   const [showSkrdModal, setShowSkrdModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  // Opsi A: Warning / STRD Document Modal State
+  const [showWarningDocModal, setShowWarningDocModal] = useState(false);
+  const [selectedWarningDoc, setSelectedWarningDoc] = useState<InvoiceWarning | null>(null);
+  const [selectedWarningInvoice, setSelectedWarningInvoice] = useState<Invoice | null>(null);
 
   const fetchInvoices = useCallback(async () => {
     try {
@@ -293,6 +300,11 @@ export default function TenantTagihanPage() {
                       setUploadInvoice(inv);
                       setShowUploadModal(true);
                     }}
+                    onOpenWarningDoc={(inv, warn) => {
+                      setSelectedWarningInvoice(inv);
+                      setSelectedWarningDoc(warn);
+                      setShowWarningDocModal(true);
+                    }}
                   />
                 ))}
               </div>
@@ -368,6 +380,18 @@ export default function TenantTagihanPage() {
         isOpen={showSkrdModal}
         invoice={selectedInvoice}
         onClose={() => setShowSkrdModal(false)}
+      />
+
+      {/* OPSI A: MODAL NASKAH DINAS RESMI (STRD / TEGURAN / PEMBERITAHUAN) */}
+      <WarningDocModal
+        isOpen={showWarningDocModal}
+        warning={selectedWarningDoc}
+        invoice={selectedWarningInvoice}
+        onClose={() => {
+          setShowWarningDocModal(false);
+          setSelectedWarningDoc(null);
+          setSelectedWarningInvoice(null);
+        }}
       />
     </div>
   );

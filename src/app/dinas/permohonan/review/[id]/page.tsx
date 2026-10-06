@@ -210,18 +210,19 @@ export default function DinasReviewPermohonanPage() {
     <div className="p-4 sm:p-6 bg-[#ecf0f5] min-h-full font-sans">
       
       {/* Header & Breadcrumb */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-6">
         <div>
-          <Link href="/dinas/permohonan" className="inline-flex items-center text-sm text-slate-500 hover:text-[#3c8dbc] transition-colors mb-2">
+          <Link href="/dinas/permohonan" className="inline-flex items-center text-sm text-slate-500 hover:text-[#3c8dbc] transition-colors mb-1">
             <ArrowLeft className="w-4 h-4 mr-1" /> Kembali ke Daftar Permohonan
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-              {isMini ? 'Telaah Permohonan Mini Airport' : 'Telaah Permohonan Sewa'}
+            <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+              {isMini ? 'Review Permohonan Mini Airport' : 'Review Permohonan Sewa'}{' '}
+              <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
             </h1>
-            <StatusBadge status={app.status} className="text-xs px-4 py-1.5" />
+            <StatusBadge status={app.status} className="text-xs px-3 py-1" />
           </div>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             ID Ref: <span className="font-mono bg-slate-200 px-1.5 py-0.5 rounded text-slate-700">{app.application_number}</span> &bull; Diajukan pada: {app.created_at ? dayjs(app.created_at).format('DD MMMM YYYY') : '-'}
             {isMini && miniAirportName && (
               <span className="ml-2 font-medium text-slate-600">
@@ -230,7 +231,10 @@ export default function DinasReviewPermohonanPage() {
             )}
           </p>
         </div>
-      </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Review Permohonan</span>
+        </div>
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         

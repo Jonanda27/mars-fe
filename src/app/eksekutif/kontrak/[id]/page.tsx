@@ -141,22 +141,27 @@ export default function EksekutifKontrakDetailPage() {
       </div>
 
       {/* Page Title */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-2">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
         <div>
-          <h1 className="text-[22px] font-normal text-[#333] flex items-center gap-2">
-            Pengesahan Kontrak <small className="text-[14px] font-mono text-[#777] font-light">#{contract.contract_number}</small>
-          </h1>
-          <p className="text-[12px] text-[#777] mt-0.5">
-            Dokumen Perjanjian Kerja Sama (PKS) {
+          <div className="flex items-center gap-3">
+            <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+              Pengesahan Kontrak &amp; PKS <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
+            </h1>
+            <StatusBadge status={contract.status || 'Draft'} />
+          </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Nomor PKS: <span className="font-mono bg-slate-200 px-1.5 py-0.5 text-slate-700 font-bold">{contract.contract_number}</span> &bull; {
               isMiniAirport 
-                ? `Kontrak Payung Pelayanan Bandara ${miniAirportName} (${miniAirportCode})` 
+                ? `Pelayanan Bandara ${miniAirportName} (${miniAirportCode})` 
                 : isHanggar 
-                ? 'Kontrak Payung Hanggar Mozes Kilangin' 
+                ? 'Hanggar & Apron Mozes Kilangin' 
                 : 'Sewa Ruangan'
             }
           </p>
         </div>
-        <StatusBadge status={contract.status || 'Draft'} />
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Kepala Dinas</span> / <Link href="/eksekutif/kontrak" className="mx-1 hover:underline">Persetujuan Kontrak</Link> / <span className="ml-1 font-medium">{contract.contract_number}</span>
+        </div>
       </header>
 
       {/* Action Banner for Kadis (if Pending) */}

@@ -50,8 +50,8 @@ export default function MasterAsetPage() {
         <h1 className="text-[24px] font-normal text-[#333] flex items-center">
           Master Data Aset <small className="text-[15px] text-[#777] ml-2 font-light">Kelola Fasilitas Bandara</small>
         </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <Home className="w-3 h-3 mr-1" /> <span className="mr-1">Home</span> / <span className="ml-1 font-medium">Data Aset</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Data Aset</span>
         </div>
       </header>
 

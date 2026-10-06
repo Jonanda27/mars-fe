@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { dashboardService, DinasDashboardData } from '@/services/dashboardService';
 
 import { DinasKPICards } from './components/dashboard/DinasKPICards';
-import { DinasActionQueueHub } from './components/dashboard/DinasActionQueueHub';
 import { DinasOverdueInvoicesTable } from './components/dashboard/DinasOverdueInvoicesTable';
 import { DinasRecentApplicationsTable } from './components/dashboard/DinasRecentApplicationsTable';
 import { DinasRevenueBreakdownCard } from './components/dashboard/DinasRevenueBreakdownCard';
@@ -39,42 +38,26 @@ export default function DinasDashboardPage() {
     );
   }
 
-  const { kpi, action_queue, recent_applications, top_overdue_invoices, revenue_breakdown } = data;
+  const { kpi, recent_applications, top_overdue_invoices, revenue_breakdown } = data;
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[22px] font-normal text-[#333] flex items-baseline uppercase">
-            Dashboard Kinerja Pelayanan &amp; PAD
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Dashboard Dinas <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
           </h1>
-          <p className="text-[12px] text-[#777] mt-0.5">
-            Dinas Perhubungan Kabupaten Mimika &bull; Seksi Pengelolaan UPBU Bandara Mozes Kilangin
-          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={fetchDashboardData}
-            title="Segarkan Data"
-            className="p-1.5 bg-white border border-[#d2d6de] hover:bg-slate-50 text-slate-600 transition-colors shadow-2xs flex items-center gap-1 text-xs font-bold cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5 text-[#3c8dbc]" /> Refresh
-          </button>
-          <div className="text-[12px] text-[#777] items-center bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-2xs hidden sm:flex">
-            <span className="mr-1">Dinas Portal</span> / <span className="ml-1 font-bold text-slate-800">Dashboard Kinerja</span>
-          </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Dashboard</span>
         </div>
       </header>
 
       {/* Baris 1: 4 KPI Cards */}
       <DinasKPICards kpi={kpi} />
 
-      {/* Baris 2: Dinas Action Command Hub */}
-      <DinasActionQueueHub actionQueue={action_queue} />
-
-      {/* Baris 3: Layout 2 Kolom (Pengawasan Piutang & Permohonan Masuk vs Komposisi PAD) */}
+      {/* Baris 2: Layout 2 Kolom (Pengawasan Piutang & Permohonan Masuk vs Komposisi PAD) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Kolom Kiri: 2/3 Lebar (Tabel Piutang & Pipeline Permohonan) */}
         <div className="lg:col-span-2 flex flex-col gap-4">

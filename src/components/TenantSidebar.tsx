@@ -14,7 +14,8 @@ import {
   FileSignature,
   Building2,
   Calendar,
-  TowerControl
+  TowerControl,
+  BellRing
 } from 'lucide-react';
 import RupiahIcon from './icons/RupiahIcon';
 
@@ -31,6 +32,7 @@ export default function TenantSidebar({ isOpen, onToggle }: Readonly<{ isOpen: b
     { href: "/tenant/kontrak-sewa", label: "Kontrak Sewa", icon: <Building2 /> },
     { href: "/tenant/pesawat", label: "Data Pesawat", icon: <Plane /> },
     { href: "/tenant/tagihan", label: "SKRD dan Tagihan", icon: <RupiahIcon /> },
+    { href: "/tenant/peringatan", label: "Surat Penagihan", icon: <BellRing /> },
     { href: "/tenant/pembayaran", label: "Riwayat Pembayaran", icon: <CreditCard /> },
     { href: "/tenant/profil", label: "Profil dan Legalitas", icon: <ShieldCheck /> },
   ];
@@ -51,7 +53,7 @@ export default function TenantSidebar({ isOpen, onToggle }: Readonly<{ isOpen: b
         !isVerified ? (
           <span className="inline-flex items-center gap-1.5 text-amber-400 font-medium leading-none">
             <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-pulse" />
-            <span>Pending/Unverified</span>
+            <span>Unverified</span>
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 text-[#3c8dbc] font-medium leading-none">

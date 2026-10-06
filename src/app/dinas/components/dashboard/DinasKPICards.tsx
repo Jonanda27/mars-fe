@@ -38,7 +38,9 @@ export const DinasKPICards: React.FC<DinasKPICardsProps> = ({ kpi }) => {
           </span>
           <span className="text-[11px] text-slate-500 font-bold mt-1">
             {kpi.overdue_invoices_count > 0 ? (
-              <span className="text-[#dd4b39] font-bold">⚠️ {kpi.overdue_invoices_count} SKRD Melewati Jatuh Tempo</span>
+              <span className="text-[#dd4b39] font-bold">
+                {kpi.overdue_invoices_count} SKRD Melewati Jatuh Tempo
+              </span>
             ) : (
               <span className="text-[#3c8dbc]">Pembayaran Berjalan Lancar</span>
             )}

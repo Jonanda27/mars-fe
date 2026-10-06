@@ -213,14 +213,17 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
-      <header className="flex justify-between items-end mb-4">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333]">
-            Tagihan e-SKRD <small className="text-[15px] font-light text-[#777] ml-2">Manajemen &amp; Monitoring Pembayaran</small>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Tagihan e-SKRD{' '}
+            <span className="text-[15px] font-light text-[#777] ml-2">
+              {role === 'dinas' ? 'Dinas Perhubungan Kab. Mimika' : (isMiniAdmin ? (currentUser?.airport_name || 'Mini Airport') : 'Bandara Mozes Kilangin')}
+            </span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">{role === 'dinas' ? 'Dinas Portal' : 'Admin Portal'}</span> / <span className="ml-1 font-medium">Tagihan e-SKRD</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">{role === 'dinas' ? 'Dinas' : (isMiniAdmin ? 'Admin Mini Airport' : 'Admin')}</span> / <span className="ml-1 font-medium">Tagihan e-SKRD</span>
         </div>
       </header>
 

@@ -88,7 +88,7 @@ export default function MasterTarifPage() {
           </h1>
         </div>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">{isMiniAdmin ? 'Admin Mini Airport' : 'Admin Portal'}</span> / <span className="ml-1 font-medium text-slate-800">Master Tarif</span>
+          <span className="mr-1">{isMiniAdmin ? 'Admin Mini Airport' : 'Admin'}</span> / <span className="ml-1 font-medium">Master Tarif</span>
         </div>
       </header>
 

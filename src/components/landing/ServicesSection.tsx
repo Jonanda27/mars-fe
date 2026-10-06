@@ -45,10 +45,10 @@ export default function ServicesSection() {
           <span className="text-xs font-bold uppercase tracking-wider text-[#3c8dbc] bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-100 inline-block mb-3">
             Fitur & Layanan Utama
           </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
             Fitur Unggulan Sistem MARS
           </h2>
-          <p className="text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-xs sm:text-base text-gray-600 leading-relaxed max-w-2xl mx-auto">
             Ekosistem digital terpadu untuk efisiensi operasional apron, transparansi tata kelola aset bandara, dan kepatuhan retribusi daerah secara akuntabel.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function ServicesSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 xl:gap-8 items-center">
           
           {/* KOLOM KIRI (3 FITUR) */}
-          <div className="lg:col-span-3 flex flex-col gap-8 sm:gap-9 order-2 lg:order-1">
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-col gap-6 sm:gap-6 lg:gap-9 order-2 lg:order-1">
             
             {/* Fitur 1 */}
             <div className="flex items-start gap-3.5 group">
@@ -116,11 +116,11 @@ export default function ServicesSection() {
             >
               
               {/* 3D Perspective Trio Displays Container - Grounded Base */}
-              <div className="relative flex items-end justify-center min-h-[320px] sm:min-h-[360px] md:min-h-[400px] pb-3 pt-2">
+              <div className="relative flex items-end justify-center min-h-[250px] sm:min-h-[340px] md:min-h-[400px] pb-2 sm:pb-3 pt-1 sm:pt-2">
                 
                 {/* 1. MONITOR KIRI (Tilted Angled Inward - Dashboard Tenant) */}
                 <div 
-                  className="absolute -left-3 sm:-left-6 md:-left-8 bottom-3 w-[50%] sm:w-[48%] md:w-[46%] z-10 transition-transform duration-500 group-hover:translate-x-[-4px]"
+                  className="absolute -left-1 sm:-left-6 md:-left-8 bottom-2 sm:bottom-3 w-[46%] sm:w-[48%] md:w-[46%] z-10 transition-transform duration-500 group-hover:translate-x-[-4px]"
                   style={{
                     transform: 'perspective(1000px) rotateY(24deg) scale(0.92)',
                     transformOrigin: 'right bottom',
@@ -154,7 +154,7 @@ export default function ServicesSection() {
 
                 {/* 2. MONITOR TENGAH (Front-Facing, Layar Utama dengan Slides Berganti & Penjelasan Langsung) */}
                 <div 
-                  className="relative w-[74%] sm:w-[72%] md:w-[70%] z-20 transition-all duration-500 group-hover:scale-[1.01]"
+                  className="relative w-[76%] sm:w-[72%] md:w-[70%] z-20 transition-all duration-500 group-hover:scale-[1.01]"
                   style={{
                     filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.32))'
                   }}
@@ -217,7 +217,7 @@ export default function ServicesSection() {
 
                 {/* 3. MONITOR KANAN (Tilted Angled Inward - MARS GIS) */}
                 <div 
-                  className="absolute -right-3 sm:-right-6 md:-right-8 bottom-3 w-[50%] sm:w-[48%] md:w-[46%] z-10 transition-transform duration-500 group-hover:translate-x-[4px]"
+                  className="absolute -right-1 sm:-right-6 md:-right-8 bottom-2 sm:bottom-3 w-[46%] sm:w-[48%] md:w-[46%] z-10 transition-transform duration-500 group-hover:translate-x-[4px]"
                   style={{
                     transform: 'perspective(1000px) rotateY(-24deg) scale(0.92)',
                     transformOrigin: 'left bottom',
@@ -296,7 +296,7 @@ export default function ServicesSection() {
           </div>
 
           {/* KOLOM KANAN (3 FITUR) */}
-          <div className="lg:col-span-3 flex flex-col gap-8 sm:gap-9 order-3">
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 lg:flex lg:flex-col gap-6 sm:gap-6 lg:gap-9 order-3">
             
             {/* Fitur 4 */}
             <div className="flex items-start gap-3.5 group">

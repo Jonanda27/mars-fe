@@ -7,31 +7,33 @@ import { newsData, NewsItem } from './data';
 export default function NewsSection() {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
-  // Karakteristik rounded khas arsitektur kartu sesuai referensi:
-  // - Baris 1: Card 1 (Kiri Atas) rounded-tl, Card 2 (Tengah) sharp (rounded-none), Card 3 (Kanan Atas) rounded-tr
-  // - Baris 2: Card 4 (Kiri Bawah) rounded-bl, Card 5 (Tengah) sharp (rounded-none), Card 6 (Kanan Bawah) rounded-br
+  // Karakteristik rounded adaptif:
+  // - Mobile/Tablet (< lg): rounded-2xl sm:rounded-3xl untuk kartu individual yang rapi
+  // - Desktop (lg+): Rounded khas referensi desain:
+  //   * Baris 1: Card 0 (Kiri Atas) rounded-tl, Card 1 (Tengah) rounded-none, Card 2 (Kanan Atas) rounded-tr
+  //   * Baris 2: Card 3 (Kiri Bawah) rounded-bl, Card 4 (Tengah) rounded-none, Card 5 (Kanan Bawah) rounded-br
   const getCardRounding = (index: number) => {
     switch (index) {
       case 0:
-        return 'rounded-tl-[36px] sm:rounded-tl-[42px] rounded-tr-none rounded-br-none rounded-bl-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none lg:rounded-tl-[42px]';
       case 1:
-        return 'rounded-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none';
       case 2:
-        return 'rounded-tr-[36px] sm:rounded-tr-[42px] rounded-tl-none rounded-br-none rounded-bl-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none lg:rounded-tr-[42px]';
       case 3:
-        return 'rounded-bl-[36px] sm:rounded-bl-[42px] rounded-tl-none rounded-tr-none rounded-br-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none lg:rounded-bl-[42px]';
       case 4:
-        return 'rounded-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none';
       case 5:
-        return 'rounded-br-[36px] sm:rounded-br-[42px] rounded-tl-none rounded-tr-none rounded-bl-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none lg:rounded-br-[42px]';
       default:
-        return 'rounded-none';
+        return 'rounded-2xl sm:rounded-3xl lg:rounded-none';
     }
   };
 
   return (
     <>
-      <section id="berita" className="py-16 sm:py-20 bg-white border-b border-gray-200 scroll-mt-12">
+      <section id="berita" className="py-14 sm:py-20 bg-white border-b border-gray-200 scroll-mt-12 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Header Section: Title Kiri & Tombol Pill 'READ MORE ->' Kanan Sesuai Gambar */}
@@ -48,15 +50,15 @@ export default function NewsSection() {
             <button
               type="button"
               onClick={() => setSelectedNews(newsData[0])}
-              className="self-start sm:self-center inline-flex items-center gap-2 px-5 py-2 rounded-full border border-gray-400 hover:border-[#0c3948] text-gray-700 hover:text-[#0c3948] text-xs font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-xs hover:bg-gray-50"
+              className="self-start sm:self-center inline-flex items-center gap-2 px-4 sm:px-5 py-2 rounded-full border border-gray-400 hover:border-[#0c3948] text-gray-700 hover:text-[#0c3948] text-xs font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-xs hover:bg-gray-50"
             >
               <span>READ MORE</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Grid Layout 3 Kolom: Card Square dengan Rounded Khas Sesuai Referensi Gambar */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7">
+          {/* Grid Layout: 1 kolom di mobile, 2 kolom di tablet (sm/md), 3 kolom di desktop (lg) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7">
             {newsData.map((item, idx) => (
               <article
                 key={item.id}
@@ -108,15 +110,15 @@ export default function NewsSection() {
       {/* POPUP MODAL DETAIL BERITA */}
       {selectedNews && (
         <div 
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
           onClick={() => setSelectedNews(null)}
         >
           <div 
-            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 flex flex-col"
+            className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header Gambar Modal: Bersih Tanpa Teks Menutupi Gambar */}
-            <div className="relative h-60 sm:h-72 w-full shrink-0 overflow-hidden bg-slate-900">
+            <div className="relative h-48 sm:h-64 md:h-72 w-full shrink-0 overflow-hidden bg-slate-900">
               <img 
                 src={selectedNews.imageSrc} 
                 alt={selectedNews.title} 
@@ -127,15 +129,15 @@ export default function NewsSection() {
               <button
                 type="button"
                 onClick={() => setSelectedNews(null)}
-                className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-lg"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-lg"
                 aria-label="Tutup"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
             {/* Isi Konten Modal di Bawah Gambar */}
-            <div className="p-6 sm:p-8 flex flex-col gap-4">
+            <div className="p-4 sm:p-6 md:p-8 flex flex-col gap-3.5 sm:gap-4">
               {/* Kategori & Tanggal */}
               <div className="flex items-center gap-2 text-xs">
                 <span className="font-bold text-[#3c8dbc]">

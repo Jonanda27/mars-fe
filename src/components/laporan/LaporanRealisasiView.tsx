@@ -190,15 +190,17 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full space-y-4">
       {/* Header Halaman */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
         <div>
           <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
             Laporan Realisasi Retribusi{' '}
-            <small className="text-[15px] font-light text-[#777] ml-2">Rekapitulasi PAD Bandara Mozes Kilangin</small>
+            <span className="text-[15px] font-light text-[#777] ml-2">
+              {roleLabel === 'Dinas' ? 'Dinas Perhubungan Kab. Mimika' : 'Bandara Mozes Kilangin'}
+            </span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <span className="mr-1">{roleLabel}</span> / <span className="ml-1 font-medium text-slate-800">Laporan Realisasi</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">{roleLabel}</span> / <span className="ml-1 font-medium">Laporan Realisasi</span>
         </div>
       </header>
 

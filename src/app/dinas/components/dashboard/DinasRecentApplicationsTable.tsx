@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { FileText, ArrowRight } from 'lucide-react';
 import { DinasDashboardData } from '@/services/dashboardService';
 import dayjs from 'dayjs';
+import StatusBadge from '@/components/StatusBadge';
 
 interface DinasRecentApplicationsTableProps {
   readonly recentApplications: DinasDashboardData['recent_applications'];
@@ -56,22 +57,14 @@ export const DinasRecentApplicationsTable: React.FC<DinasRecentApplicationsTable
                     {dayjs(app.created_at).format('DD MMM YYYY')}
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold border ${
-                      app.status === 'Approved'
-                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                        : app.status === 'Rejected'
-                          ? 'bg-red-100 text-red-800 border-red-200'
-                          : 'bg-blue-50 text-[#3c8dbc] border-blue-200'
-                    }`}>
-                      {app.status || 'Pending'}
-                    </span>
+                    <StatusBadge status={app.status || 'Pending'} />
                   </td>
                   <td className="py-3 px-4 text-center">
                     <Link
                       href={`/dinas/permohonan/review/${app.id}`}
                       className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-[11px] px-2.5 py-1 transition-colors inline-block"
                     >
-                      Telaah
+                      Detail
                     </Link>
                   </td>
                 </tr>

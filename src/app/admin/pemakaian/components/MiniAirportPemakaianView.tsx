@@ -89,8 +89,8 @@ export const MiniAirportPemakaianView: React.FC<MiniAirportPemakaianViewProps> =
           >
             <RefreshCw className="w-3.5 h-3.5 text-[#3c8dbc]" /> Refresh
           </button>
-          <div className="text-[12px] text-[#777] flex items-center bg-white border border-[#d2d6de] p-2 shadow-2xs hidden sm:flex">
-            <span className="mr-1">Admin Mini Airport</span> / <span className="ml-1 font-bold text-slate-800">Log Realisasi</span>
+          <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+            <span className="mr-1">Admin Mini Airport</span> / <span className="ml-1 font-medium">Log Realisasi</span>
           </div>
         </div>
       </header>

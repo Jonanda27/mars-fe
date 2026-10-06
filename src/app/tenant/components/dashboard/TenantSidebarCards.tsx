@@ -52,13 +52,17 @@ export const TenantSidebarCards: React.FC<TenantSidebarCardsProps> = ({
                     {sch.registration_number || sch.aircraft?.registration_number || 'PK-XXX'}
                   </span>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                    sch.status === 'Disetujui' || sch.status === 'Checked-In'
-                      ? 'bg-emerald-50 text-[#00a65a] border-emerald-200'
-                      : sch.status === 'Ditolak'
-                        ? 'bg-red-50 text-[#dd4b39] border-red-200'
-                        : 'bg-blue-50 text-[#3c8dbc] border-blue-200'
+                    sch.status === 'Checked-Out' || sch.status === 'Selesai' || sch.status === 'Completed'
+                      ? 'bg-purple-50 text-[#605ca8] border-purple-200'
+                      : sch.status === 'Disetujui'
+                        ? 'bg-emerald-50 text-[#00a65a] border-emerald-200'
+                        : sch.status === 'Checked-In'
+                          ? 'bg-blue-50 text-[#3c8dbc] border-blue-200'
+                          : sch.status === 'Ditolak'
+                            ? 'bg-red-50 text-[#dd4b39] border-red-200'
+                            : 'bg-amber-50 text-[#f39c12] border-amber-200'
                   }`}>
-                    {sch.status}
+                    {sch.status === 'Selesai' || sch.status === 'Completed' ? 'Checked-Out' : sch.status}
                   </span>
                 </div>
                 <div className="text-[11px] text-slate-600 flex items-center justify-between">

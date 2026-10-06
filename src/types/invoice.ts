@@ -39,6 +39,19 @@ export interface UnbilledHanggarLog {
   contract_number?: string | null;
 }
 
+export interface InvoiceWarning {
+  id: number;
+  warning_number: string;
+  tenant_id: number;
+  invoice_id?: number | null;
+  type: string;
+  message?: string | null;
+  status?: string | null;
+  created_at: string;
+  tenants?: any;
+  invoices?: any;
+}
+
 export interface Invoice {
   id: number;
   invoice_number: string;
@@ -57,4 +70,5 @@ export interface Invoice {
   contracts?: Contract | null;
   tenants?: any;
   operational_logs?: any[];
+  warnings?: InvoiceWarning[];
 }

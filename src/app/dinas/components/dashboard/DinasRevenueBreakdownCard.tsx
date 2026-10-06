@@ -109,7 +109,7 @@ export const DinasRevenueBreakdownCard: React.FC<DinasRevenueBreakdownCardProps>
           </div>
           <div className="flex items-start gap-2">
             <div className="w-4 h-4 bg-blue-50 text-[#3c8dbc] flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5">3</div>
-            <p>Penerbitan Surat Peringatan berjenjang (SP-1 H+7, SP-2 H+14, SP-3 H+21) bagi wajib retribusi menunggak.</p>
+            <p>Penagihan piutang retribusi berjenjang: Surat Pemberitahuan H-7, Surat Teguran H+7, dan STRD bunga 1%/bulan (Perbup Mimika 25/2024 Pasal 21).</p>
           </div>
         </div>
       </div>

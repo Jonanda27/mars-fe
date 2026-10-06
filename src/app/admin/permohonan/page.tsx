@@ -108,40 +108,19 @@ export default function PermohonanAdminPage() {
 
   const isMiniAirportAdmin = user?.role === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
 
-  const airportBadge = useMemo(() => {
-    if (isMiniAirportAdmin) {
-      return (
-        <span className="text-[12px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 border border-amber-200">
-          Wilayah: [Mini Airport] {user?.airport_name || 'Khusus Wilayah Anda'} {user?.airport_code ? `(${user.airport_code})` : ''}
-        </span>
-      );
-    }
-    if (user?.airport_id || user?.role === 'admin') {
-      return (
-        <span className="text-[12px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 border border-slate-300">
-          Wilayah: {user?.airport_name || 'Bandara Mozes Kilangin'} {user?.airport_code ? `(${user.airport_code})` : ''}
-        </span>
-      );
-    }
-    return null;
-  }, [user, isMiniAirportAdmin]);
-
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full font-sans">
-      <header className="flex justify-between items-end mb-4">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-center gap-2 flex-wrap">
-            Permohonan Masuk
-            {airportBadge}
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Permohonan Masuk{' '}
+            <span className="text-[15px] font-light text-[#777] ml-2">
+              {isMiniAirportAdmin ? (user?.airport_name || 'Mini Airport') : 'Bandara Mozes Kilangin'}
+            </span>
           </h1>
-          <p className="text-[13px] text-[#777] mt-0.5">
-            {isMiniAirportAdmin 
-              ? `Daftar permohonan operasional & pendaratan khusus yang ditujukan ke ${user?.airport_name || 'Mini Airport Anda'}.`
-              : 'Daftar permohonan pemanfaatan sewa hanggar, apron, dan ruangan Bandara Mozes Kilangin.'}
-          </p>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Permohonan</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">{isMiniAirportAdmin ? 'Admin Mini Airport' : 'Admin'}</span> / <span className="ml-1 font-medium">Permohonan</span>
         </div>
       </header>
 

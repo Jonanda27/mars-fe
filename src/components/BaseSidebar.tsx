@@ -93,7 +93,17 @@ export default function BaseSidebar({
         {/* Navigation Items */}
         <ul className="text-[14px] mt-2">
           {navItems.map((item) => {
-            const isActive = pathname === item.href;
+            const isRootDashboard =
+              item.href === '/tenant' ||
+              item.href === '/admin' ||
+              item.href === '/superadmin' ||
+              item.href === '/eksekutif' ||
+              item.href === '/dinas' ||
+              item.href === '/petugas';
+
+            const isActive = isRootDashboard
+              ? pathname === item.href
+              : pathname === item.href || (pathname ? pathname.startsWith(`${item.href}/`) : false);
 
             if (item.disabled) {
               return (

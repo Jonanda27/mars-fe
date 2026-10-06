@@ -118,12 +118,14 @@ export default function EksekutifKontrakPage() {
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
-      <header className="flex justify-between items-end mb-4">
-        <h1 className="text-[24px] font-normal text-[#333]">
-          Persetujuan Kontrak <small className="text-[15px] font-light text-[#777] ml-2">Daftar kontrak masuk</small>
-        </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Eksekutif Portal</span> / <span className="ml-1 font-medium">Persetujuan Kontrak</span>
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
+        <div>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Persetujuan Kontrak &amp; PKS <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
+          </h1>
+        </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Kepala Dinas</span> / <span className="ml-1 font-medium">Persetujuan Kontrak</span>
         </div>
       </header>
 
@@ -131,10 +133,29 @@ export default function EksekutifKontrakPage() {
       <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
         
         {/* Filter Tabs & Search Header */}
-        <div className="p-3.5 border-b border-[#f4f4f4] flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+        <div className="p-3.5 border-b border-[#f4f4f4] flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3">
           
-          {/* Tabs Filter Konsisten */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Tabs Filter Konsisten & Rapi */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {/* Tab 1: Semua */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('all')}
+              className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 rounded-none border ${
+                activeTab === 'all'
+                  ? 'bg-[#3c8dbc] text-white border-[#3c8dbc] shadow-2xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
+              }`}
+            >
+              <span>Semua</span>
+              <span className={`px-1.5 py-0.2 rounded-none text-[10.5px] font-mono ${
+                activeTab === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
+                {stats.total}
+              </span>
+            </button>
+
+            {/* Tab 2: Menunggu Pengesahan */}
             <button
               type="button"
               onClick={() => setActiveTab('pending')}
@@ -147,12 +168,15 @@ export default function EksekutifKontrakPage() {
               <Clock className="w-3.5 h-3.5" /> 
               <span>Menunggu Pengesahan</span>
               <span className={`px-1.5 py-0.2 rounded-none text-[10.5px] font-mono ${
-                activeTab === 'pending' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'
+                activeTab === 'pending' 
+                  ? 'bg-white/20 text-white' 
+                  : (stats.pending > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-700')
               }`}>
                 {stats.pending}
               </span>
             </button>
 
+            {/* Tab 3: Kontrak Aktif */}
             <button
               type="button"
               onClick={() => setActiveTab('active')}
@@ -171,6 +195,7 @@ export default function EksekutifKontrakPage() {
               </span>
             </button>
 
+            {/* Tab 4: Hanggar */}
             <button
               type="button"
               onClick={() => setActiveTab('hanggar')}
@@ -181,7 +206,7 @@ export default function EksekutifKontrakPage() {
               }`}
             >
               <Plane className="w-3.5 h-3.5" /> 
-              <span>PKS Payung (Hanggar)</span>
+              <span>Hanggar</span>
               <span className={`px-1.5 py-0.2 rounded-none text-[10.5px] font-mono ${
                 activeTab === 'hanggar' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
@@ -189,6 +214,7 @@ export default function EksekutifKontrakPage() {
               </span>
             </button>
 
+            {/* Tab 5: Mini Airport */}
             <button
               type="button"
               onClick={() => setActiveTab('mini_airport')}
@@ -199,7 +225,7 @@ export default function EksekutifKontrakPage() {
               }`}
             >
               <MapPin className="w-3.5 h-3.5" /> 
-              <span>PKS Payung (Mini Airport)</span>
+              <span>Mini Airport</span>
               <span className={`px-1.5 py-0.2 rounded-none text-[10.5px] font-mono ${
                 activeTab === 'mini_airport' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
@@ -207,6 +233,7 @@ export default function EksekutifKontrakPage() {
               </span>
             </button>
 
+            {/* Tab 6: Sewa Ruangan */}
             <button
               type="button"
               onClick={() => setActiveTab('ruangan')}
@@ -217,29 +244,17 @@ export default function EksekutifKontrakPage() {
               }`}
             >
               <Building2 className="w-3.5 h-3.5" /> 
-              <span>PKS Sewa Ruangan</span>
+              <span>Sewa Ruangan</span>
               <span className={`px-1.5 py-0.2 rounded-none text-[10.5px] font-mono ${
                 activeTab === 'ruangan' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
               }`}>
                 {stats.ruangan}
               </span>
             </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('all')}
-              className={`px-3 py-1.5 text-xs font-bold transition-all cursor-pointer rounded-none border ${
-                activeTab === 'all'
-                  ? 'bg-[#3c8dbc] text-white border-[#3c8dbc] shadow-2xs'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200'
-              }`}
-            >
-              Semua ({stats.total})
-            </button>
           </div>
 
           {/* Search Box */}
-          <div className="relative w-full md:w-72">
+          <div className="relative w-full lg:w-64 flex-shrink-0">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
-  Calendar, Plane, CheckCircle2, XCircle, Clock 
+  Calendar, Plane, CheckCircle2, XCircle, Clock, FileText 
 } from 'lucide-react';
 import { FlightSchedule } from '@/types/flightSchedule';
 import StatusBadge from '@/components/StatusBadge';
+import { SuratIzinMasukModal } from '@/components/SuratIzinMasukModal';
 import dayjs from 'dayjs';
 
 interface ScheduleRosterTableProps {
@@ -15,6 +16,7 @@ export const ScheduleRosterTable: React.FC<ScheduleRosterTableProps> = ({
   schedules,
   aircraftBookingMap,
 }) => {
+  const [selectedScheduleForTicket, setSelectedScheduleForTicket] = useState<FlightSchedule | null>(null);
 
   return (
     <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs rounded-none">
@@ -47,12 +49,15 @@ export const ScheduleRosterTable: React.FC<ScheduleRosterTableProps> = ({
                 <th className="py-3 px-4">Estimasi Masuk Hanggar</th>
                 <th className="py-3 px-4 text-center">Status</th>
                 <th className="py-3 px-4">Catatan Petugas</th>
+                <th className="py-3 px-4 text-center">Aksi Dokumen</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f4f4f4]">
               {schedules.map((item) => {
                 const booking = aircraftBookingMap?.[item.registration_number] 
                   || (item.aircraft_id ? aircraftBookingMap?.[String(item.aircraft_id)] : undefined);
+
+                const isPermitAvailable = ['Disetujui', 'Checked-In', 'Checked-Out', 'Selesai', 'Completed'].includes(item.status);
 
                 return (
                   <tr key={item.id} className="hover:bg-[#f9f9f9] transition-colors">
@@ -86,7 +91,7 @@ export const ScheduleRosterTable: React.FC<ScheduleRosterTableProps> = ({
                       {dayjs(item.estimated_arrival).format('DD MMM YYYY, HH:mm')} WIT
                     </td>
                     <td className="py-3 px-4 text-center">
-                      <StatusBadge status={item.status} />
+                      <StatusBadge status={item.status === 'Selesai' || item.status === 'Completed' ? 'Checked-Out' : item.status} />
                     </td>
                     <td className="py-3 px-4 text-[11px]">
                       {item.officer_notes ? (
@@ -102,6 +107,23 @@ export const ScheduleRosterTable: React.FC<ScheduleRosterTableProps> = ({
                         <span className="text-slate-400">-</span>
                       )}
                     </td>
+                    <td className="py-3 px-4 text-center">
+                      {isPermitAvailable ? (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedScheduleForTicket(item)}
+                          className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-[#3c8dbc] text-[#3c8dbc] font-bold text-[11px] inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                          title="Lihat & Unduh PDF Tiket Izin Masuk Resmi"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-[#3c8dbc]" />
+                          <span>Lihat Tiket PDF</span>
+                        </button>
+                      ) : item.status === 'Ditolak' ? (
+                        <span className="text-[10px] text-red-500 font-medium">Izin Ditolak</span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 italic">Menunggu Izin</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
@@ -109,6 +131,14 @@ export const ScheduleRosterTable: React.FC<ScheduleRosterTableProps> = ({
           </table>
         )}
       </div>
+
+      {/* Modal Preview & Unduh Tiket Izin Masuk PDF */}
+      {selectedScheduleForTicket && (
+        <SuratIzinMasukModal
+          schedule={selectedScheduleForTicket}
+          onClose={() => setSelectedScheduleForTicket(null)}
+        />
+      )}
     </div>
   );
 };

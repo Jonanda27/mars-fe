@@ -276,7 +276,7 @@ export const CreateEmergencyPksModal: React.FC<CreateEmergencyPksModalProps> = (
               />
               {!hasSignature && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none text-slate-400 font-medium text-xs">
-                  ✍️ Gambar tanda tangan perwakilan maskapai di sini
+                  Tanda tangan perwakilan maskapai di sini
                 </div>
               )}
             </div>

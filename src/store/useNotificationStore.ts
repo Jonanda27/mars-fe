@@ -222,7 +222,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
                   message: `Kontrak No. ${c.contract_number} (${c.assets?.nama_aset || 'Aset'}) akan berakhir pada ${dayjs(c.end_date).format('DD/MM/YYYY')}. Segera ajukan perpanjangan.`,
                   type: 'TASK',
                   is_read: isRead,
-                  link_url: c.contract_type === 'Payung' ? '/tenant/kontrak-payung' : '/tenant/permohonan',
+                  link_url: (c.contract_type || '').toLowerCase().includes('payung') ? '/tenant/kontrak-payung' : '/tenant/permohonan',
                   created_at: new Date().toISOString(),
                   is_task: true
                 });

@@ -104,7 +104,7 @@ export default function EksekutifPermohonanDetailPage() {
     <div className="p-4 bg-[#ecf0f5] min-h-[calc(100vh-60px)] space-y-4 font-sans">
       
       {/* Header & Navigasi Eksekutif */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
         <div>
           <Link 
             href="/eksekutif/permohonan" 
@@ -112,18 +112,18 @@ export default function EksekutifPermohonanDetailPage() {
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> Kembali ke Daftar Persetujuan
           </Link>
-          <h1 className="text-[22px] font-normal text-[#333] flex items-baseline gap-2">
-            Detail Permohonan Sewa
-            <span className="text-[14px] text-[#777] font-mono font-normal">
-              ({app.application_number})
-            </span>
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <StatusBadge status={app.status} className="text-xs px-3.5 py-1 font-bold shadow-2xs" />
-          <div className="text-[12px] text-[#777] items-center bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-2xs hidden sm:flex rounded-none">
-            <span className="mr-1">Eksekutif Portal</span> / <span className="ml-1 font-bold text-slate-800">Tinjauan Permohonan</span>
+          <div className="flex items-center gap-3">
+            <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+              Detail Permohonan Sewa <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
+            </h1>
+            <StatusBadge status={app.status} className="text-xs px-3.5 py-1 font-bold shadow-2xs" />
           </div>
+          <p className="text-xs text-slate-500 mt-1">
+            Nomor Tiket: <span className="font-mono bg-slate-200 px-1.5 py-0.5 text-slate-700 font-bold">{app.application_number}</span> &bull; Diajukan pada: {app.created_at ? dayjs(app.created_at).format('DD MMMM YYYY') : '-'}
+          </p>
+        </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Kepala Dinas</span> / <Link href="/eksekutif/permohonan" className="mx-1 hover:underline">Persetujuan Surat</Link> / <span className="ml-1 font-medium">{app.application_number}</span>
         </div>
       </header>
 

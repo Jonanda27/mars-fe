@@ -63,8 +63,8 @@ export default function LayoutWrapper({ children }: Readonly<{ children: React.R
 
   const userRole = (user?.role || '').toLowerCase();
   const isSuperAdmin = isSuperAdminRole(userRole) || (pathname.startsWith('/superadmin') && !isTenantRole(userRole));
-  const isDinas = userRole === 'dinas';
-  const isAdmin = userRole === 'admin' || userRole === 'admin_mini_airport';
+  const isDinas = userRole === 'dinas' || pathname.startsWith('/dinas');
+  const isAdmin = (userRole === 'admin' || userRole === 'admin_mini_airport') && !pathname.startsWith('/dinas');
   const isEksekutif = isEksekutifRole(userRole) || (pathname.startsWith('/eksekutif') && !isAdmin && !isDinas && !isSuperAdmin);
   const isPetugas = isPetugasRole(userRole) || (pathname.startsWith('/petugas') && !isAdmin && !isDinas && !isSuperAdmin);
   const isTenant = isTenantRole(userRole) || (pathname.startsWith('/tenant') && !isAdmin && !isDinas && !isSuperAdmin);

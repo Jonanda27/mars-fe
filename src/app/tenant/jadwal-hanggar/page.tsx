@@ -73,7 +73,24 @@ export default function TenantJadwalHanggarPage() {
 
   // Kontrak Payung Aktif (PKS Induk)
   const activePayung = useMemo(() => {
-    return contracts.find(c => c.contract_type === 'Payung' && (c.status === 'Aktif' || c.status === 'Active')) || null;
+    const payungList = contracts.filter(c => {
+      const type = (c.contract_type || '').toLowerCase();
+      const num = (c.contract_number || '').toUpperCase();
+      const isPayung = type === 'payung' || type.includes('payung') || num.includes('PAYUNG');
+      const isAktif = ['aktif', 'active'].includes((c.status || '').toLowerCase());
+      return isPayung && isAktif;
+    });
+
+    if (payungList.length === 0) return null;
+
+    // Prioritaskan kontrak Payung Mozes Kilangin jika ada
+    const mozesPayung = payungList.find(c => {
+      const type = (c.contract_type || '').toLowerCase();
+      const num = (c.contract_number || '').toUpperCase();
+      return type.includes('mozes') || num.includes('MOZES') || (!type.includes('mini') && !num.includes('ILA') && !num.includes('EWI') && !num.includes('UGU'));
+    });
+
+    return mozesPayung || payungList[0];
   }, [contracts]);
 
   // Daftar Semua Permohonan Sewa Hanggar & Apron Aktif Milik Tenant

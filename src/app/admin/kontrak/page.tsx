@@ -121,8 +121,8 @@ export default function KontrakPage() {
             }
           </small>
         </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">{isMiniAdmin ? 'Admin Mini Airport' : 'Admin Portal'}</span> / <span className="ml-1 font-medium">{isMiniAdmin ? 'PKS Payung' : 'Manajemen Kontrak'}</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">{isMiniAdmin ? 'Admin Mini Airport' : 'Admin'}</span> / <span className="ml-1 font-medium">{isMiniAdmin ? 'PKS Payung' : 'Kontrak'}</span>
         </div>
       </header>
 

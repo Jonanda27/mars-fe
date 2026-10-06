@@ -8,8 +8,6 @@ import {
   FileText, 
   Users, 
   ShieldCheck, 
-  RefreshCw, 
-  ExternalLink, 
   ArrowRight, 
   AlertTriangle, 
   CheckCircle2, 
@@ -97,29 +95,15 @@ export default function EksekutifDashboardPage() {
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
       
-      {/* Header Halaman (Layout & Pewarnaan Selaras dengan AdminLTE & Dashboard Lainnya) */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+      {/* Header Halaman Konsisten */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-2">
         <div>
-          <h1 className="text-[20px] sm:text-[22px] font-normal text-[#333] flex items-baseline uppercase">
-            Dashboard Eksekutif <small className="text-[14px] font-light text-[#777] ml-2 lowercase">command center &amp; persetujuan kadis</small>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Dashboard Eksekutif <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
           </h1>
-          <p className="text-[12px] text-[#777] mt-0.5">
-            Pemerintah Kabupaten Mimika &bull; Dinas Perhubungan &bull; UPBU Mozes Kilangin
-          </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={fetchDashboardData}
-            disabled={isLoading}
-            title="Segarkan Data"
-            className="p-1.5 bg-white border border-[#d2d6de] hover:bg-slate-50 text-slate-600 transition-colors shadow-2xs flex items-center gap-1 text-xs font-bold cursor-pointer"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#3c8dbc] ${isLoading ? 'animate-spin' : ''}`} /> Refresh
-          </button>
-          <div className="text-[12px] text-[#777] items-center bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-2xs hidden sm:flex">
-            <span className="mr-1">Eksekutif Portal</span> / <span className="ml-1 font-bold text-slate-800">Dashboard Eksekutif</span>
-          </div>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Kepala Dinas</span> / <span className="ml-1 font-medium">Dashboard</span>
         </div>
       </header>
 
@@ -195,95 +179,7 @@ export default function EksekutifDashboardPage() {
         </div>
       </div>
 
-      {/* Baris 2: Executive Action Hub (Akses Cepat Persetujuan Kadis) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        
-        {/* Akses 1: Persetujuan Permohonan */}
-        <Link 
-          href="/eksekutif/permohonan"
-          className="bg-white p-3.5 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase">1. Izin Prinsip Permohonan</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              Persetujuan Surat Masuk
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Disposisi &amp; telaah surat pemohon
-            </p>
-          </div>
-          <span className={`w-8 h-8 flex items-center justify-center font-bold text-xs ${
-            actionQueue.pendingApplications > 0
-              ? 'bg-amber-50 text-[#f39c12] border border-amber-200'
-              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
-          }`}>
-            {actionQueue.pendingApplications}
-          </span>
-        </Link>
-
-        {/* Akses 2: Pengesahan Kontrak PKS */}
-        <Link 
-          href="/eksekutif/kontrak"
-          className="bg-white p-3.5 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase">2. Pengesahan PKS Kontrak</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              PKS Induk &amp; Sewa Ruangan
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Tandatangan pengesahan Kadis
-            </p>
-          </div>
-          <span className={`w-8 h-8 flex items-center justify-center font-bold text-xs ${
-            actionQueue.pendingKadisContracts > 0
-              ? 'bg-amber-50 text-[#f39c12] border border-amber-200'
-              : 'bg-blue-50 text-[#3c8dbc] border border-blue-200'
-          }`}>
-            {actionQueue.pendingKadisContracts}
-          </span>
-        </Link>
-
-        {/* Akses 3: Pengawasan Mitra & Legalitas */}
-        <Link 
-          href="/admin/penyewa"
-          className="bg-white p-3.5 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase">3. Legalitas Mitra &amp; NIB</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              Mitra Maskapai &amp; MRO
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              {kpi.total_tenants} Mitra ({kpi.pending_tenants} Verifikasi)
-            </p>
-          </div>
-          <span className="w-8 h-8 flex items-center justify-center font-bold text-xs bg-blue-50 text-[#3c8dbc] border border-blue-200">
-            {kpi.total_tenants}
-          </span>
-        </Link>
-
-        {/* Akses 4: Laporan Realisasi Retribusi PAD */}
-        <Link 
-          href="/admin/laporan"
-          className="bg-white p-3.5 border-l-4 border-[#3c8dbc] shadow-2xs hover:shadow-sm transition-all flex items-center justify-between group"
-        >
-          <div>
-            <span className="text-[10px] font-bold text-slate-500 uppercase">4. Monitoring Retribusi PAD</span>
-            <p className="text-xs font-bold text-slate-800 group-hover:text-[#3c8dbc] transition-colors">
-              Laporan Realisasi &amp; SKRD
-            </p>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Rekapitulasi PAD &amp; APBD Mimika
-            </p>
-          </div>
-          <span className="w-8 h-8 flex items-center justify-center font-bold text-xs bg-blue-50 text-[#3c8dbc] border border-blue-200">
-            <ExternalLink className="w-4 h-4 text-[#3c8dbc]" />
-          </span>
-        </Link>
-      </div>
-
-      {/* Baris 3: Layout 2 Kolom (Antrean Disposisi & Piutang vs Capaian APBD & Utilisasi) */}
+      {/* Baris 2: Layout 2 Kolom (Antrean Disposisi & Piutang vs Capaian APBD & Utilisasi) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
         {/* Kolom Kiri: 2/3 Lebar (Tabel Permohonan Masuk & Tabel Piutang Jatuh Tempo) */}

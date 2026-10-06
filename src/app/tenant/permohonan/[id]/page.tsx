@@ -81,7 +81,9 @@ export default function TenantPermohonanDetailPage() {
     app.requires_payung ?? (
       app.status === 'Menunggu TTD Kontrak Payung' ||
       app.status === 'Menunggu Pengesahan Kadis' ||
-      app.contracts?.contract_type === 'Payung'
+      app.contracts?.contract_type === 'Payung' ||
+      app.contracts?.contract_type === 'PKS Payung Mozes Kilangin' ||
+      Boolean(app.contracts?.contract_type?.toLowerCase().includes('payung'))
     )
   );
 
@@ -92,7 +94,7 @@ export default function TenantPermohonanDetailPage() {
       app.status === 'Menunggu TTD Kontrak Payung' ||
       app.status === 'Menunggu Pengesahan Kadis' ||
       (
-        app.contracts?.contract_type === 'Payung' &&
+        (app.contracts?.contract_type === 'Payung' || app.contracts?.contract_type === 'PKS Payung Mozes Kilangin' || Boolean(app.contracts?.contract_type?.toLowerCase().includes('payung'))) &&
         app.contracts?.status !== 'Aktif' &&
         app.contracts?.status !== 'Active' &&
         app.status !== 'Surat Disetujui' &&

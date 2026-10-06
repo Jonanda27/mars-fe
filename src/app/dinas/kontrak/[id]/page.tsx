@@ -94,17 +94,17 @@ export default function DinasContractDetailPage() {
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full">
-      <header className="flex justify-between items-end mb-4">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 mb-4">
         <div>
           <Link href="/dinas/kontrak" className="text-xs text-slate-500 hover:text-[#3c8dbc] flex items-center gap-1 mb-1">
             <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Daftar Kontrak &amp; PKS
           </Link>
-          <h1 className="text-[24px] font-normal text-[#333]">
-            Detail Kontrak &amp; PKS <small className="text-[15px] font-light text-[#777] ml-2">{contract.contract_number}</small>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Detail Kontrak &amp; PKS <span className="text-[15px] font-light text-[#777] ml-2">{contract.contract_number}</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Dinas Portal</span> / <span className="ml-1 font-medium">Kontrak &amp; PKS</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Detail Kontrak</span>
         </div>
       </header>
 

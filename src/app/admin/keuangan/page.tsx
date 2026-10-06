@@ -103,6 +103,9 @@ export default function AdminKeuanganPage() {
         <h1 className="text-[24px] font-normal text-[#333] flex items-center">
           Keuangan & Tagihan <small className="text-[15px] text-[#777] ml-2 font-light">Pemantauan SKRD</small>
         </h1>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Keuangan</span>
+        </div>
       </header>
 
       <div className="bg-white border-t-[3px] border-[#00a65a] shadow-sm rounded-sm">

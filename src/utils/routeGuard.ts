@@ -245,7 +245,6 @@ export const checkRouteAccess = (
     return {
       allowed: false,
       redirectTo: '/login',
-      reason: 'Silakan login terlebih dahulu untuk mengakses halaman ini.',
     };
   }
 

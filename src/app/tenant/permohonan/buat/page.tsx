@@ -9,7 +9,6 @@ import dayjs from 'dayjs';
 import { getErrorMessage } from '@/services/api';
 import { rentalService } from '@/services/rentalService';
 import { Stepper } from '@/components/Stepper';
-import { ContractStatusBar } from '@/components/ContractStatusBar';
 import { useAuthStore } from '@/store/useAuthStore';
 import SuratPermohonanTemplate from '@/components/SuratPermohonanTemplate';
 import { contractService } from '@/services/contractService';
@@ -52,64 +51,6 @@ function BuatPermohonanForm() {
     };
     checkPayung();
   }, []);
-
-  // Identifikasi Kontrak Payung KHUSUS Bandara Mozes Kilangin (Bukan Mini Airport)
-  const activePayung = useMemo(() => {
-    if (!contracts || contracts.length === 0) return null;
-
-    // Filter KHUSUS Mozes Kilangin (Kecualikan semua Mini Airport: Ilaga, Enarotali, Bilogai, dll.)
-    const mozesPayungList = contracts.filter((c) => {
-      const type = (c.contract_type || '').toLowerCase();
-      const num = (c.contract_number || '').toUpperCase();
-      let fas: any = c.fasilitas;
-      if (typeof fas === 'string') {
-        try { fas = JSON.parse(fas); } catch (e) { fas = {}; }
-      }
-      const isMini = type.includes('mini') || 
-                     Boolean(fas?.mini_airport_id) || 
-                     Boolean(fas?.category === 'Mini Airport') ||
-                     num.includes('PKS/ILA') ||
-                     num.includes('PKS/EWI') ||
-                     num.includes('PKS/UGU') ||
-                     num.includes('/ILA/') ||
-                     num.includes('/EWI/') ||
-                     num.includes('/UGU/') ||
-                     num.includes('/MINI/');
-      if (isMini) return false;
-
-      return (
-        type === 'pks payung mozes kilangin' ||
-        type === 'payung' ||
-        num.includes('MOZES') ||
-        num.includes('/TIM/') ||
-        (type.includes('payung') && !isMini)
-      );
-    });
-
-    const activeMozes = mozesPayungList.find((c) => {
-      const s = (c.status || '').trim().toLowerCase();
-      return s === 'aktif' || s === 'active' || s === 'signed';
-    });
-    return activeMozes || mozesPayungList[0] || null;
-  }, [contracts]);
-
-  const daysRemaining = useMemo(() => {
-    if (!activePayung?.end_date) return null;
-    const today = dayjs().startOf('day');
-    const end = dayjs(activePayung.end_date).startOf('day');
-    return end.diff(today, 'day');
-  }, [activePayung]);
-
-  const statusLower = (activePayung?.status || '').trim().toLowerCase();
-  const isPayungExpired = daysRemaining !== null && daysRemaining < 0;
-  const isContractActive = Boolean(
-    activePayung && 
-    (statusLower === 'aktif' || statusLower === 'active' || statusLower === 'signed') && 
-    !isPayungExpired
-  );
-  const isPendingSignature = statusLower === 'menunggu ttd tenant' || statusLower === 'menunggu ttd';
-  const isPendingVerification = statusLower === 'menunggu verifikasi admin' || statusLower === 'menunggu pengesahan kadis';
-  const companyName = user?.nama_perusahaan || activePayung?.tenants?.nama_perusahaan || 'PT Geo Citra';
 
 
   useEffect(() => {
@@ -204,18 +145,6 @@ function BuatPermohonanForm() {
         </h1>
       </header>
 
-      {/* Status Kontrak Payung Induk (Persis Tampilan Gambar) */}
-      <div className="mb-4">
-        <ContractStatusBar
-          activePayung={activePayung}
-          companyName={companyName}
-          isLoading={contractsLoading}
-          isContractActive={isContractActive}
-          isPendingSignature={isPendingSignature}
-          isPendingVerification={isPendingVerification}
-          subtitle="• Izin operasional fasilitas kebandarudaraan & pemanfaatan hanggar aktif"
-        />
-      </div>
 
       {/* Stepper Component */}
       {(() => {

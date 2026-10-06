@@ -171,8 +171,8 @@ export const MiniAirportDashboardView: React.FC<MiniAirportDashboardViewProps> =
           >
             <RefreshCw className="w-3.5 h-3.5 text-[#3c8dbc]" /> Refresh
           </button>
-          <div className="text-[12px] text-[#777] items-center bg-white border border-[#e0e0e0] px-3 py-1.5 shadow-2xs hidden sm:flex">
-            <span className="mr-1">Admin Mini Airport</span> / <span className="ml-1 font-bold text-slate-800">Dashboard Operasional</span>
+          <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+            <span className="mr-1">Admin Mini Airport</span> / <span className="ml-1 font-medium">Dashboard</span>
           </div>
         </div>
       </header>

@@ -24,8 +24,8 @@ export default function AdminRekonsiliasiPage() {
         <h1 className="text-[24px] font-normal text-[#333]">
           Rekonsiliasi <small className="text-[15px] font-light text-[#777] ml-2">Pendapatan Daerah</small>
         </h1>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <span className="mr-1">Admin Portal</span> / <span className="ml-1 font-medium">Rekonsiliasi</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Rekonsiliasi</span>
         </div>
       </header>
 
