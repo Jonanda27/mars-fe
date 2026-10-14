@@ -333,109 +333,14 @@ export default function PendaratanDaruratPage() {
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline flex-wrap">
-            Pendaratan Darurat{' '}
-            <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Pendaratan Darurat <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <Link href="/petugas" className="mr-1 hover:text-[#3c8dbc]">Petugas</Link> /{' '}
-          <span className="ml-1 font-medium text-slate-800">Pendaratan Darurat</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <Link href="/petugas" className="mr-1 hover:text-[#3c8dbc]">Petugas</Link> / <span className="ml-1 font-medium">Pendaratan Darurat</span>
         </div>
       </header>
-
-      {/* Ringkasan KPI Mini (Top Metric Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* KPI 1: Menunggu Check-in */}
-        <div 
-          onClick={() => setActiveTab('checkin')}
-          className={`bg-white border-t-[3px] border-[#3c8dbc] shadow-xs border-x border-b border-slate-200 p-4 cursor-pointer transition-all ${
-            activeTab === 'checkin' ? 'ring-2 ring-[#3c8dbc]/30 bg-blue-50/20' : 'hover:bg-slate-50'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Menunggu Check-In</div>
-              <div className="text-2xl font-bold font-mono text-slate-800 mt-1">
-                {readyContracts.length}
-                <span className="text-xs font-normal font-sans text-slate-500 ml-1.5">PKS</span>
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-              <FileText className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-100 pt-1.5">
-            <span>{readyContracts.length > 0 ? 'Perlu tindakan lapangan' : 'Semua PKS terproses'}</span>
-            <span className="text-[#3c8dbc] font-semibold text-[10px]">Buka ➔</span>
-          </div>
-        </div>
-
-        {/* KPI 2: Armada Aktif di Lapangan */}
-        <div 
-          onClick={() => setActiveTab('active')}
-          className={`bg-white border-t-[3px] border-[#3c8dbc] shadow-xs border-x border-b border-slate-200 p-4 cursor-pointer transition-all ${
-            activeTab === 'active' ? 'ring-2 ring-[#3c8dbc]/30 bg-blue-50/20' : 'hover:bg-slate-50'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Aktif Parkir / Perbaikan</div>
-              <div className="text-2xl font-bold font-mono text-slate-800 mt-1">
-                {activeOnFieldContracts.length}
-                <span className="text-xs font-normal font-sans text-slate-500 ml-1.5">Armada</span>
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-              <Plane className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-100 pt-1.5">
-            <span>{activeOnFieldContracts.length > 0 ? 'Siap monitoring / check-out' : 'Tidak ada armada parkir'}</span>
-            <span className="text-[#3c8dbc] font-semibold text-[10px]">Buka ➔</span>
-          </div>
-        </div>
-
-        {/* KPI 3: Kapasitas Apron */}
-        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs border-x border-b border-slate-200 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Kapasitas Apron</div>
-              <div className="text-lg font-bold font-mono text-slate-800 mt-1">
-                {apronRemainingArea.toLocaleString('id-ID')}
-                <span className="text-xs font-normal font-sans text-slate-500 ml-1">m² sisa</span>
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-              <MapPin className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-100 pt-1.5">
-            <span>{apronActiveCount} armada di Apron</span>
-            <span className="font-mono font-bold text-slate-700">{apronPercent}%</span>
-          </div>
-        </div>
-
-        {/* KPI 4: Kapasitas Hanggar */}
-        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs border-x border-b border-slate-200 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Kapasitas Hanggar</div>
-              <div className="text-lg font-bold font-mono text-slate-800 mt-1">
-                {hangarRemainingArea.toLocaleString('id-ID')}
-                <span className="text-xs font-normal font-sans text-slate-500 ml-1">m² sisa</span>
-              </div>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-              <Building2 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-100 pt-1.5">
-            <span>{hangarActiveCount} armada di Hanggar</span>
-            <span className="font-mono font-bold text-slate-700">{hangarPercent}%</span>
-          </div>
-        </div>
-      </div>
 
       {/* Banner SOP Pendaratan Darurat (Ringkas & Collapsible) */}
       <div className="bg-white border border-slate-200 text-xs text-slate-700 shadow-2xs">

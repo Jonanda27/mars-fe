@@ -122,7 +122,7 @@ export const RoomListSection: React.FC<RoomListSectionProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
+    <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs" data-tour="tour-step4-kapasitas">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-2">
         <div>
           <h4 className="text-[15px] font-bold text-slate-800 flex items-center gap-2">

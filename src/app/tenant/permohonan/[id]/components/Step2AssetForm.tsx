@@ -1,13 +1,14 @@
-import React from 'react';
-import { MapPin, AlertCircle, Loader2, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, AlertCircle, Loader2, Save, HelpCircle } from 'lucide-react';
 import dayjs from 'dayjs';
 import { Step2AssetFormProps } from './step2/types';
 import { calculateAircraftArea } from './step2/utils';
 import { HangarFormSection } from './step2/HangarFormSection';
 import { RoomFormSection } from './step2/RoomFormSection';
+import { PilihLayananTutorial } from './step2/PilihLayananTutorial';
 
 // Re-export for backward compatibility
-export { calculateAircraftArea };
+export { calculateAircraftArea, PilihLayananTutorial };
 export type { Step2AssetFormProps };
 
 export const Step2AssetForm: React.FC<Step2AssetFormProps> = ({
@@ -32,6 +33,7 @@ export const Step2AssetForm: React.FC<Step2AssetFormProps> = ({
   saving,
   setShowAircraftModal,
 }) => {
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const isHangar = formData.application_type.toLowerCase().includes('hanggar');
 
   const calculateRequiredArea = () => {
@@ -57,13 +59,25 @@ export const Step2AssetForm: React.FC<Step2AssetFormProps> = ({
   const selectedAsset = availableAssets.find(a => a.id.toString() === formData.asset_id);
 
   return (
-    <form onSubmit={handleSubmitDetails} className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-none mb-8">
-      <div className="p-4 border-b border-[#f4f4f4] bg-slate-50">
-        <h3 className="text-[16px] text-[#444] font-bold flex items-center mb-1">
-          <MapPin className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Lengkapi Detail Layanan Sewa
-        </h3>
-        <p className="text-[13px] text-slate-500 ml-7">Surat Anda telah disetujui. Silakan pilih aset dan jadwalkan penyewaan.</p>
-      </div>
+    <>
+      <form onSubmit={handleSubmitDetails} className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-none mb-8">
+        <div className="p-4 border-b border-[#f4f4f4] bg-slate-50 flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h3 className="text-[16px] text-[#444] font-bold flex items-center mb-1">
+              <MapPin className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Lengkapi Detail Layanan Sewa
+            </h3>
+            <p className="text-[13px] text-slate-500 ml-7">Surat Anda telah disetujui. Silakan pilih aset dan jadwalkan penyewaan.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setTutorialOpen(true)}
+            className="bg-white border border-[#3c8dbc] text-[#3c8dbc] hover:bg-blue-50 px-3 py-1.5 text-[12px] font-semibold transition-colors flex items-center rounded-sm cursor-pointer shadow-2xs"
+            title="Buka panduan & tutorial Langkah 4: Pilih Layanan"
+          >
+            <HelpCircle className="w-4 h-4 mr-1.5 text-[#3c8dbc]" />
+            Panduan Langkah
+          </button>
+        </div>
         
       <div className="p-6 md:p-8">
         {isHangar ? (
@@ -136,7 +150,7 @@ export const Step2AssetForm: React.FC<Step2AssetFormProps> = ({
               </div>
             </div>
           )}
-          <div className="flex justify-end">
+          <div className="flex justify-end" data-tour="tour-step4-btn-simpan">
             <button 
               type="submit" 
               disabled={saving || !formData.asset_id || (isHangar && isOverCapacity) || (isHangar && specificNeeds.aircraft_ids.length === 0)}
@@ -149,6 +163,15 @@ export const Step2AssetForm: React.FC<Step2AssetFormProps> = ({
         </div>
       </div>
     </form>
+
+    {/* Modal & Spotlight Tour Tutorial Langkah 4 */}
+    <PilihLayananTutorial
+      isOpen={tutorialOpen}
+      onClose={() => setTutorialOpen(false)}
+      isHangar={isHangar}
+      defaultMode="tour"
+    />
+  </>
   );
 };
 

@@ -77,10 +77,10 @@ export const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
   const activeBooking = selectedAircraft?.bookingApp;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
-      <div className="bg-white rounded-none shadow-2xl max-w-xl w-full overflow-hidden border border-slate-300 animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs font-sans">
+      <div className="bg-white rounded-none shadow-2xl max-w-xl w-full flex flex-col max-h-[92vh] overflow-hidden border border-slate-300 animate-in zoom-in-95 duration-150">
         {/* Header Modal */}
-        <div className="bg-[#3c8dbc] text-white px-5 py-3.5 flex justify-between items-center rounded-none">
+        <div className="bg-[#3c8dbc] text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center rounded-none shrink-0">
           <div>
             <h3 className="font-bold text-sm sm:text-base flex items-center gap-2">
               <Plane className="w-4 h-4 text-white" />
@@ -99,7 +99,7 @@ export const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="p-5 space-y-4 text-xs text-slate-700 max-h-[82vh] overflow-y-auto">
+        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-3.5 sm:space-y-4 text-xs text-slate-700 overflow-y-auto">
           {/* 1. INFO STATUS PKS PAYUNG */}
           <div className="bg-blue-50/70 border border-blue-200 rounded-none p-2.5 flex items-center justify-between gap-2 text-[11px] text-blue-900">
             <div className="flex items-center gap-2">
@@ -350,19 +350,19 @@ export const CreateScheduleModal: React.FC<CreateScheduleModalProps> = ({
           </div>
 
           {/* Footer Modal */}
-          <div className="pt-3 border-t border-slate-200 flex justify-end gap-2">
+          <div className="pt-3 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border border-slate-300 rounded-none font-bold text-slate-600 hover:bg-slate-100 cursor-pointer text-xs transition-colors"
+              className="w-full sm:w-auto px-4 py-2 border border-slate-300 rounded-none font-bold text-slate-600 hover:bg-slate-100 cursor-pointer text-xs transition-colors text-center"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !selectedAircraft || selectedAircraft?.isLocked}
-              className={`px-4 py-2 font-bold rounded-none shadow-xs flex items-center gap-1.5 text-xs transition-colors ${
+              className={`w-full sm:w-auto px-4 py-2 font-bold rounded-none shadow-xs flex items-center justify-center gap-1.5 text-xs transition-colors ${
                 selectedAircraft?.isLocked
                   ? 'bg-slate-300 text-slate-500 cursor-not-allowed border border-slate-300'
                   : 'bg-[#3c8dbc] hover:bg-[#367fa9] text-white cursor-pointer disabled:opacity-60'

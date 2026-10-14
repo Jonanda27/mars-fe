@@ -43,7 +43,7 @@ export const RejectReasonModal: React.FC<RejectReasonModalProps> = ({
             autoFocus
           ></textarea>
           <p className="text-[11px] text-gray-500 mt-2">
-            Pesan ini akan ditampilkan kepada Tenant di halaman profil mereka.
+            Pesan ini akan ditampilkan kepada Mitra di halaman profil mereka.
           </p>
         </div>
         <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">

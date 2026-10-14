@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, LogOut, Inbox } from 'lucide-react';
+import { Bell, LogOut, Inbox, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import { useNotificationStore, Notification } from '@/store/useNotificationStore';
@@ -150,19 +150,35 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
 
   return (
     <>
-      <header className="bg-[#222d32] h-12 flex items-center justify-end text-white flex-shrink-0 shadow-sm z-50 border-b border-[#1a2226] relative">
-        <div className="flex items-center h-full relative">
+      <header className="bg-[#222d32] h-12 flex items-center justify-between text-white flex-shrink-0 shadow-sm z-30 border-b border-[#1a2226] relative px-2.5 sm:px-4">
+        {/* Sisi Kiri: Tombol Hamburger (Khusus Mobile / Tablet / iPad, Tersembunyi di Desktop) */}
+        <div className="flex items-center h-full lg:hidden">
+          {onToggleSidebar && (
+            <button 
+              type="button"
+              onClick={onToggleSidebar}
+              title="Menu Navigasi"
+              aria-label="Toggle Menu Navigasi"
+              className="p-1.5 -ml-1 text-[#b8c7ce] hover:text-white hover:bg-[#1a2226] rounded transition-colors focus:outline-none cursor-pointer flex items-center justify-center"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
+        {/* Sisi Kanan: Notifikasi & Logout (Selalu Berada di Kanan) */}
+        <div className="flex items-center h-full relative ml-auto">
           
           {/* Notification Bell */}
           <div ref={notifRef} className="relative h-full flex">
             <button 
               type="button"
               onClick={handleToggleNotifDropdown}
-              className="h-full px-4 relative text-[#b8c7ce] hover:text-white hover:bg-[#1a2226] transition-colors focus:outline-none border-l border-[#1a2226]"
+              className="h-full px-3 sm:px-4 relative text-[#b8c7ce] hover:text-white hover:bg-[#1a2226] transition-colors focus:outline-none border-l border-[#1a2226]"
             >
               <Bell className="w-4 h-4" />
               {unreadCount > 0 && (
-                <span className="absolute top-2 right-2 bg-[#dd4b39] text-white text-[9px] font-bold px-1 rounded-sm leading-tight animate-pulse">
+                <span className="absolute top-2 right-1.5 sm:right-2 bg-[#dd4b39] text-white text-[9px] font-bold px-1 rounded-sm leading-tight animate-pulse">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -198,10 +214,10 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
             type="button"
             onClick={() => setShowLogoutModal(true)}
             title="Logout"
-            className="flex items-center gap-2 px-4 hover:bg-[#dd4b39] text-[#b8c7ce] hover:text-white transition-colors h-full cursor-pointer border-l border-[#1a2226] focus:outline-none bg-transparent rounded-none"
+            className="flex items-center gap-1.5 px-3 sm:px-4 hover:bg-[#dd4b39] text-[#b8c7ce] hover:text-white transition-colors h-full cursor-pointer border-l border-[#1a2226] focus:outline-none bg-transparent rounded-none"
           >
             <LogOut className="w-4 h-4" />
-            <span className="text-sm font-medium">Logout</span>
+            <span className="text-sm font-medium hidden sm:inline">Logout</span>
           </button>
         </div>
       </header>

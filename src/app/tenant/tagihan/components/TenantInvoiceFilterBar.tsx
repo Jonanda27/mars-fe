@@ -29,7 +29,7 @@ export const TenantInvoiceFilterBar: React.FC<TenantInvoiceFilterBarProps> = ({
   return (
     <>
       {/* Tabs Filter Bar */}
-      <div className="flex border-b border-slate-200 bg-white px-4 pt-2 shadow-2xs overflow-x-auto">
+      <div data-tour="tour-tagihan-filter" className="flex border-b border-slate-200 bg-white px-4 pt-2 shadow-2xs overflow-x-auto">
         <button
           onClick={() => setServiceFilter('ALL')}
           className={`px-4 py-2.5 text-xs font-bold border-b-2 flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap ${

@@ -98,7 +98,11 @@ export const InvoiceSearchPanel: React.FC<InvoiceSearchPanelProps> = ({
                       {selectedInvoice.contracts?.assets?.nama_aset || selectedInvoice.invoice_type || 'Retribusi Pemakaian Fasilitas UPBU'}
                     </div>
                     <div className="text-[11px] text-[#777]">
-                      Kode Rekening: {selectedInvoice.invoice_type?.toLowerCase().includes('ruangan') ? '4.1.2.02.01 (Sewa Ruangan)' : '4.1.2.02.02 (Sewa Hanggar & Apron)'}
+                      Kode Rekening: {selectedInvoice.invoice_type?.toLowerCase().includes('ruangan') 
+                        ? '4.1.2.02.01 (Sewa Ruangan)' 
+                        : selectedInvoice.invoice_type?.toLowerCase().includes('apron')
+                        ? '4.1.2.02.03 (Sewa Apron)'
+                        : '4.1.2.02.02 (Sewa Hanggar)'}
                     </div>
                   </td>
                   <td className="py-3 px-2 text-center text-[#555]">

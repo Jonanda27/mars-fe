@@ -5,7 +5,17 @@ import { useAuthStore } from '@/store/useAuthStore';
 import BaseSidebar, { NavItem } from './BaseSidebar';
 import { FileText, Briefcase, User, Circle, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 
-export default function EksekutifSidebar({ isOpen, onToggle }: { readonly isOpen: boolean; readonly onToggle?: () => void }) {
+export default function EksekutifSidebar({ 
+  isOpen, 
+  onToggle,
+  isMobileOpen,
+  onCloseMobile
+}: { 
+  readonly isOpen: boolean; 
+  readonly onToggle?: () => void;
+  readonly isMobileOpen?: boolean;
+  readonly onCloseMobile?: () => void;
+}) {
   const { user } = useAuthStore();
 
   const navItems: NavItem[] = [
@@ -19,6 +29,8 @@ export default function EksekutifSidebar({ isOpen, onToggle }: { readonly isOpen
     <BaseSidebar
       isOpen={isOpen}
       onToggle={onToggle}
+      isMobileOpen={isMobileOpen}
+      onCloseMobile={onCloseMobile}
       userName={user?.username || 'Kepala Dinas'}
       userAvatar={<User className="w-5 h-5" />}
       userStatus={

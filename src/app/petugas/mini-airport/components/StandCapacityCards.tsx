@@ -51,15 +51,18 @@ export const StandCapacityCards: React.FC<StandCapacityCardsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Stand 01 */}
-      <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-        <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className={`bg-white border-t-[3px] ${stand1Occupied ? 'border-purple-600' : 'border-[#3c8dbc]'} shadow-sm flex items-stretch`}>
+        <div className={`w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center ${stand1Occupied ? 'text-purple-600' : 'text-[#3c8dbc]'}`}>
+          <TowerControl className="w-8 h-8" />
+        </div>
+        <div className="p-3 flex flex-col justify-center flex-1">
+          <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">
             Kapasitas Apron — STAND 01
           </span>
-          <div className="flex items-baseline gap-2 mt-0.5">
+          <div className="mt-0.5">
             <span
-              className={`text-base font-bold ${
-                stand1Occupied ? 'text-purple-700' : 'text-emerald-700'
+              className={`text-[16px] font-bold font-mono ${
+                stand1Occupied ? 'text-purple-700' : 'text-[#00a65a]'
               }`}
             >
               {stand1Occupied
@@ -86,32 +89,26 @@ export const StandCapacityCards: React.FC<StandCapacityCardsProps> = ({
               </span>
             </div>
           ) : (
-            <span className="text-[10px] text-slate-500 block mt-0.5">
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
               Siap dialokasikan untuk pendaratan berikutnya
             </span>
           )}
         </div>
-        <div
-          className={`w-11 h-11 flex items-center justify-center ${
-            stand1Occupied
-              ? 'bg-purple-50 text-purple-700'
-              : 'bg-blue-50 text-[#3c8dbc]'
-          }`}
-        >
-          <TowerControl className="w-5 h-5" />
-        </div>
       </div>
 
       {/* Stand 02 */}
-      <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-        <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className={`bg-white border-t-[3px] ${stand2Occupied ? 'border-purple-600' : 'border-[#3c8dbc]'} shadow-sm flex items-stretch`}>
+        <div className={`w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center ${stand2Occupied ? 'text-purple-600' : 'text-[#3c8dbc]'}`}>
+          <TowerControl className="w-8 h-8" />
+        </div>
+        <div className="p-3 flex flex-col justify-center flex-1">
+          <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">
             Kapasitas Apron — STAND 02
           </span>
-          <div className="flex items-baseline gap-2 mt-0.5">
+          <div className="mt-0.5">
             <span
-              className={`text-base font-bold ${
-                stand2Occupied ? 'text-purple-700' : 'text-emerald-700'
+              className={`text-[16px] font-bold font-mono ${
+                stand2Occupied ? 'text-purple-700' : 'text-[#00a65a]'
               }`}
             >
               {stand2Occupied
@@ -138,19 +135,10 @@ export const StandCapacityCards: React.FC<StandCapacityCardsProps> = ({
               </span>
             </div>
           ) : (
-            <span className="text-[10px] text-slate-500 block mt-0.5">
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
               Siap dialokasikan untuk pendaratan berikutnya
             </span>
           )}
-        </div>
-        <div
-          className={`w-11 h-11 flex items-center justify-center ${
-            stand2Occupied
-              ? 'bg-purple-50 text-purple-700'
-              : 'bg-blue-50 text-[#3c8dbc]'
-          }`}
-        >
-          <TowerControl className="w-5 h-5" />
         </div>
       </div>
     </div>

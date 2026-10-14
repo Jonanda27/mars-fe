@@ -15,7 +15,7 @@ export const RoomFilterConfig: React.FC<RoomFilterConfigProps> = ({
   setRoomAC,
   setFormData,
 }) => (
-  <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs">
+  <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs" data-tour="tour-step4-pilih-aset">
     <div className="border-b border-slate-100 pb-3 mb-4">
       <h4 className="text-[15px] font-bold text-slate-800 flex items-center gap-2">
         <SlidersHorizontal className="w-4 h-4 text-[#3c8dbc]" />

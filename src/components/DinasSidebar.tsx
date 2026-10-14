@@ -11,15 +11,21 @@ import {
   Users, 
   ShieldCheck, 
   Circle, 
-  ReceiptText,
-  User,
-  FileCheck2,
-  BellRing,
-  ShieldAlert
+  User
 } from 'lucide-react';
 import RupiahIcon from './icons/RupiahIcon';
 
-export default function DinasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
+export default function DinasSidebar({ 
+  isOpen, 
+  onToggle,
+  isMobileOpen,
+  onCloseMobile
+}: Readonly<{ 
+  isOpen: boolean; 
+  onToggle?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}>) {
   const { user } = useAuthStore();
 
   const navItems: NavItem[] = [
@@ -29,10 +35,6 @@ export default function DinasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: bo
     { href: "/dinas/kontrak", label: "Kontrak & PKS", icon: <ShieldCheck /> },
     { href: "/dinas/tagihan", label: "SKRD & Penetapan", icon: <RupiahIcon /> },
     { href: "/dinas/peringatan", label: "Penagihan Piutang", icon: <AlertTriangle /> },
-    { href: "/dinas/template-surat-pemberitahuan", label: "Pemberitahuan (H-7)", icon: <BellRing /> },
-    { href: "/dinas/template-surat-teguran", label: "Surat Teguran (H+7)", icon: <ShieldAlert /> },
-    { href: "/dinas/template-strd", label: "Template STRD", icon: <ReceiptText /> },
-    { href: "/dinas/template-ssrd", label: "Template SSRD", icon: <FileCheck2 /> },
     { href: "/dinas/laporan", label: "Laporan Realisasi PAD", icon: <FileSpreadsheet /> },
   ];
 
@@ -40,6 +42,8 @@ export default function DinasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: bo
     <BaseSidebar
       isOpen={isOpen}
       onToggle={onToggle}
+      isMobileOpen={isMobileOpen}
+      onCloseMobile={onCloseMobile}
       userName={user?.username || 'Dinas Perhubungan'}
       userAvatar={user?.username?.charAt(0) || <User className="w-5 h-5" />}
       userStatus={

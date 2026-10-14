@@ -44,10 +44,31 @@ interface RoleDefinition {
 const ROLE_OPTIONS: RoleDefinition[] = [
   {
     id: 'admin',
-    name: 'Admin Bandara Mozes Kilangin',
+    name: 'Admin Bandara Mozes Kilangin (Umum)',
     badge: 'Mozes Kilangin',
     icon: Building2,
-    desc: 'Kelola permohonan sewa hanggar, apron, ruangan, dan fasilitas Bandara Mozes Kilangin'
+    desc: 'Akses seluruh divisi: sewa hanggar, apron, ruangan, dan fasilitas Bandara Mozes Kilangin'
+  },
+  {
+    id: 'admin_hanggar',
+    name: 'Admin Sewa Hanggar Mozes Kilangin',
+    badge: 'Admin Hanggar',
+    icon: Building2,
+    desc: 'Khusus divisi sewa hanggar pesawat, kapasitas ruang hanggar, kontrak, dan SKRD hanggar'
+  },
+  {
+    id: 'admin_apron',
+    name: 'Admin Sewa Apron Mozes Kilangin',
+    badge: 'Admin Apron',
+    icon: Plane,
+    desc: 'Khusus divisi sewa apron pesawat, penempatan stand, pergerakan armada, dan SKRD apron'
+  },
+  {
+    id: 'admin_ruangan',
+    name: 'Admin Sewa Ruangan Mozes Kilangin',
+    badge: 'Admin Ruangan',
+    icon: Building2,
+    desc: 'Khusus divisi sewa ruang kantor, konter, gudang, lahan komersial terminal, dan SKRD ruangan'
   },
   {
     id: 'admin_mini_airport',
@@ -227,7 +248,7 @@ export default function SuperAdminUsersPage() {
       mini_airport_id = formData.selectedAirportId 
         ? Number.parseInt(formData.selectedAirportId, 10) 
         : (airportOptions.mini_airports[0]?.id || null);
-    } else if (formData.role === 'admin' || formData.role === 'petugas' || formData.role === 'petugas lapangan') {
+    } else if (['admin', 'admin_hanggar', 'admin_apron', 'admin_ruangan', 'petugas', 'petugas lapangan'].includes(formData.role)) {
       airport_type = 'main';
       airport_id = formData.selectedAirportId 
         ? Number.parseInt(formData.selectedAirportId, 10) 
@@ -322,7 +343,25 @@ export default function SuperAdminUsersPage() {
       case 'admin':
         return (
           <span className="px-2.5 py-0.5 text-[11px] font-bold bg-[#3c8dbc] text-white rounded inline-flex items-center gap-1">
-            <Building2 className="w-3 h-3 text-white" /> ADMIN MOZES KILANGIN
+            <Building2 className="w-3 h-3 text-white" /> ADMIN MOZES (UMUM)
+          </span>
+        );
+      case 'admin_hanggar':
+        return (
+          <span className="px-2.5 py-0.5 text-[11px] font-bold bg-[#0284c7] text-white rounded inline-flex items-center gap-1">
+            <Building2 className="w-3 h-3 text-white" /> ADMIN HANGGAR MOZES
+          </span>
+        );
+      case 'admin_apron':
+        return (
+          <span className="px-2.5 py-0.5 text-[11px] font-bold bg-[#0d9488] text-white rounded inline-flex items-center gap-1">
+            <Plane className="w-3 h-3 text-white" /> ADMIN APRON MOZES
+          </span>
+        );
+      case 'admin_ruangan':
+        return (
+          <span className="px-2.5 py-0.5 text-[11px] font-bold bg-[#4f46e5] text-white rounded inline-flex items-center gap-1">
+            <Building2 className="w-3 h-3 text-white" /> ADMIN RUANGAN MOZES
           </span>
         );
       case 'admin_mini_airport':
@@ -424,10 +463,10 @@ export default function SuperAdminUsersPage() {
           <div className="p-3.5 flex flex-col justify-center flex-1 min-w-0">
             <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider truncate">Admin Bandara (Mozes &amp; Mini)</span>
             <span className="text-[20px] font-bold text-[#333] font-mono leading-tight mt-0.5">
-              {users.filter(u => u.role === 'admin' || u.role === 'admin_mini_airport').length} Akun
+              {users.filter(u => ['admin', 'admin_mini_airport', 'admin_hanggar', 'admin_apron', 'admin_ruangan'].includes(u.role)).length} Akun
             </span>
             <span className="text-[11px] text-[#3c8dbc] font-bold mt-1 truncate">
-              Mozes: {users.filter(u => u.role === 'admin').length} • Mini: {users.filter(u => u.role === 'admin_mini_airport').length}
+              Mozes: {users.filter(u => ['admin', 'admin_hanggar', 'admin_apron', 'admin_ruangan'].includes(u.role)).length} • Mini: {users.filter(u => u.role === 'admin_mini_airport').length}
             </span>
           </div>
         </div>

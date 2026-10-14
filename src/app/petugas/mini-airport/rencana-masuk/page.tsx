@@ -94,83 +94,70 @@ export default function RencanaPendaratanMasukPage() {
       {/* 1. Page Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[22px] font-bold text-slate-800 tracking-tight">
-              Rencana Kedatangan Pesawat
-            </h1>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-blue-50 text-[#3c8dbc] border border-blue-200">
-              <TowerControl className="w-3 h-3 text-[#3c8dbc]" />
-              {displayAirport}
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Daftar permohonan pendaratan yang telah disetujui dinas dan dijadwalkan tiba di airstrip
-          </p>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Rencana Kedatangan Pesawat <span className="text-[15px] font-light text-[#777] ml-2">{displayAirport}</span>
+          </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <span className="mr-1">Petugas Mini Airport</span> / <span className="ml-1 font-medium text-slate-800">Rencana Kedatangan</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <Link href="/petugas/mini-airport" className="mr-1 hover:text-[#3c8dbc]">Petugas Mini Airport</Link> / <span className="ml-1 font-medium">Rencana Kedatangan</span>
         </div>
       </header>
 
-      {/* 2. Stat Boxes (Small Box Style) - Konsisten Warna Biru Mozes Kilangin */}
+      {/* 2. Stat Boxes (AdminLTE Flat Style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Box 1: Total Slot Berizin */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Slot Berizin</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{totalApps}</span>
-              <span className="text-xs text-slate-500 font-medium">Armada</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Telah Disetujui Admin</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Plane className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Plane className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Total Slot Berizin</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {totalApps} <span className="text-xs font-sans text-slate-500 font-normal">Armada</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Telah Disetujui Admin</span>
           </div>
         </div>
 
         {/* Box 2: Stand 01 */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Alokasi Stand 01</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{stand1Count}</span>
-              <span className="text-xs text-slate-500 font-medium">Slot</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Kapasitas Apron Utama</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <TowerControl className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <TowerControl className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Alokasi Stand 01</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {stand1Count} <span className="text-xs font-sans text-slate-500 font-normal">Slot</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Kapasitas Apron Utama</span>
           </div>
         </div>
 
         {/* Box 3: Stand 02 */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Alokasi Stand 02</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{stand2Count}</span>
-              <span className="text-xs text-slate-500 font-medium">Slot</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Kapasitas Apron Sekunder</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <TowerControl className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <TowerControl className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Alokasi Stand 02</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {stand2Count} <span className="text-xs font-sans text-slate-500 font-normal">Slot</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Kapasitas Apron Sekunder</span>
           </div>
         </div>
 
         {/* Box 4: Mitra Maskapai */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Mitra Maskapai</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{uniqueTenants}</span>
-              <span className="text-xs text-slate-500 font-medium">Maskapai</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Operator Terhubung</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Building2 className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Building2 className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Mitra Maskapai</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {uniqueTenants} <span className="text-xs font-sans text-slate-500 font-normal">Maskapai</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Operator Terhubung</span>
           </div>
         </div>
       </div>

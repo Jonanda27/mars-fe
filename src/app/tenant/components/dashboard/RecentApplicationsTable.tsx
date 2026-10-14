@@ -24,7 +24,8 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
         </Link>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Tampilan Desktop: Tabel Klasik Lengkap (hidden md:block) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
             <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
@@ -75,6 +76,52 @@ export const RecentApplicationsTable: React.FC<RecentApplicationsTableProps> = (
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Tampilan Mobile: Kartu Ringkas Modern (block md:hidden) */}
+      <div className="block md:hidden">
+        {applications.length === 0 ? (
+          <div className="py-7 px-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2.5">
+              <Inbox className="w-6 h-6 text-slate-400" />
+            </div>
+            <p className="font-bold text-xs text-slate-800">Belum Ada Permohonan Sewa</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Ajukan permohonan baru untuk memulai kerja sama aset.</p>
+          </div>
+        ) : (
+          <div className="p-3 space-y-2.5 bg-slate-50/50">
+            {applications.slice(0, 5).map((app) => (
+              <div key={app.id} className="bg-white p-3 rounded border border-slate-200 shadow-2xs space-y-2">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="min-w-0">
+                    <span className="font-mono font-bold text-xs text-[#3c8dbc] block truncate">
+                      {app.application_number}
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-800 line-clamp-1 mt-0.5">
+                      {app.application_type || 'Sewa Fasilitas'}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block truncate">
+                      {app.assets?.nama_aset || 'Lokasi Terjadwal'}
+                    </span>
+                  </div>
+                  <StatusBadge status={app.status} className="text-[10px] shrink-0" />
+                </div>
+
+                <div className="flex justify-between items-center pt-2 border-t border-dashed border-slate-200">
+                  <span className="text-[10px] text-slate-400">
+                    Diajukan: {app.created_at ? dayjs(app.created_at).format('DD MMM YYYY') : '-'}
+                  </span>
+                  <Link
+                    href={`/tenant/permohonan/${app.id}`}
+                    className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs px-3 py-1 rounded transition-colors shadow-2xs"
+                  >
+                    Detail
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

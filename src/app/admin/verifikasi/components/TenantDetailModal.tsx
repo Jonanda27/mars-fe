@@ -183,7 +183,7 @@ export const TenantDetailModal: React.FC<TenantDetailModalProps> = ({
                         <div>
                           <p className="text-sm font-bold text-yellow-800">Menunggu Kelengkapan</p>
                           <p className="text-[11px] text-yellow-700 mt-1">
-                            Tenant belum melengkapi dokumen wajib (NIB, NPWP, Akta).
+                            Mitra belum melengkapi dokumen wajib (NIB, NPWP, Akta).
                           </p>
                         </div>
                       </div>

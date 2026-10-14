@@ -48,7 +48,7 @@ export const HangarFormSection: React.FC<HangarFormSectionProps> = ({
         </div>
 
         {/* Dropdown Aset Utama */}
-        <div className="space-y-1.5">
+        <div className="space-y-1.5" data-tour="tour-step4-pilih-aset">
           <label className="block text-[13px] font-bold text-slate-800" htmlFor="asset_id_select">
             {isExtension ? 'Objek Aset (Perpanjangan)' : 'Objek Aset Utama yang Diminati'} <span className="text-red-500">*</span>
           </label>
@@ -75,93 +75,95 @@ export const HangarFormSection: React.FC<HangarFormSectionProps> = ({
           </p>
         </div>
 
-        {/* Status Kapasitas Hanggar */}
-        {selectedAsset && assetCapacity && (
-          <div className="bg-[#f4f8fb] border border-[#d2e3ee] rounded-none p-4 space-y-2">
-            <div className="flex justify-between items-center text-xs">
-              <span className="font-bold text-slate-700 flex items-center gap-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-[#3c8dbc]" /> Kapasitas Hanggar
-              </span>
-              <span className={`font-bold px-2 py-0.5 text-[11px] ${isOverCapacity ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-blue-100 text-[#3c8dbc] border border-blue-200'}`}>
-                {isOverCapacity ? 'Melebihi Kapasitas' : `Sisa: ${assetCapacity.remainingArea} m²`}
-              </span>
+        {/* Status Kapasitas Hanggar & Spesifikasi */}
+        <div data-tour="tour-step4-kapasitas" className="space-y-4">
+          {selectedAsset && assetCapacity && (
+            <div className="bg-[#f4f8fb] border border-[#d2e3ee] rounded-none p-4 space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#3c8dbc]" /> Kapasitas Hanggar
+                </span>
+                <span className={`font-bold px-2 py-0.5 text-[11px] ${isOverCapacity ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-blue-100 text-[#3c8dbc] border border-blue-200'}`}>
+                  {isOverCapacity ? 'Melebihi Kapasitas' : `Sisa: ${assetCapacity.remainingArea} m²`}
+                </span>
+              </div>
+              <div className="w-full bg-slate-200 rounded-none h-2.5 overflow-hidden flex">
+                <div className="bg-slate-400 h-2.5 transition-all duration-300" style={{ width: `${Math.min(100, (assetCapacity.usedArea / assetCapacity.totalArea) * 100)}%` }}></div>
+                <div className={`h-2.5 transition-all duration-300 ${isOverCapacity ? 'bg-red-500' : 'bg-[#3c8dbc]'}`} style={{ width: `${Math.min(100 - (assetCapacity.usedArea / assetCapacity.totalArea) * 100, (requiredArea / assetCapacity.totalArea) * 100)}%` }}></div>
+              </div>
+              <div className="flex justify-between items-center text-[11px] text-slate-500 font-medium">
+                <span>Terpakai: {assetCapacity.usedArea + requiredArea} m²</span>
+                <span>Total Luas: {assetCapacity.totalArea} m²</span>
+              </div>
             </div>
-            <div className="w-full bg-slate-200 rounded-none h-2.5 overflow-hidden flex">
-              <div className="bg-slate-400 h-2.5 transition-all duration-300" style={{ width: `${Math.min(100, (assetCapacity.usedArea / assetCapacity.totalArea) * 100)}%` }}></div>
-              <div className={`h-2.5 transition-all duration-300 ${isOverCapacity ? 'bg-red-500' : 'bg-[#3c8dbc]'}`} style={{ width: `${Math.min(100 - (assetCapacity.usedArea / assetCapacity.totalArea) * 100, (requiredArea / assetCapacity.totalArea) * 100)}%` }}></div>
-            </div>
-            <div className="flex justify-between items-center text-[11px] text-slate-500 font-medium">
-              <span>Terpakai: {assetCapacity.usedArea + requiredArea} m²</span>
-              <span>Total Luas: {assetCapacity.totalArea} m²</span>
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Rincian Objek Sewa & Spesifikasi Detail Hanggar */}
-        {selectedAsset ? (
-          <div className="border border-slate-200 rounded-none overflow-hidden bg-white shadow-xs">
-            <div className="bg-[#f4f8fb] border-b border-[#d2e3ee] text-[#3c8dbc] px-4 py-2.5 text-[12px] font-bold uppercase flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Building2 className="w-4 h-4" />
-                Rincian Objek & Spesifikasi Teknis
-              </span>
-              <span className="font-mono text-[11px] text-slate-600 bg-white px-2 py-0.5 border border-slate-200">
-                {selectedAsset.kode_aset}
-              </span>
-            </div>
-            <div className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4">
-                <div>
-                  <h5 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider mb-2">Data Bandara</h5>
-                  <div className="text-[12px] text-slate-600 space-y-1">
-                    <p><span className="text-slate-400">Bandara:</span> <strong className="text-slate-700">Mozes Kilangin</strong></p>
-                    <p><span className="text-slate-400">Kode IATA:</span> <strong className="text-slate-700">TIM</strong></p>
-                    <p><span className="text-slate-400">Wilayah:</span> Timika, Papua Tengah</p>
+          {/* Rincian Objek Sewa & Spesifikasi Detail Hanggar */}
+          {selectedAsset ? (
+            <div className="border border-slate-200 rounded-none overflow-hidden bg-white shadow-xs">
+              <div className="bg-[#f4f8fb] border-b border-[#d2e3ee] text-[#3c8dbc] px-4 py-2.5 text-[12px] font-bold uppercase flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4" />
+                  Rincian Objek & Spesifikasi Teknis
+                </span>
+                <span className="font-mono text-[11px] text-slate-600 bg-white px-2 py-0.5 border border-slate-200">
+                  {selectedAsset.kode_aset}
+                </span>
+              </div>
+              <div className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4">
+                  <div>
+                    <h5 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider mb-2">Data Bandara</h5>
+                    <div className="text-[12px] text-slate-600 space-y-1">
+                      <p><span className="text-slate-400">Bandara:</span> <strong className="text-slate-700">Mozes Kilangin</strong></p>
+                      <p><span className="text-slate-400">Kode IATA:</span> <strong className="text-slate-700">TIM</strong></p>
+                      <p><span className="text-slate-400">Wilayah:</span> Timika, Papua Tengah</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider mb-2">Data Aset Utama</h5>
+                    <div className="text-[12px] text-slate-600 space-y-1">
+                      <p><span className="text-slate-400">Nama:</span> <strong className="text-slate-700">{selectedAsset.nama_aset}</strong></p>
+                      <p><span className="text-slate-400">Luas:</span> <strong className="text-[#3c8dbc]">{selectedAsset.luas || 0} m²</strong></p>
+                      <p><span className="text-slate-400">Kapasitas:</span> {selectedAsset.kapasitas || '-'}</p>
+                    </div>
                   </div>
                 </div>
                 <div>
-                  <h5 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider mb-2">Data Aset Utama</h5>
-                  <div className="text-[12px] text-slate-600 space-y-1">
-                    <p><span className="text-slate-400">Nama:</span> <strong className="text-slate-700">{selectedAsset.nama_aset}</strong></p>
-                    <p><span className="text-slate-400">Luas:</span> <strong className="text-[#3c8dbc]">{selectedAsset.luas || 0} m²</strong></p>
-                    <p><span className="text-slate-400">Kapasitas:</span> {selectedAsset.kapasitas || '-'}</p>
+                  <h5 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider mb-2.5">Spesifikasi Fasilitas Hanggar</h5>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-[12px] text-slate-700">
+                    <div>
+                      <span className="text-slate-400 text-[11px] block">Tinggi Bangunan:</span>
+                      <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.tinggi_bangunan || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 text-[11px] block">Pintu Hanggar:</span>
+                      <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.pintu_hanggar || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 text-[11px] block">Fasilitas Listrik:</span>
+                      <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.fasilitas_listrik || '-'}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 text-[11px] block">Fire Safety:</span>
+                      <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.fire_safety || '-'}</span>
+                    </div>
+                    <div className="col-span-2 pt-1 border-t border-slate-50">
+                      <span className="text-slate-400 text-[11px] block">Koneksi Apron:</span>
+                      <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.apron_connection || '-'}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div>
-                <h5 className="text-[12px] font-bold text-slate-700 uppercase tracking-wider mb-2.5">Spesifikasi Fasilitas Hanggar</h5>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-[12px] text-slate-700">
-                  <div>
-                    <span className="text-slate-400 text-[11px] block">Tinggi Bangunan:</span>
-                    <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.tinggi_bangunan || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[11px] block">Pintu Hanggar:</span>
-                    <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.pintu_hanggar || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[11px] block">Fasilitas Listrik:</span>
-                    <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.fasilitas_listrik || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[11px] block">Fire Safety:</span>
-                    <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.fire_safety || '-'}</span>
-                  </div>
-                  <div className="col-span-2 pt-1 border-t border-slate-50">
-                    <span className="text-slate-400 text-[11px] block">Koneksi Apron:</span>
-                    <span className="font-semibold text-slate-800">{selectedAsset.spesifikasi_detail?.apron_connection || '-'}</span>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
-        ) : (
-          <div className="border border-dashed border-slate-300 p-8 text-center bg-slate-50/60 rounded-none">
-            <Warehouse className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-            <p className="text-xs font-bold text-slate-600">Pilih Aset Hanggar</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Spesifikasi teknis, dimensi, dan status kapasitas akan tampil di sini.</p>
-          </div>
-        )}
+          ) : (
+            <div className="border border-dashed border-slate-300 p-8 text-center bg-slate-50/60 rounded-none">
+              <Warehouse className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs font-bold text-slate-600">Pilih Aset Hanggar</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">Spesifikasi teknis, dimensi, dan status kapasitas akan tampil di sini.</p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Kolom Kanan: Jadwal Sewa, Armada & Kebutuhan Spesifik */}
@@ -177,7 +179,7 @@ export const HangarFormSection: React.FC<HangarFormSectionProps> = ({
         </div>
 
         {/* Periode Rencana Sewa */}
-        <div className="bg-[#f8fafc] border border-slate-200 p-4 rounded-none space-y-2.5">
+        <div className="bg-[#f8fafc] border border-slate-200 p-4 rounded-none space-y-2.5" data-tour="tour-step4-jadwal">
           <label className="block text-[13px] font-bold text-slate-800">
             Periode Rencana Sewa {isExtension && <span className="text-[#3c8dbc] font-normal text-xs">(Perpanjangan)</span>} <span className="text-red-500">*</span>
           </label>
@@ -222,7 +224,7 @@ export const HangarFormSection: React.FC<HangarFormSectionProps> = ({
         </div>
 
         {/* Armada Pesawat */}
-        <div className="space-y-2">
+        <div className="space-y-2" data-tour="tour-step4-armada">
           <div className="flex justify-between items-center">
             <div>
               <span className="block text-[13px] font-bold text-slate-800">

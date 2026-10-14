@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Upload, FileText, ArrowLeft, Loader2, Info, Download } from 'lucide-react';
+import { Upload, FileText, ArrowLeft, Loader2, Info, Download, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -13,6 +13,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import SuratPermohonanTemplate from '@/components/SuratPermohonanTemplate';
 import { contractService } from '@/services/contractService';
 import { Contract } from '@/types/contract';
+import { BuatPermohonanTutorial } from './components/BuatPermohonanTutorial';
 
 function BuatPermohonanForm() {
   const router = useRouter();
@@ -21,6 +22,9 @@ function BuatPermohonanForm() {
   const [loading, setLoading] = useState(false);
   const [contractsLoading, setContractsLoading] = useState(true);
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [currentTourIndex, setCurrentTourIndex] = useState(0);
+
   const { user } = useAuthStore();
   const templateRef = useRef<HTMLDivElement>(null);
   
@@ -132,25 +136,41 @@ function BuatPermohonanForm() {
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-[calc(100vh-60px)]">
-      <div className="mb-4">
-        <Link href="/tenant/permohonan" className="inline-flex items-center text-[14px] text-[#3c8dbc] hover:text-[#367fa9] transition-colors">
+    <div className="p-3 sm:p-4 bg-[#ecf0f5] min-h-[calc(100vh-60px)] font-sans">
+      <div className="mb-3 sm:mb-4">
+        <Link href="/tenant/permohonan" className="inline-flex items-center text-[12px] sm:text-[14px] text-[#3c8dbc] hover:text-[#367fa9] transition-colors">
           <ArrowLeft className="w-4 h-4 mr-1" /> Kembali ke Daftar Permohonan
         </Link>
       </div>
       
-      <header className="flex justify-between items-end mb-4">
-        <h1 className="text-[24px] font-normal text-[#333] flex items-center">
-          Buat Permohonan Baru <small className="text-[15px] text-[#777] ml-2 font-light">Langkah 1: Unggah Surat Permohonan Resmi</small>
-        </h1>
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-3 sm:mb-4 gap-2.5 sm:gap-2">
+        <div>
+          <h1 className="text-xl sm:text-[24px] font-normal text-[#333] flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+            Buat Permohonan Baru
+            <span className="text-xs sm:text-[15px] text-[#777] font-light">
+              Langkah 1: Unggah Surat Permohonan Resmi
+            </span>
+          </h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentTourIndex(0);
+            setTutorialOpen(true);
+          }}
+          className="bg-white border border-[#3c8dbc] text-[#3c8dbc] hover:bg-blue-50 px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-colors flex items-center rounded-none cursor-pointer shadow-2xs self-start sm:self-auto"
+          title="Buka panduan & tutorial Langkah 1"
+        >
+          <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-[#3c8dbc]" />
+          Panduan Tutorial
+        </button>
       </header>
-
 
       {/* Stepper Component */}
       {(() => {
         const isHangar = formData.application_type.toLowerCase().includes('hanggar');
         return (
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6" data-tour="tour-stepper">
             <Stepper 
               currentStep={1} 
               requiresPayung={isHangar && requiresPayung} 
@@ -160,20 +180,32 @@ function BuatPermohonanForm() {
         );
       })()}
 
-      <form onSubmit={handleSubmit} className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
-        <div className="p-3 border-b border-[#f4f4f4] bg-slate-50 flex items-center">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Surat Permohonan Resmi
+      {/* Form Step 1: Unggah Surat Permohonan Resmi */}
+      <form onSubmit={handleSubmit} className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-none">
+        <div className="p-3 border-b border-[#f4f4f4] bg-slate-50 flex items-center justify-between flex-wrap gap-2">
+          <h3 className="text-[14px] sm:text-[16px] text-[#444] font-bold flex items-center">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#3c8dbc]" /> Surat Permohonan Resmi
           </h3>
+          <button
+            type="button"
+            onClick={() => {
+              setCurrentTourIndex(0);
+              setTutorialOpen(true);
+            }}
+            className="text-[11px] sm:text-[12px] font-semibold text-[#3c8dbc] hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            Panduan Langkah 1
+          </button>
         </div>
         
-        <div className="p-6 md:p-8 space-y-8">
+        <div className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-8">
             {/* Info Box */}
-            <div className="bg-blue-50/50 border-l-4 border-blue-500 rounded-r-lg p-5 flex gap-4 text-blue-900">
-              <Info className="w-5 h-5 flex-shrink-0 text-blue-600 mt-0.5" />
+            <div className="bg-blue-50/50 border-l-4 border-blue-500 rounded-r-lg p-3.5 sm:p-5 flex gap-2.5 sm:gap-4 text-blue-900">
+              <Info className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-blue-600 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-[15px] mb-1">Alur Permohonan</h4>
-                <p className="text-[14px] text-blue-800/80 leading-relaxed">
+                <h4 className="font-semibold text-xs sm:text-[15px] mb-1">Alur Permohonan</h4>
+                <p className="text-xs sm:text-[14px] text-blue-800/80 leading-relaxed">
                   Pilih layanan yang Anda butuhkan, lalu unggah <strong>Surat Permohonan Resmi</strong> (ber-Kop Surat, ditandatangani, dan distempel).{' '}
                   {formData.application_type.toLowerCase().includes('hanggar') ? (
                     requiresPayung
@@ -186,12 +218,12 @@ function BuatPermohonanForm() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8">
               {/* Form Kolom Kiri */}
-              <div className="lg:col-span-7 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="application_type" className="block text-[14px] font-semibold text-slate-700 mb-2">Jenis Layanan Sewa <span className="text-red-500">*</span></label>
+              <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div data-tour="tour-jenis-layanan">
+                    <label htmlFor="application_type" className="block text-xs sm:text-[14px] font-semibold text-slate-700 mb-1.5 sm:mb-2">Jenis Layanan Sewa <span className="text-red-500">*</span></label>
                     <select 
                       id="application_type"
                       name="application_type" 
@@ -199,7 +231,7 @@ function BuatPermohonanForm() {
                       onChange={handleChange} 
                       required
                       disabled={!!extendFromId}
-                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-[#3c8dbc] focus:ring-1 focus:ring-[#3c8dbc] transition-all bg-white shadow-sm disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+                      className="w-full border border-slate-300 px-3 sm:px-4 py-2 sm:py-2.5 rounded-md text-xs sm:text-[14px] outline-none focus:border-[#3c8dbc] focus:ring-1 focus:ring-[#3c8dbc] transition-all bg-white shadow-2xs disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
                     >
                       {extendFromId ? (
                         <>
@@ -216,8 +248,8 @@ function BuatPermohonanForm() {
                     </select>
                   </div>
 
-                  <div>
-                    <label htmlFor="purpose" className="block text-[14px] font-semibold text-slate-700 mb-2">Perihal Surat <span className="text-red-500">*</span></label>
+                  <div data-tour="tour-perihal">
+                    <label htmlFor="purpose" className="block text-xs sm:text-[14px] font-semibold text-slate-700 mb-1.5 sm:mb-2">Perihal Surat <span className="text-red-500">*</span></label>
                     <input 
                       id="purpose"
                       type="text" 
@@ -226,35 +258,35 @@ function BuatPermohonanForm() {
                       onChange={handleChange} 
                       required
                       placeholder={`Cth: Permohonan ${formData.application_type}...`}
-                      className="w-full border border-slate-300 px-4 py-2.5 rounded-md text-[14px] outline-none focus:border-[#3c8dbc] focus:ring-1 focus:ring-[#3c8dbc] transition-all shadow-sm"
+                      className="w-full border border-slate-300 px-3 sm:px-4 py-2 sm:py-2.5 rounded-md text-xs sm:text-[14px] outline-none focus:border-[#3c8dbc] focus:ring-1 focus:ring-[#3c8dbc] transition-all shadow-2xs"
                     />
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-5">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 sm:p-5" data-tour="tour-template-pdf">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                     <div>
-                      <h4 className="font-semibold text-[14px] text-slate-800 mb-1">Belum memiliki format surat?</h4>
-                      <p className="text-[13px] text-slate-500">Kami dapat membuatkan draft otomatis berdasarkan profil Anda.</p>
+                      <h4 className="font-semibold text-xs sm:text-[14px] text-slate-800 mb-0.5 sm:mb-1">Belum memiliki format surat?</h4>
+                      <p className="text-[11px] sm:text-[13px] text-slate-500">Kami dapat membuatkan draft otomatis berdasarkan profil Anda.</p>
                     </div>
                     <button 
                       type="button" 
                       onClick={handleDownloadTemplate}
                       disabled={loading}
-                      className="whitespace-nowrap bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 py-2 px-4 rounded-md text-[13px] font-semibold transition-all shadow-sm flex items-center"
+                      className="w-full sm:w-auto justify-center whitespace-nowrap bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 py-1.5 sm:py-2 px-3 sm:px-4 rounded-md text-xs sm:text-[13px] font-semibold transition-all shadow-2xs flex items-center"
                     >
-                      <Download className="w-4 h-4 mr-2" /> Unduh Draft PDF
+                      <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" /> Unduh Draft PDF
                     </button>
                   </div>
                 </div>
               </div>
 
               {/* Upload Kolom Kanan */}
-              <div className="lg:col-span-5">
-                <label htmlFor="file-upload" className="block text-[14px] font-semibold text-slate-700 mb-2">Dokumen Surat Resmi <span className="text-red-500">*</span></label>
+              <div className="lg:col-span-5" data-tour="tour-upload-surat">
+                <label htmlFor="file-upload" className="block text-xs sm:text-[14px] font-semibold text-slate-700 mb-1.5 sm:mb-2">Dokumen Surat Resmi <span className="text-red-500">*</span></label>
                 
                 {!officialLetter ? (
-                  <div className="mt-1 flex justify-center px-6 pt-10 pb-10 border-2 border-slate-300 border-dashed rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all group relative">
+                  <div className="mt-1 flex justify-center px-4 sm:px-6 pt-7 pb-7 sm:pt-10 sm:pb-10 border-2 border-slate-300 border-dashed rounded-lg hover:border-blue-400 hover:bg-blue-50/50 transition-all group relative">
                     <input 
                       id="file-upload" 
                       name="file-upload" 
@@ -267,31 +299,31 @@ function BuatPermohonanForm() {
                         }
                       }}
                     />
-                    <div className="space-y-3 text-center pointer-events-none">
-                      <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                        <Upload className="w-6 h-6" />
+                    <div className="space-y-2.5 sm:space-y-3 text-center pointer-events-none">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                        <Upload className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
-                      <div className="flex flex-col text-[14px] text-slate-600 justify-center">
+                      <div className="flex flex-col text-xs sm:text-[14px] text-slate-600 justify-center">
                         <p className="font-semibold text-blue-600">Pilih file dokumen</p>
-                        <p className="mt-1">atau seret dan lepas ke sini</p>
+                        <p className="mt-0.5 sm:mt-1">atau seret dan lepas ke sini</p>
                       </div>
-                      <p className="text-[12px] text-slate-400 font-medium">Format PDF (Maks. 5MB)</p>
+                      <p className="text-[11px] sm:text-[12px] text-slate-400 font-medium">Format PDF (Maks. 5MB)</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-1 flex flex-col items-center justify-center px-6 py-8 border-2 border-blue-400 bg-blue-50/50 rounded-lg transition-all shadow-sm">
-                    <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-3 shadow-sm transform transition-transform hover:scale-105">
-                      <FileText className="w-7 h-7" />
+                  <div className="mt-1 flex flex-col items-center justify-center px-4 sm:px-6 py-6 sm:py-8 border-2 border-blue-400 bg-blue-50/50 rounded-lg transition-all shadow-2xs">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-2.5 sm:mb-3 shadow-2xs transform transition-transform hover:scale-105">
+                      <FileText className="w-6 h-6 sm:w-7 sm:h-7" />
                     </div>
-                    <p className="text-[14px] font-bold text-slate-800 text-center truncate w-full px-2 mb-1" title={officialLetter.name}>
+                    <p className="text-xs sm:text-[14px] font-bold text-slate-800 text-center truncate w-full px-2 mb-1" title={officialLetter.name}>
                       {officialLetter.name}
                     </p>
-                    <p className="text-[12px] text-blue-600 font-semibold mb-4">File siap diunggah</p>
+                    <p className="text-[11px] sm:text-[12px] text-blue-600 font-semibold mb-3 sm:mb-4">File siap diunggah</p>
                     
                     <button 
                       type="button"
                       onClick={() => setOfficialLetter(null)}
-                      className="px-4 py-1.5 bg-white border border-slate-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md text-[13px] font-semibold transition-colors shadow-sm text-slate-600"
+                      className="px-3.5 sm:px-4 py-1.5 bg-white border border-slate-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-md text-xs sm:text-[13px] font-semibold transition-colors shadow-2xs text-slate-600"
                     >
                       Ganti File
                     </button>
@@ -300,17 +332,18 @@ function BuatPermohonanForm() {
               </div>
             </div>
             
-            <div className="pt-6 border-t border-slate-100 flex justify-end">
+            <div className="pt-4 sm:pt-6 border-t border-slate-100 flex justify-end">
               <button 
                 type="submit" 
                 disabled={loading}
-                className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white py-2 px-6 rounded-sm text-[14px] font-medium transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
+                data-tour="tour-btn-kirim"
+                className="w-full sm:w-auto justify-center bg-[#3c8dbc] hover:bg-[#367fa9] text-white py-2.5 sm:py-2 px-6 rounded-none text-xs sm:text-[14px] font-medium transition-all shadow-2xs disabled:opacity-70 disabled:cursor-not-allowed flex items-center"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                 Kirim Permohonan
               </button>
             </div>
-        </div>
+          </div>
         </form>
 
         {/* Hidden template for PDF generation */}
@@ -323,6 +356,18 @@ function BuatPermohonanForm() {
             purpose={formData.purpose}
           />
         </div>
+
+        {/* Tutorial Tour Spotlight Mode (Persis seperti pada gambar) */}
+        <BuatPermohonanTutorial
+          isOpen={tutorialOpen}
+          currentTourIndex={currentTourIndex}
+          onTourIndexChange={setCurrentTourIndex}
+          onClose={() => {
+            setTutorialOpen(false);
+            setCurrentTourIndex(0);
+          }}
+          defaultMode="tour"
+        />
     </div>
   );
 }

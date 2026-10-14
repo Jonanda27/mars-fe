@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import StatusBadge from '@/components/StatusBadge';
 
 interface UnbilledHanggarTableProps {
+  readonly isDinas?: boolean;
   readonly isLoading: boolean;
   readonly filteredLogs: UnbilledHanggarLog[];
   readonly selectedLogIds: number[];
@@ -18,6 +19,7 @@ interface UnbilledHanggarTableProps {
 }
 
 export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
+  isDinas = false,
   isLoading,
   filteredLogs,
   selectedLogIds,
@@ -45,19 +47,23 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50 text-slate-700 font-bold uppercase tracking-wider">
-              <th className="py-3 px-3 w-8 text-center">
-                <button 
-                  type="button"
-                  onClick={onSelectAll}
-                  className="cursor-pointer text-slate-600 hover:text-slate-900"
-                >
-                  {selectedLogIds.length === filteredLogs.length && filteredLogs.length > 0 ? (
-                    <CheckSquare className="w-4 h-4 text-[#3c8dbc]" />
-                  ) : (
-                    <Square className="w-4 h-4" />
-                  )}
-                </button>
-              </th>
+              {isDinas ? (
+                <th className="py-3 px-3 w-8 text-center">
+                  <button 
+                    type="button"
+                    onClick={onSelectAll}
+                    className="cursor-pointer text-slate-600 hover:text-slate-900"
+                  >
+                    {selectedLogIds.length === filteredLogs.length && filteredLogs.length > 0 ? (
+                      <CheckSquare className="w-4 h-4 text-[#3c8dbc]" />
+                    ) : (
+                      <Square className="w-4 h-4" />
+                    )}
+                  </button>
+                </th>
+              ) : (
+                <th className="py-3 px-3 w-8 text-center text-slate-400 font-bold">#</th>
+              )}
               <th className="py-3 px-3">Registrasi & Tipe</th>
               <th className="py-3 px-3">Maskapai / Tenant</th>
               <th className="py-3 px-3 text-center">Lokasi</th>
@@ -65,11 +71,11 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
               <th className="py-3 px-3 text-center">Malam Inap</th>
               <th className="py-3 px-3 text-right">Tarif / Malam</th>
               <th className="py-3 px-3 text-right">Subtotal</th>
-              <th className="py-3 px-3 text-center">Aksi Penetapan</th>
+              <th className="py-3 px-3 text-center">{isDinas ? 'Aksi Penetapan' : 'Status Ketetapan'}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {filteredLogs.map(log => {
+            {filteredLogs.map((log, idx) => {
               const isSelected = selectedLogIds.includes(log.log_id);
               const currentRate = customRates[log.log_id] ?? log.rate_per_night;
               const calculatedSubtotal = log.total_nights * currentRate;
@@ -80,17 +86,23 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                   className={`hover:bg-blue-50/40 transition-colors ${isSelected ? 'bg-blue-50/60' : ''}`}
                 >
                   <td className="py-3 px-3 text-center">
-                    <button
-                      type="button"
-                      onClick={() => onToggleSelect(log.log_id)}
-                      className="cursor-pointer"
-                    >
-                      {isSelected ? (
-                        <CheckSquare className="w-4 h-4 text-[#3c8dbc]" />
-                      ) : (
-                        <Square className="w-4 h-4 text-slate-400 hover:text-slate-600" />
-                      )}
-                    </button>
+                    {isDinas ? (
+                      <button
+                        type="button"
+                        onClick={() => onToggleSelect(log.log_id)}
+                        className="cursor-pointer"
+                      >
+                        {isSelected ? (
+                          <CheckSquare className="w-4 h-4 text-[#3c8dbc]" />
+                        ) : (
+                          <Square className="w-4 h-4 text-slate-400 hover:text-slate-600" />
+                        )}
+                      </button>
+                    ) : (
+                      <span className="font-mono text-slate-400 text-[11px] font-bold">
+                        {idx + 1}
+                      </span>
+                    )}
                   </td>
 
                   <td className="py-3 px-3">
@@ -184,15 +196,22 @@ export const UnbilledHanggarTable: React.FC<UnbilledHanggarTableProps> = ({
                   </td>
 
                   <td className="py-3 px-3 text-center">
-                    <button
-                      type="button"
-                      onClick={() => onTriggerSingle(log)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded text-[11px] font-bold shadow-xs cursor-pointer transition-colors"
-                      title="Tetapkan SKRD untuk pergerakan armada ini"
-                    >
-                      <FileText className="w-3 h-3" />
-                      Tetapkan SKRD
-                    </button>
+                    {isDinas ? (
+                      <button
+                        type="button"
+                        onClick={() => onTriggerSingle(log)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded text-[11px] font-bold shadow-xs cursor-pointer transition-colors"
+                        title="Tetapkan SKRD untuk pergerakan armada ini"
+                      >
+                        <FileText className="w-3 h-3" />
+                        Tetapkan SKRD
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded whitespace-nowrap">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        Menunggu Penetapan Dinas
+                      </span>
+                    )}
                   </td>
                 </tr>
               );

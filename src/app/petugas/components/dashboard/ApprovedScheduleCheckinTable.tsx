@@ -11,6 +11,7 @@ interface ApprovedScheduleCheckinTableProps {
   readonly isCheckingInSchedule: number | null;
   readonly onRefresh: () => void;
   readonly onCheckInFromSchedule: (schedule: FlightSchedule) => void;
+  readonly hideHeader?: boolean;
 }
 
 export const ApprovedScheduleCheckinTable: React.FC<ApprovedScheduleCheckinTableProps> = ({
@@ -19,29 +20,10 @@ export const ApprovedScheduleCheckinTable: React.FC<ApprovedScheduleCheckinTable
   isCheckingInSchedule,
   onRefresh,
   onCheckInFromSchedule,
+  hideHeader = false,
 }) => {
-  return (
-    <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs">
-      <div className="p-3.5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <div>
-          <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-[#3c8dbc]" />
-            Rencana Kedatangan Hari Ini ({dayjs().format('DD MMMM YYYY')})
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-0.5">
-            Pesawat yang telah disetujui izin masuknya dan dijadwalkan tiba hari ini. Klik <strong>1-Click Check-In</strong> saat pesawat fisik mendarat.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onRefresh}
-          className="px-2.5 py-1 text-slate-600 hover:bg-slate-100 text-xs flex items-center gap-1 border border-slate-200 cursor-pointer self-end sm:self-auto"
-        >
-          <RefreshCw className="w-3 h-3" /> Refresh
-        </button>
-      </div>
-
-      <div className="overflow-x-auto">
+  const content = (
+    <div className="overflow-x-auto">
         {isLoadingTodayArrivals ? (
           <div className="p-6 text-center text-slate-400">
             <Loader2 className="w-6 h-6 animate-spin mx-auto mb-1 text-[#3c8dbc]" />
@@ -105,7 +87,7 @@ export const ApprovedScheduleCheckinTable: React.FC<ApprovedScheduleCheckinTable
                       ) : (
                         <>
                           <LogIn className="w-3.5 h-3.5" />
-                          1-Click Check-In Masuk
+                          Konfirmasi Kedatangan
                         </>
                       )}
                     </button>
@@ -116,6 +98,33 @@ export const ApprovedScheduleCheckinTable: React.FC<ApprovedScheduleCheckinTable
           </table>
         )}
       </div>
+  );
+
+  if (hideHeader) {
+    return content;
+  }
+
+  return (
+    <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs">
+      <div className="p-3.5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <UserCheck className="w-4 h-4 text-[#3c8dbc]" />
+            Rencana Kedatangan Hari Ini ({dayjs().format('DD MMMM YYYY')})
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-0.5">
+            Pesawat yang telah disetujui izin masuknya dan dijadwalkan tiba hari ini. Klik <strong>Konfirmasi Kedatangan</strong> saat pesawat fisik mendarat.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onRefresh}
+          className="px-2.5 py-1 text-slate-600 hover:bg-slate-100 text-xs flex items-center gap-1 border border-slate-200 cursor-pointer self-end sm:self-auto"
+        >
+          <RefreshCw className="w-3 h-3" /> Refresh
+        </button>
+      </div>
+      {content}
     </div>
   );
 };

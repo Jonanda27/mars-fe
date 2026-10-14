@@ -3,15 +3,26 @@
 import React from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import BaseSidebar, { NavItem } from './BaseSidebar';
-import { Plane, User, Circle, ShieldCheck, Clock, History, AlertTriangle, TowerControl, MapPin } from 'lucide-react';
+import { Plane, User, Circle, ShieldCheck, Clock, History, AlertTriangle, TowerControl, MapPin, LayoutDashboard } from 'lucide-react';
 
-export default function PetugasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
+export default function PetugasSidebar({ 
+  isOpen, 
+  onToggle,
+  isMobileOpen,
+  onCloseMobile
+}: Readonly<{ 
+  isOpen: boolean; 
+  onToggle?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}>) {
   const { user } = useAuthStore();
   const role = (user?.role || '').toLowerCase();
   const isMiniPetugas = role === 'petugas_mini_airport' || role === 'petugas lapangan mini airport' || Boolean(user?.mini_airport_id);
 
   const mozesNavItems: NavItem[] = [
-    { href: "/petugas", label: "Log Operasional (Mozes)", icon: <Plane className="w-4 h-4" /> },
+    { href: "/petugas", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
+    { href: "/petugas/log-operasional", label: "Log Operasional", icon: <Plane className="w-4 h-4" /> },
     { href: "/petugas/verifikasi-jadwal", label: "Verifikasi Jadwal Masuk", icon: <ShieldCheck className="w-4 h-4" /> },
     { href: "/petugas/tutup-hari", label: "Laporan Tutup Hari", icon: <Clock className="w-4 h-4" /> },
     { href: "/petugas/riwayat", label: "Riwayat Tutup Hari", icon: <History className="w-4 h-4" /> },
@@ -71,6 +82,8 @@ export default function PetugasSidebar({ isOpen, onToggle }: Readonly<{ isOpen: 
     <BaseSidebar
       isOpen={isOpen}
       onToggle={onToggle}
+      isMobileOpen={isMobileOpen}
+      onCloseMobile={onCloseMobile}
       userName={user?.username || 'Petugas'}
       userAvatar={user?.username?.charAt(0).toUpperCase() || <User className="w-5 h-5" />}
       userStatus={userStatusElement}

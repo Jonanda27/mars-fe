@@ -9,16 +9,18 @@ import dayjs from 'dayjs';
 import StatusBadge from '@/components/StatusBadge';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ReviewExtensionModal } from './components/ReviewExtensionModal';
+import { normalizeRole } from '@/utils/routeGuard';
 
 export default function PermohonanAdminPage() {
   const { user } = useAuthStore();
   const [applications, setApplications] = useState<RentalApplication[]>([]);
   const [loading, setLoading] = useState(true);
-  const userRole = (user?.role || '').toLowerCase();
+  const userRole = normalizeRole(user?.role);
   const isMiniAdmin = userRole === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
+  const isMozesAdmin = userRole === 'admin' || ['admin_hanggar', 'admin_apron', 'admin_ruangan'].includes(userRole);
   const [activeTab, setActiveTab] = useState<'ALL' | 'EXTENSIONS'>('ALL');
   const [airportCategory, setAirportCategory] = useState<'ALL' | 'MOZES' | 'MINI'>(
-    isMiniAdmin ? 'MINI' : (user?.airport_id || userRole === 'admin' ? 'MOZES' : 'ALL')
+    isMiniAdmin ? 'MINI' : (user?.airport_id || isMozesAdmin ? 'MOZES' : 'ALL')
   );
 
   // Modal Review Perpanjangan

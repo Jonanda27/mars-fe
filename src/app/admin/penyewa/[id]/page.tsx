@@ -68,8 +68,8 @@ export default function AdminPenyewaDetailPage() {
     return (
       <div className="p-4 text-center mt-20">
         <h2 className="text-xl font-bold text-gray-700">Penyewa tidak ditemukan</h2>
-        <Link href="/admin/penyewa" className="text-blue-500 hover:underline mt-2 inline-block">
-          Kembali ke Daftar Penyewa
+        <Link href="/admin/verifikasi" className="text-blue-500 hover:underline mt-2 inline-block">
+          Kembali ke Verifikasi Mitra
         </Link>
       </div>
     );
@@ -84,15 +84,15 @@ export default function AdminPenyewaDetailPage() {
       <header className="flex justify-between items-end mb-4">
         <div>
           <h1 className="text-[24px] font-normal text-[#333] flex items-center">
-            Detail Penyewa <small className="text-[15px] text-[#777] ml-2 font-light">{tenant.tenant_id_str || '(Pending ID)'}</small>
+            Detail Mitra <small className="text-[15px] text-[#777] ml-2 font-light">{tenant.tenant_id_str || '(Pending ID)'}</small>
           </h1>
         </div>
         <div className="flex items-center gap-2">
           <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-            <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Detail Penyewa</span>
+            <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Detail Mitra</span>
           </div>
           <Link 
-            href="/admin/penyewa"
+            href="/admin/verifikasi"
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded shadow-sm flex items-center text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" /> Kembali

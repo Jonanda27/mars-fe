@@ -139,6 +139,7 @@ export interface DinasOverdueInvoice {
 
 export interface DinasRevenueBreakdown {
   hanggar: number;
+  apron: number;
   ruangan: number;
   denda: number;
   total: number;

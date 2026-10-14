@@ -18,47 +18,59 @@ export const PetugasKPICards: React.FC<PetugasKPICardsProps> = ({
 }) => {
   return (
     <>
-      {/* Stat Boxes (Small Box Style) - Konsisten Warna Biru */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Box 1: Armada Parkir Saat Ini */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pesawat Parkir Saat Ini</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{activeLogsCount}</span>
-              <span className="text-xs text-slate-500 font-medium">Armada</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Sedang Menempati Fasilitas</span>
+      {/* 3 KPI Cards (AdminLTE Flat Style) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        {/* KPI 1: Pesawat Parkir Saat Ini */}
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <Plane className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Plane className="w-5 h-5" />
-          </div>
-        </div>
-
-        {/* Box 2: Rencana Kedatangan Hari Ini */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Kedatangan Hari Ini</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{todayArrivalsCount}</span>
-              <span className="text-xs text-slate-500 font-medium">Jadwal</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Terverifikasi Masuk</span>
-          </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Clock className="w-5 h-5" />
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Pesawat Parkir Saat Ini
+            </span>
+            <span className="text-[16px] sm:text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5 truncate">
+              {activeLogsCount} <span className="text-xs font-sans text-slate-500 font-normal">Armada</span>
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-[#3c8dbc] font-bold mt-1 line-clamp-1 sm:line-clamp-none">
+              Sedang Menempati Fasilitas
+            </span>
           </div>
         </div>
 
-        {/* Box 3: Tanggal Operasional */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Tanggal Operasional</span>
-            <span className="text-sm font-bold text-slate-800 block mt-1">{dayjs().format('dddd, DD MMM YYYY')}</span>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Warden Hanggar Aktif</span>
+        {/* KPI 2: Kedatangan Hari Ini */}
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <Clock className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Calendar className="w-5 h-5" />
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Kedatangan Hari Ini
+            </span>
+            <span className="text-[16px] sm:text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5 truncate">
+              {todayArrivalsCount} <span className="text-xs font-sans text-slate-500 font-normal">Jadwal</span>
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-[#3c8dbc] font-bold mt-1 line-clamp-1 sm:line-clamp-none">
+              Terverifikasi &amp; Siap Check-In
+            </span>
+          </div>
+        </div>
+
+        {/* KPI 3: Tanggal Operasional */}
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <Calendar className="w-7 h-7 sm:w-8 sm:h-8" />
+          </div>
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Tanggal Operasional
+            </span>
+            <span className="text-[14px] sm:text-[16px] font-bold text-[#333] leading-tight mt-0.5 truncate">
+              {dayjs().format('dddd, DD MMM YYYY')}
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-[#3c8dbc] font-bold mt-1 line-clamp-1 sm:line-clamp-none">
+              Warden Hanggar Aktif
+            </span>
           </div>
         </div>
       </div>

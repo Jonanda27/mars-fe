@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   ShieldCheck, Search, Filter, RefreshCw, 
   CheckCircle2, XCircle, Clock, Calendar, 
@@ -93,71 +94,103 @@ export default function PetugasVerifikasiJadwalPage() {
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[20px] font-normal text-[#333] uppercase flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-[#3c8dbc]" />
-            Verifikasi Jadwal Masuk (Bandara Mozes Kilangin)
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Verifikasi Jadwal Masuk <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
           </h1>
-          <p className="text-[12px] text-[#777] mt-0.5">
-            Persetujuan Rencana Kedatangan Armada Hanggar &amp; Apron Bandara Mozes Kilangin Timika
-          </p>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-white border border-[#e0e0e0] py-1 px-3 shadow-2xs">
-          <span className="mr-1">Petugas Mozes Kilangin</span> / <span className="ml-1 font-bold text-slate-800">Verifikasi Jadwal Masuk</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <Link href="/petugas" className="mr-1 hover:text-[#3c8dbc]">Petugas</Link> / <span className="ml-1 font-medium">Verifikasi Jadwal</span>
         </div>
       </header>
 
-      {/* Small Box Summary Stats - Konsisten Warna Biru */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* 4 KPI Filter Cards (AdminLTE Flat Style) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div 
           onClick={() => setStatusFilter('ALL')}
-          className={`p-3 bg-white border cursor-pointer transition-all ${
+          className={`bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch cursor-pointer transition-all ${
             statusFilter === 'ALL' 
-              ? 'border-l-4 border-l-[#3c8dbc] shadow-xs ring-1 ring-blue-200' 
-              : 'border-slate-200 hover:border-slate-300'
+              ? 'ring-2 ring-[#3c8dbc] shadow-md' 
+              : 'hover:bg-slate-50/60'
           }`}
         >
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Pengajuan</span>
-          <span className="text-xl font-black text-slate-800 block mt-0.5">{schedules.length}</span>
-          <span className="text-[10px] text-slate-400">Semua Jadwal</span>
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Calendar className="w-8 h-8" />
+          </div>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Total Pengajuan</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {schedules.length} <span className="text-xs font-sans text-slate-500 font-normal">Jadwal</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+              Semua Pengajuan
+            </span>
+          </div>
         </div>
 
         <div 
           onClick={() => setStatusFilter('Menunggu Verifikasi Petugas')}
-          className={`p-3 bg-white border cursor-pointer transition-all ${
+          className={`bg-white border-t-[3px] border-[#f39c12] shadow-sm flex items-stretch cursor-pointer transition-all ${
             statusFilter === 'Menunggu Verifikasi Petugas' 
-              ? 'border-l-4 border-l-amber-500 ring-1 ring-amber-400 shadow-xs' 
-              : 'border-slate-200 hover:border-slate-300'
+              ? 'ring-2 ring-[#f39c12] shadow-md' 
+              : 'hover:bg-slate-50/60'
           }`}
         >
-          <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider block">Menunggu Verifikasi</span>
-          <span className="text-xl font-black text-amber-600 block mt-0.5">{pendingCount}</span>
-          <span className="text-[10px] text-amber-600 font-semibold">Perlu Tinjauan Petugas</span>
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#f39c12]">
+            <Clock className="w-8 h-8" />
+          </div>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Menunggu Verifikasi</span>
+            <span className="text-[18px] font-bold text-[#f39c12] font-mono leading-tight mt-0.5">
+              {pendingCount} <span className="text-xs font-sans text-slate-500 font-normal">Antrean</span>
+            </span>
+            <span className="text-[11px] text-[#f39c12] font-bold mt-1">
+              Perlu Tinjauan Petugas
+            </span>
+          </div>
         </div>
 
         <div 
           onClick={() => setStatusFilter('Disetujui')}
-          className={`p-3 bg-white border cursor-pointer transition-all ${
+          className={`bg-white border-t-[3px] border-[#00a65a] shadow-sm flex items-stretch cursor-pointer transition-all ${
             statusFilter === 'Disetujui' 
-              ? 'border-l-4 border-l-[#3c8dbc] ring-1 ring-blue-200 shadow-xs' 
-              : 'border-slate-200 hover:border-slate-300'
+              ? 'ring-2 ring-[#00a65a] shadow-md' 
+              : 'hover:bg-slate-50/60'
           }`}
         >
-          <span className="text-[11px] font-bold text-[#3c8dbc] uppercase tracking-wider block">Disetujui</span>
-          <span className="text-xl font-black text-[#3c8dbc] block mt-0.5">{approvedCount}</span>
-          <span className="text-[10px] text-[#3c8dbc]">Siap Mendarat</span>
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#00a65a]">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Disetujui Dinas</span>
+            <span className="text-[18px] font-bold text-[#00a65a] font-mono leading-tight mt-0.5">
+              {approvedCount} <span className="text-xs font-sans text-slate-500 font-normal">Armada</span>
+            </span>
+            <span className="text-[11px] text-[#00a65a] font-bold mt-1">
+              Siap Mendarat di Bandara
+            </span>
+          </div>
         </div>
 
         <div 
           onClick={() => setStatusFilter('Checked-In')}
-          className={`p-3 bg-white border cursor-pointer transition-all ${
+          className={`bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch cursor-pointer transition-all ${
             statusFilter === 'Checked-In' 
-              ? 'border-l-4 border-l-[#3c8dbc] ring-1 ring-blue-200 shadow-xs' 
-              : 'border-slate-200 hover:border-slate-300'
+              ? 'ring-2 ring-[#3c8dbc] shadow-md' 
+              : 'hover:bg-slate-50/60'
           }`}
         >
-          <span className="text-[11px] font-bold text-[#3c8dbc] uppercase tracking-wider block">Checked-In</span>
-          <span className="text-xl font-black text-[#3c8dbc] block mt-0.5">{checkedInCount}</span>
-          <span className="text-[10px] text-[#3c8dbc]">Fisik Sudah Masuk</span>
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Plane className="w-8 h-8" />
+          </div>
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Checked-In</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {checkedInCount} <span className="text-xs font-sans text-slate-500 font-normal">Armada</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+              Fisik Berada di Apron
+            </span>
+          </div>
         </div>
       </div>
 

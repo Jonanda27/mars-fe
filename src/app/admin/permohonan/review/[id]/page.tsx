@@ -133,10 +133,35 @@ export default function ReviewPermohonanPage() {
       return;
     }
     
+    const appType = (app?.application_type || '').toLowerCase();
+    const assetJenis = (app?.assets?.jenis_aset || '').toLowerCase();
+    const assetKategori = (app?.assets?.kategori || '').toLowerCase();
+    const assetNama = (app?.assets?.nama_aset || '').toLowerCase();
+
+    let specStr = '';
+    if (app?.specific_needs) {
+      specStr = typeof app.specific_needs === 'string'
+        ? app.specific_needs.toLowerCase()
+        : JSON.stringify(app.specific_needs).toLowerCase();
+    }
+
     const isHangar = Boolean(
-      app?.application_type?.toLowerCase().includes('hanggar') ||
-      app?.assets?.kategori?.toLowerCase().includes('hanggar') ||
+      appType.includes('hanggar') ||
+      assetJenis.includes('hanggar') ||
+      assetKategori.includes('hanggar') ||
+      assetNama.includes('hanggar') ||
+      specStr.includes('"hanggar"') ||
+      specStr.includes('trf-hgr') ||
       app?.contracts?.contract_type === 'Payung'
+    );
+
+    const isApron = Boolean(
+      appType.includes('apron') ||
+      assetJenis.includes('apron') ||
+      assetKategori.includes('apron') ||
+      assetNama.includes('apron') ||
+      specStr.includes('"apron"') ||
+      specStr.includes('trf-apron')
     );
 
     let confirmMessage = `Apakah Anda yakin ingin menandai permohonan ini sebagai ${status}?`;
@@ -147,6 +172,8 @@ export default function ReviewPermohonanPage() {
         : `Apakah Anda yakin ingin menolak permohonan ini?`;
     } else if (isHangar && status === 'Aktif') {
       confirmMessage = 'Apakah Anda yakin ingin menyetujui dan memvalidasi permohonan sewa hanggar ini?';
+    } else if (isApron && status === 'Aktif') {
+      confirmMessage = 'Apakah Anda yakin ingin menyetujui dan memvalidasi permohonan sewa apron ini?';
     }
 
     if (confirm(confirmMessage)) {
@@ -169,6 +196,10 @@ export default function ReviewPermohonanPage() {
           await rentalService.updateApplicationStatus(Number.parseInt(id, 10), status, selectedAssetId ? Number.parseInt(selectedAssetId, 10) : undefined);
           if (isHangar && status === 'Aktif') {
             toast.success('Validasi berhasil! Permohonan sewa hanggar telah disetujui.');
+          } else if (isApron && status === 'Aktif') {
+            toast.success('Validasi berhasil! Permohonan sewa apron telah disetujui.');
+          } else if (status === 'Aktif') {
+            toast.success('Validasi berhasil! Permohonan telah disetujui.');
           }
         }
         router.push('/admin/permohonan');

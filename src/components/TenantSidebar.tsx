@@ -19,7 +19,17 @@ import {
 } from 'lucide-react';
 import RupiahIcon from './icons/RupiahIcon';
 
-export default function TenantSidebar({ isOpen, onToggle }: Readonly<{ isOpen: boolean; onToggle?: () => void }>) {
+export default function TenantSidebar({ 
+  isOpen, 
+  onToggle,
+  isMobileOpen,
+  onCloseMobile
+}: Readonly<{ 
+  isOpen: boolean; 
+  onToggle?: () => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}>) {
   const { user } = useAuthStore();
   const isVerified = user?.status_verifikasi === 'Verified';
 
@@ -47,6 +57,8 @@ export default function TenantSidebar({ isOpen, onToggle }: Readonly<{ isOpen: b
     <BaseSidebar
       isOpen={isOpen}
       onToggle={onToggle}
+      isMobileOpen={isMobileOpen}
+      onCloseMobile={onCloseMobile}
       userName={user?.nama_perusahaan || 'Tenant'}
       userAvatar={<User className="w-5 h-5" />}
       userStatus={

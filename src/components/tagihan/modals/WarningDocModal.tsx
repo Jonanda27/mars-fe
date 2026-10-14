@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { X, Download, Printer, FileText, AlertTriangle } from 'lucide-react';
 import { Invoice, InvoiceWarning } from '@/types/invoice';
-import { SuratSTRD, StrdData } from '@/components/SuratSTRD';
+import { SuratSTRD, StrdData, StrdPaymentRecord } from '@/components/SuratSTRD';
 import { SuratTeguran, SuratTeguranData } from '@/components/SuratTeguran';
 import { SuratPemberitahuan, SuratPemberitahuanData } from '@/components/SuratPemberitahuan';
 import toast from 'react-hot-toast';
@@ -46,21 +46,34 @@ export const WarningDocModal: React.FC<WarningDocModalProps> = ({
     if (!printRef.current || !warning) return;
     try {
       setIsDownloading(true);
-      const html2pdf = (await import('html2pdf.js')).default;
+      const html2canvas = (await import('html2canvas-pro')).default;
+      const { jsPDF } = await import('jspdf');
+
       const element = printRef.current;
       const docType = (warning.type || 'Dokumen').replace(/\s+/g, '_');
       const filename = `${docType}_${(warning.warning_number || 'dokumen').replace(/[\/\\:]/g, '_')}.pdf`;
 
-      const opt = {
-        margin: 0,
-        filename,
-        image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, scrollX: 0 },
-        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
-      };
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        scrollY: 0,
+        scrollX: 0
+      });
 
-      await html2pdf().set(opt).from(element).save();
-      toast.success('Dokumen PDF berhasil diunduh!');
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+      pdf.save(filename);
+      toast.success('Dokumen PDF berhasil diunduh (Tepat 1 Halaman A4)!');
     } catch (err) {
       console.error(err);
       toast.error('Gagal mengunduh dokumen PDF');
@@ -71,9 +84,28 @@ export const WarningDocModal: React.FC<WarningDocModalProps> = ({
 
   const getStrdData = (): StrdData => {
     const tenant = invoice?.contracts?.tenants || invoice?.tenants || warning.tenants;
-    const amount = Number(invoice?.amount || 0);
-    const penalty = Number(invoice?.penalty_amount || 0) || Math.round(amount * 0.01);
+    const baseAmount = Number(invoice?.amount || 0);
+    const paidAmount = Number(invoice?.paid_amount || 0);
+    const penalty = Number(invoice?.penalty_amount || 0) || Math.round(baseAmount * 0.01);
+    const totalObligation = baseAmount + penalty;
+    const remainingBalance = Math.max(0, totalObligation - paidAmount);
     const currentYear = new Date().getFullYear().toString();
+
+    // Rincian mutasi setoran yang telah diverifikasi
+    const verifiedPayments = invoice?.invoice_payments?.filter(p => p.status === 'Verified' || (Number(p.amount) > 0 && p.status !== 'Rejected')) || [];
+    const payments: StrdPaymentRecord[] = verifiedPayments.length > 0 
+      ? verifiedPayments.map((p, idx) => ({
+          payment_date: dayjs(p.payment_date || p.created_at || Date.now()).format('YYYY-MM-DD'),
+          reference_no: p.ocr_data?.reference_number ? `NTPN-${p.ocr_data.reference_number}` : (p.payment_receipt ? `BUKTI-${p.id}` : `SSRD-MMK-${idx + 1}`),
+          amount: Number(p.amount || 0),
+          description: `Setoran Sebagian ${idx === 0 ? 'Ke-1' : `Ke-${idx + 1}`}`
+        }))
+      : (paidAmount > 0 ? [{
+          payment_date: dayjs(invoice?.payment_date || Date.now()).format('YYYY-MM-DD'),
+          reference_no: `SSRD-MMK-${invoice?.id || '01'}`,
+          amount: paidAmount,
+          description: 'Setoran Sebagian Kas Daerah'
+        }] : []);
 
     return {
       strd_number: warning.warning_number || 'STRD/2026/10/001',
@@ -85,15 +117,18 @@ export const WarningDocModal: React.FC<WarningDocModalProps> = ({
       items: [
         {
           year: currentYear,
-          retribusi_terhutang: amount,
+          retribusi_terhutang: baseAmount,
           sanksi_denda: penalty,
-          jumlah_terhutang: amount + penalty
+          jumlah_terhutang: totalObligation
         },
         { year: (new Date().getFullYear() - 1).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 },
         { year: (new Date().getFullYear() - 2).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 },
         { year: (new Date().getFullYear() - 3).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 },
         { year: (new Date().getFullYear() - 4).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 }
       ],
+      payments,
+      total_paid: paidAmount,
+      remaining_balance: remainingBalance,
       city: 'Timika',
       issue_date: dayjs(warning.created_at || Date.now()).format('YYYY-MM-DD'),
       official_title: 'Kepala Dinas Perhubungan',

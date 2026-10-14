@@ -15,7 +15,6 @@ import { CatatRealisasiModal } from './components/CatatRealisasiModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { PhotoPreviewModal } from './components/PhotoPreviewModal';
 
-import { TowerControl } from 'lucide-react';
 
 dayjs.locale('id');
 
@@ -305,22 +304,12 @@ function PetugasMiniAirportContent() {
       {/* 1. Page Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[22px] font-bold text-slate-800 tracking-tight">
-              Dashboard Operasional
-            </h1>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-blue-50 text-[#3c8dbc] border border-blue-200">
-              <TowerControl className="w-3 h-3 text-[#3c8dbc]" />
-              {displayAirport}
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Pencatatan realisasi fisik pendaratan, alokasi stand apron, dan checkout armada
-          </p>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Dashboard Petugas <span className="text-[15px] font-light text-[#777] ml-2">{displayAirport}</span>
+          </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <span className="mr-1">Petugas Mini Airport</span> /{' '}
-          <span className="ml-1 font-medium text-slate-800">Dashboard Operasional</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Petugas Mini Airport</span> / <span className="ml-1 font-medium">Dashboard</span>
         </div>
       </header>
 

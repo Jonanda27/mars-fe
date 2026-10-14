@@ -69,7 +69,7 @@ export const RoomDetailsSchedule: React.FC<RoomDetailsScheduleProps> = ({
       </div>
 
       {/* Periode Sewa */}
-      <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-xs p-4">
+      <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-xs p-4" data-tour="tour-step4-jadwal">
         <h5 className="text-[13px] font-bold text-slate-800 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2">
           <Calendar className="w-4 h-4 text-[#3c8dbc]" />
           Periode Rencana Sewa <span className="text-red-500">*</span>
@@ -164,7 +164,7 @@ export const RoomDetailsSchedule: React.FC<RoomDetailsScheduleProps> = ({
       </div>
 
       {/* Kebutuhan Khusus / Catatan */}
-      <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-xs p-4">
+      <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-xs p-4" data-tour="tour-step4-armada">
         <h5 className="text-[13px] font-bold text-slate-800 mb-2 flex items-center gap-2">
           <FileText className="w-4 h-4 text-[#3c8dbc]" />
           Kebutuhan Khusus / Catatan Tambahan (Opsional)

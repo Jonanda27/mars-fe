@@ -172,28 +172,28 @@ export const PayungContractStatusBanner: React.FC<PayungContractStatusBannerProp
         /* 4. EXECUTIVE SMART BANNER (COLLAPSIBLE & SCALABLE FOR ANY NUMBER OF PERMOHONAN) */
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs rounded-none transition-all">
           {/* Header Baris Utama Ringkas */}
-          <div className="p-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            <div className="flex items-start gap-3 flex-1">
+          <div className="p-3.5 sm:p-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4">
+            <div className="flex items-start gap-2.5 sm:gap-3 flex-1 w-full">
               <ShieldCheck className="w-5 h-5 text-[#3c8dbc] flex-shrink-0 mt-0.5" />
               <div className="w-full">
                 {/* Info Baris 1: PKS, Lokasi, dan Status Izin */}
-                <div className="flex items-center gap-2 flex-wrap text-sm font-bold text-slate-900">
-                  <span>PKS: {activePayung.contract_number}</span>
-                  <span className="text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-300">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs sm:text-sm font-bold text-slate-900">
+                  <span className="break-all sm:break-normal">PKS: {activePayung.contract_number}</span>
+                  <span className="text-[10px] sm:text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-300">
                     Lokasi: {locationName}
                   </span>
-                  <span className="text-[11px] font-bold bg-[#00a65a] text-white px-2 py-0.5 rounded flex items-center gap-1">
+                  <span className="text-[10px] sm:text-[11px] font-bold bg-[#00a65a] text-white px-2 py-0.5 rounded flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3 text-white" />
                     {activeHanggarApps.length} Izin Sewa Aktif
                   </span>
-                  <span className="text-[11px] font-bold bg-[#3c8dbc] text-white px-2 py-0.5 rounded flex items-center gap-1">
+                  <span className="text-[10px] sm:text-[11px] font-bold bg-[#3c8dbc] text-white px-2 py-0.5 rounded flex items-center gap-1">
                     <Plane className="w-3 h-3 text-white" />
                     Total {totalFleetCount} Armada
                   </span>
                 </div>
 
                 {/* Info Baris 2: Rentang Operasional Global + Quick Toggle Button */}
-                <div className="mt-1.5 flex items-center gap-3 flex-wrap text-xs text-slate-600">
+                <div className="mt-1.5 flex items-center gap-2 sm:gap-3 flex-wrap text-[11px] sm:text-xs text-slate-600">
                   {globalRange && (
                     <span>
                       Rentang Operasional: <strong>{globalRange.startStr}</strong> s/d <strong>{globalRange.endStr}</strong>
@@ -316,11 +316,11 @@ export const PayungContractStatusBanner: React.FC<PayungContractStatusBannerProp
                 </table>
               </div>
 
-              <div className="mt-2.5 text-[11px] text-slate-500 flex items-center justify-between">
+              <div className="mt-2.5 text-[11px] text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
                 <span>
                   💡 Setiap armada pesawat terikat pada salah satu tiket di atas. Tanggal kalender pada form jadwal akan otomatis mengunci sesuai izin armada yang dipilih.
                 </span>
-                <span className="font-medium text-slate-400">
+                <span className="font-medium text-slate-400 shrink-0">
                   Menampilkan {filteredApps.length} dari {activeHanggarApps.length} Izin
                 </span>
               </div>

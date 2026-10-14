@@ -28,7 +28,7 @@ import { formatRupiah } from '@/utils/formatCurrency';
 import StatusBadge from '@/components/StatusBadge';
 import { SuratPemberitahuan, SuratPemberitahuanData } from '@/components/SuratPemberitahuan';
 import { SuratTeguran, SuratTeguranData } from '@/components/SuratTeguran';
-import { SuratSTRD, StrdData } from '@/components/SuratSTRD';
+import { SuratSTRD, StrdData, StrdPaymentRecord } from '@/components/SuratSTRD';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
@@ -233,8 +233,26 @@ export default function DinasPeringatanPage() {
   const getStrdData = (warn: any): StrdData => {
     const inv = warn.invoices;
     const tenant = warn.tenants;
-    const amount = Number(inv?.amount) || 0;
-    const sanksiDenda = Math.round(amount * 0.01); // Sanksi bunga 1% per bulan (Pasal 21 ayat 8)
+    const baseAmount = Number(inv?.amount) || 0;
+    const paidAmount = Number(inv?.paid_amount) || 0;
+    const sanksiDenda = Number(inv?.penalty_amount) || Math.round(baseAmount * 0.01); // Sanksi bunga 1% per bulan (Pasal 21 ayat 8)
+    const totalObligation = baseAmount + sanksiDenda;
+    const remainingBalance = Math.max(0, totalObligation - paidAmount);
+
+    const verifiedPayments = inv?.invoice_payments?.filter((p: any) => p.status === 'Verified' || (Number(p.amount) > 0 && p.status !== 'Rejected')) || [];
+    const payments: StrdPaymentRecord[] = verifiedPayments.length > 0
+      ? verifiedPayments.map((p: any, idx: number) => ({
+          payment_date: dayjs(p.payment_date || p.created_at || Date.now()).format('YYYY-MM-DD'),
+          reference_no: p.ocr_data?.reference_number ? `NTPN-${p.ocr_data.reference_number}` : (p.payment_receipt ? `BUKTI-${p.id}` : `SSRD-MMK-${idx + 1}`),
+          amount: Number(p.amount || 0),
+          description: `Setoran Sebagian ${idx === 0 ? 'Ke-1' : `Ke-${idx + 1}`}`
+        }))
+      : (paidAmount > 0 ? [{
+          payment_date: dayjs(inv?.payment_date || Date.now()).format('YYYY-MM-DD'),
+          reference_no: `SSRD-MMK-${inv?.id || '01'}`,
+          amount: paidAmount,
+          description: 'Setoran Sebagian Kas Daerah'
+        }] : []);
 
     return {
       strd_number: warn.warning_number || 'STRD/2026/10/001',
@@ -246,15 +264,18 @@ export default function DinasPeringatanPage() {
       items: [
         { 
           year: new Date().getFullYear().toString(), 
-          retribusi_terhutang: amount, 
+          retribusi_terhutang: baseAmount, 
           sanksi_denda: sanksiDenda, 
-          jumlah_terhutang: amount + sanksiDenda 
+          jumlah_terhutang: totalObligation 
         },
         { year: (new Date().getFullYear() - 1).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 },
         { year: (new Date().getFullYear() - 2).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 },
         { year: (new Date().getFullYear() - 3).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 },
         { year: (new Date().getFullYear() - 4).toString(), retribusi_terhutang: 0, sanksi_denda: 0, jumlah_terhutang: 0 }
       ],
+      payments,
+      total_paid: paidAmount,
+      remaining_balance: remainingBalance,
       city: 'Timika',
       issue_date: dayjs(warn.created_at || Date.now()).format('YYYY-MM-DD'),
       official_title: 'Kepala Dinas Perhubungan',
@@ -294,28 +315,22 @@ export default function DinasPeringatanPage() {
       {/* Header Halaman */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[22px] font-bold text-[#333] flex items-center gap-2">
-            Penagihan Piutang Retribusi Daerah
-            <span className="text-xs px-2.5 py-0.5 bg-blue-100 text-blue-800 font-semibold rounded-none">
-              Perbup Mimika No. 25 Tahun 2024
-            </span>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Penagihan Piutang <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Penegakan kepatuhan wajib retribusi melalui urutan yuridis: <strong>Surat Pemberitahuan (H-7)</strong> &rarr; <strong>Surat Teguran (H+7)</strong> &rarr; <strong>STRD (Bunga 1%/bln)</strong>.
-          </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleTriggerSync}
             disabled={isSyncing}
-            className="px-3 py-1.5 bg-[#00a65a] hover:bg-[#008d4c] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="px-3 py-1.5 bg-[#3c8dbc] hover:bg-[#367fa9] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             title="Jalankan pengecekan penagihan otomatis untuk mendeteksi SKRD H-7, H+7, dan STRD"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing ? 'Memeriksa SKRD...' : 'Sinkronkan Penagihan (H-7 / H+7 / STRD)'}
+            {isSyncing ? 'Memeriksa SKRD...' : 'Sinkronkan Penagihan'}
           </button>
           <div className="text-[12px] text-[#777] hidden sm:flex items-center bg-[#ecf0f5] p-2">
-            <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium text-slate-700">Penagihan Retribusi</span>
+            <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Penagihan Piutang</span>
           </div>
         </div>
       </header>
@@ -333,71 +348,37 @@ export default function DinasPeringatanPage() {
           </div>
         </div>
 
-        <div className="bg-white p-3.5 border-t-3 border-[#f39c12] shadow-xs flex items-center justify-between">
+        <div className="bg-white p-3.5 border-t-3 border-[#3c8dbc] shadow-xs flex items-center justify-between">
           <div>
-            <div className="text-[11px] text-amber-700 uppercase font-bold">Pemberitahuan (H-7)</div>
-            <div className="text-2xl font-bold text-amber-700 mt-0.5">{countPemberitahuan}</div>
+            <div className="text-[11px] text-slate-500 uppercase font-bold">Pemberitahuan (H-7)</div>
+            <div className="text-2xl font-bold text-slate-800 mt-0.5">{countPemberitahuan}</div>
             <div className="text-[10px] text-slate-400 mt-0.5">7 hari sblm jatuh tempo</div>
           </div>
-          <div className="p-2.5 bg-amber-50 text-amber-600">
+          <div className="p-2.5 bg-blue-50 text-[#3c8dbc]">
             <BellRing className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-3.5 border-t-3 border-[#dd4b39] shadow-xs flex items-center justify-between">
+        <div className="bg-white p-3.5 border-t-3 border-[#3c8dbc] shadow-xs flex items-center justify-between">
           <div>
-            <div className="text-[11px] text-red-700 uppercase font-bold">Surat Teguran (H+7)</div>
-            <div className="text-2xl font-bold text-red-700 mt-0.5">{countTeguran}</div>
+            <div className="text-[11px] text-slate-500 uppercase font-bold">Surat Teguran (H+7)</div>
+            <div className="text-2xl font-bold text-slate-800 mt-0.5">{countTeguran}</div>
             <div className="text-[10px] text-slate-400 mt-0.5">7 hari stlh jatuh tempo</div>
           </div>
-          <div className="p-2.5 bg-red-50 text-red-600">
+          <div className="p-2.5 bg-blue-50 text-[#3c8dbc]">
             <ShieldAlert className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="bg-white p-3.5 border-t-3 border-[#00a65a] shadow-xs flex items-center justify-between">
+        <div className="bg-white p-3.5 border-t-3 border-[#3c8dbc] shadow-xs flex items-center justify-between">
           <div>
-            <div className="text-[11px] text-emerald-800 uppercase font-bold">Tagihan STRD Terbit</div>
-            <div className="text-2xl font-bold text-emerald-700 mt-0.5">{countSTRD}</div>
+            <div className="text-[11px] text-slate-500 uppercase font-bold">Tagihan STRD Terbit</div>
+            <div className="text-2xl font-bold text-slate-800 mt-0.5">{countSTRD}</div>
             <div className="text-[10px] text-slate-400 mt-0.5">Sanksi bunga 1%/bulan</div>
           </div>
-          <div className="p-2.5 bg-emerald-50 text-emerald-600">
+          <div className="p-2.5 bg-blue-50 text-[#3c8dbc]">
             <ReceiptText className="w-5 h-5" />
           </div>
-        </div>
-      </div>
-
-      {/* Quick Links Menu ke Format Baku Naskah Dinas */}
-      <div className="bg-slate-100 p-2.5 border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-          <FileCheck2 className="w-4 h-4 text-[#3c8dbc]" />
-          Format Dokumen Baku Perbup Mimika 25/2024:
-        </span>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link 
-            href="/dinas/template-surat-pemberitahuan"
-            className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-slate-300 text-blue-700 font-medium inline-flex items-center gap-1 transition-colors"
-          >
-            <BellRing className="w-3.5 h-3.5" /> Template Pemberitahuan (H-7)
-          </Link>
-          <Link 
-            href="/dinas/template-surat-teguran"
-            className="px-2.5 py-1 bg-white hover:bg-red-50 border border-slate-300 text-red-700 font-medium inline-flex items-center gap-1 transition-colors"
-          >
-            <ShieldAlert className="w-3.5 h-3.5" /> Template Surat Teguran (H+7)
-          </Link>
-          <Link 
-            href="/dinas/template-strd"
-            className="px-2.5 py-1 bg-white hover:bg-emerald-50 border border-slate-300 text-emerald-700 font-medium inline-flex items-center gap-1 transition-colors"
-          >
-            <ReceiptText className="w-3.5 h-3.5" /> Template STRD (Lampiran IV)
-          </Link>
-          <Link 
-            href="/dinas/template-ssrd"
-            className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-medium inline-flex items-center gap-1 transition-colors"
-          >
-            <FileText className="w-3.5 h-3.5" /> Template SSRD (Lampiran III)
-          </Link>
         </div>
       </div>
 
@@ -423,7 +404,7 @@ export default function DinasPeringatanPage() {
               onClick={() => setActiveTab('PEMBERITAHUAN')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-none transition-colors cursor-pointer ${
                 activeTab === 'PEMBERITAHUAN'
-                  ? 'bg-[#f39c12] text-white shadow-xs'
+                  ? 'bg-[#3c8dbc] text-white shadow-xs'
                   : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200'
               }`}
             >
@@ -433,7 +414,7 @@ export default function DinasPeringatanPage() {
               onClick={() => setActiveTab('TEGURAN')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-none transition-colors cursor-pointer ${
                 activeTab === 'TEGURAN'
-                  ? 'bg-[#dd4b39] text-white shadow-xs'
+                  ? 'bg-[#3c8dbc] text-white shadow-xs'
                   : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200'
               }`}
             >
@@ -443,7 +424,7 @@ export default function DinasPeringatanPage() {
               onClick={() => setActiveTab('STRD')}
               className={`px-3 py-1.5 text-xs font-semibold rounded-none transition-colors cursor-pointer ${
                 activeTab === 'STRD'
-                  ? 'bg-[#00a65a] text-white shadow-xs'
+                  ? 'bg-[#3c8dbc] text-white shadow-xs'
                   : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-200'
               }`}
             >

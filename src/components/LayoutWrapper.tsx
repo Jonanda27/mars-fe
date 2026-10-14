@@ -11,12 +11,13 @@ import TenantSidebar from './TenantSidebar';
 import PetugasSidebar from './PetugasSidebar';
 import EksekutifSidebar from './EksekutifSidebar';
 import TopNavbar from './TopNavbar';
-import { checkRouteAccess, isPublicRoute, isTenantRole, isPetugasRole, isEksekutifRole, isSuperAdminRole } from '@/utils/routeGuard';
+import { checkRouteAccess, isPublicRoute, isTenantRole, isPetugasRole, isEksekutifRole, isSuperAdminRole, normalizeRole, isAdminRole } from '@/utils/routeGuard';
 
 const emptySubscribe = () => () => {};
 
 export default function LayoutWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const isMounted = React.useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -25,6 +26,11 @@ export default function LayoutWrapper({ children }: Readonly<{ children: React.R
   const pathname = usePathname();
   const router = useRouter();
   const { user, isAuthenticated, isAuthReady, syncUser } = useAuthStore();
+
+  // Otomatis tutup sidebar drawer mobile setiap kali rute berpindah
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     // Sync profil user ke backend setiap kali app di-mount atau dimuat ulang
@@ -61,35 +67,53 @@ export default function LayoutWrapper({ children }: Readonly<{ children: React.R
     return <>{children}</>;
   }
 
-  const userRole = (user?.role || '').toLowerCase();
+  const userRole = normalizeRole(user?.role);
   const isSuperAdmin = isSuperAdminRole(userRole) || (pathname.startsWith('/superadmin') && !isTenantRole(userRole));
   const isDinas = userRole === 'dinas' || pathname.startsWith('/dinas');
-  const isAdmin = (userRole === 'admin' || userRole === 'admin_mini_airport') && !pathname.startsWith('/dinas');
+  const isAdmin = isAdminRole(userRole) && !pathname.startsWith('/dinas');
   const isEksekutif = isEksekutifRole(userRole) || (pathname.startsWith('/eksekutif') && !isAdmin && !isDinas && !isSuperAdmin);
   const isPetugas = isPetugasRole(userRole) || (pathname.startsWith('/petugas') && !isAdmin && !isDinas && !isSuperAdmin);
   const isTenant = isTenantRole(userRole) || (pathname.startsWith('/tenant') && !isAdmin && !isDinas && !isSuperAdmin);
 
+  const handleToggleSidebar = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setIsMobileOpen(prev => !prev);
+    } else {
+      setIsSidebarOpen(prev => !prev);
+    }
+  };
+
+  const handleCloseMobile = () => {
+    setIsMobileOpen(false);
+  };
+
   const renderSidebar = () => {
-    const handleToggleSidebar = () => setIsSidebarOpen(prev => !prev);
+    const commonProps = {
+      isOpen: isSidebarOpen,
+      onToggle: handleToggleSidebar,
+      isMobileOpen: isMobileOpen,
+      onCloseMobile: handleCloseMobile,
+    };
+
     if (isSuperAdmin) {
-      return <SuperAdminSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+      return <SuperAdminSidebar {...commonProps} />;
     }
     if (isDinas) {
-      return <DinasSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+      return <DinasSidebar {...commonProps} />;
     }
     if (isAdmin) {
-      return <Sidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+      return <Sidebar {...commonProps} />;
     }
     if (isTenant) {
-      return <TenantSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+      return <TenantSidebar {...commonProps} />;
     }
     if (isPetugas) {
-      return <PetugasSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+      return <PetugasSidebar {...commonProps} />;
     }
     if (isEksekutif) {
-      return <EksekutifSidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+      return <EksekutifSidebar {...commonProps} />;
     }
-    return <Sidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />;
+    return <Sidebar {...commonProps} />;
   };
 
   return (
@@ -99,7 +123,7 @@ export default function LayoutWrapper({ children }: Readonly<{ children: React.R
       
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        <TopNavbar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <TopNavbar onToggleSidebar={handleToggleSidebar} />
         <main className="flex-1 overflow-auto">
           {children}
         </main>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { 
   Clock, Calendar, Printer, RefreshCw, Plane, Users, 
   Moon, Sun, TowerControl, FileText, Loader2, AlertCircle
@@ -109,26 +110,17 @@ export default function RekapHarianMiniAirportPage() {
       {/* 1. Page Header */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2 print:hidden">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-[22px] font-bold text-slate-800 tracking-tight">
-              Rekapitulasi &amp; Tutup Hari
-            </h1>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold bg-blue-50 text-[#3c8dbc] border border-blue-200">
-              <TowerControl className="w-3 h-3 text-[#3c8dbc]" />
-              {displayAirport}
-            </span>
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Laporan tutup buku harian dan status keterisian apron di airstrip
-          </p>
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Rekapitulasi &amp; Tutup Hari <span className="text-[15px] font-light text-[#777] ml-2">{displayAirport}</span>
+          </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] py-1 px-2">
-          <span className="mr-1">Petugas Mini Airport</span> / <span className="ml-1 font-medium text-slate-800">Rekapitulasi Harian</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <Link href="/petugas/mini-airport" className="mr-1 hover:text-[#3c8dbc]">Petugas Mini Airport</Link> / <span className="ml-1 font-medium">Rekapitulasi Harian</span>
         </div>
       </header>
 
       {/* 2. Date Picker Bar & Actions */}
-      <div className="bg-white p-3.5 border border-slate-200 border-l-4 border-l-[#3c8dbc] shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 print:hidden">
+      <div className="bg-white p-3.5 border border-slate-200 border-t-[3px] border-t-[#3c8dbc] shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 print:hidden">
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
             <Calendar className="w-4 h-4 text-[#3c8dbc]" />
@@ -177,62 +169,61 @@ export default function RekapHarianMiniAirportPage() {
         </div>
       </div>
 
-      {/* 3. Stat Boxes (Small Box Style) - Konsisten Warna Biru Mozes Kilangin */}
+      {/* 3. Stat Boxes (AdminLTE Flat Style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Box 1: Total Movements */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pergerakan Pesawat</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{totalMovements}</span>
-              <span className="text-xs text-slate-500 font-medium">Pendaratan</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">{dayjs(selectedDate).format('DD MMM YYYY')}</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Plane className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Plane className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Pergerakan Pesawat</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {totalMovements} <span className="text-xs font-sans text-slate-500 font-normal">Pendaratan</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">{dayjs(selectedDate).format('DD MMM YYYY')}</span>
           </div>
         </div>
 
         {/* Box 2: Total Pax */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Penumpang (Pax)</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{totalPax}</span>
-              <span className="text-xs text-slate-500 font-medium">Orang</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Retribusi Pax Terdata</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Users className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Users className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Total Penumpang (Pax)</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {totalPax} <span className="text-xs font-sans text-slate-500 font-normal">Orang</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Retribusi Pax Terdata</span>
           </div>
         </div>
 
         {/* Box 3: Pesawat Inap RON */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pesawat Menginap (RON)</span>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-2xl font-black text-slate-800">{overnightCount}</span>
-              <span className="text-xs text-slate-500 font-medium">Armada</span>
-            </div>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Parkir Menginap di Stand</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <Moon className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <Moon className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Pesawat Menginap (RON)</span>
+            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+              {overnightCount} <span className="text-xs font-sans text-slate-500 font-normal">Armada</span>
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Parkir Menginap di Stand</span>
           </div>
         </div>
 
         {/* Box 4: Estimasi Retribusi */}
-        <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-          <div>
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Estimasi Pajak Retribusi</span>
-            <span className="text-lg font-black text-slate-800 block mt-1 font-mono">{formatRupiah(totalEstimatedRevenue)}</span>
-            <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">Dasar SKRD Dinas</span>
+        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+          <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+            <FileText className="w-8 h-8" />
           </div>
-          <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-            <FileText className="w-5 h-5" />
+          <div className="p-3 flex flex-col justify-center flex-1">
+            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Estimasi Pajak Retribusi</span>
+            <span className="text-[18px] font-bold text-[#00a65a] font-mono leading-tight mt-0.5">
+              {formatRupiah(totalEstimatedRevenue)}
+            </span>
+            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">Dasar Penetapan SKRD Dinas</span>
           </div>
         </div>
       </div>

@@ -38,6 +38,15 @@ export const getStatusColorClass = (status: string): string => {
     return 'bg-[#dd4b39] text-white'; // Red
   }
 
+  // 1b. Kurang Dibayar / Partially Paid (Oranye Tua AdminLTE)
+  if (
+    s.includes('kurang dibayar') ||
+    s.includes('partially') ||
+    s.includes('cicilan')
+  ) {
+    return 'bg-[#d58512] text-white'; // Deep Orange/Amber AdminLTE
+  }
+
   // 2. Kosong / Belum Ada Berkas / Empty (Netral Slate Gray - Kontras dengan Tersedia/Hijau)
   if (
     s.includes('kosong') ||
@@ -172,6 +181,8 @@ export default function StatusBadge({ status, className = '', label }: Readonly<
     displayText = 'Menunggu Verifikasi';
   } else if (lower === 'overdue') {
     displayText = 'Menunggak';
+  } else if (lower === 'partially paid' || lower === 'partially_paid' || lower === 'kurang dibayar') {
+    displayText = 'Kurang Bayar';
   } else if (lower === 'scheduled') {
     displayText = 'Terjadwal';
   } else if (lower === 'checked-out' || lower === 'checked out' || lower === 'checkout') {

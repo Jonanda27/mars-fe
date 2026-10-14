@@ -20,6 +20,8 @@ import { TenantDashboardKPICards } from './components/dashboard/TenantDashboardK
 import { RecentInvoicesTable } from './components/dashboard/RecentInvoicesTable';
 import { RecentApplicationsTable } from './components/dashboard/RecentApplicationsTable';
 import { TenantSidebarCards } from './components/dashboard/TenantSidebarCards';
+import { FileText, Calendar } from 'lucide-react';
+import RupiahIcon from '@/components/icons/RupiahIcon';
 
 export default function TenantDashboard() {
   const { user, syncUser } = useAuthStore();
@@ -31,6 +33,7 @@ export default function TenantDashboard() {
   const [schedules, setSchedules] = useState<FlightSchedule[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [mobileTab, setMobileTab] = useState<'invoices' | 'applications' | 'schedules'>('invoices');
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -80,11 +83,15 @@ export default function TenantDashboard() {
   }, [contracts]);
 
   const unpaidInvoices = useMemo(() => {
-    return invoices.filter(inv => ['Unpaid', 'Overdue', 'Menunggu Pembayaran'].includes(inv.status));
+    return invoices.filter(inv => ['Unpaid', 'Overdue', 'Menunggu Pembayaran', 'Partially Paid', 'Pending Verification'].includes(inv.status));
   }, [invoices]);
 
   const totalUnpaidAmount = useMemo(() => {
-    return unpaidInvoices.reduce((sum, inv) => sum + Number(inv.amount || 0) + Number(inv.penalty_amount || 0), 0);
+    return unpaidInvoices.reduce((sum, inv) => {
+      const total = Number(inv.amount || 0) + Number(inv.penalty_amount || 0);
+      const paid = Number(inv.paid_amount || 0);
+      return sum + Math.max(0, total - paid);
+    }, 0);
   }, [unpaidInvoices]);
 
   const activeWarnings = useMemo(() => {
@@ -108,16 +115,16 @@ export default function TenantDashboard() {
   }
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
+    <div className="p-3 sm:p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-3 sm:gap-4 font-sans">
       {/* Header */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
-            Dashboard Tenant <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex flex-wrap items-baseline gap-1.5">
+            Dashboard Tenant <span className="text-xs sm:text-sm font-normal text-gray-500">Bandara Mozes Kilangin</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Dashboard</span>
+        <div className="text-[11px] sm:text-xs text-gray-500 flex items-center bg-white sm:bg-transparent px-2.5 py-1 rounded border sm:border-0 border-gray-200">
+          <span className="mr-1">Tenant</span> / <span className="ml-1 font-semibold text-gray-800">Dashboard</span>
         </div>
       </header>
 
@@ -139,8 +146,92 @@ export default function TenantDashboard() {
         totalUnpaidAmount={totalUnpaidAmount}
       />
 
-      {/* Layout 2 Kolom (60% Kiri, 40% Kanan) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+      {/* Segmented Tab Switcher Khusus Mobile/Tablet (Hidden di Desktop lg:) */}
+      <div className="block lg:hidden">
+        <div className="bg-slate-200/70 p-1 rounded-xl flex items-center gap-1 border border-slate-300/50 shadow-inner text-xs">
+          <button
+            type="button"
+            onClick={() => setMobileTab('invoices')}
+            className={`flex-1 py-2 px-1.5 sm:px-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all text-center active:scale-[0.98] ${
+              mobileTab === 'invoices'
+                ? 'bg-white text-[#3c8dbc] font-bold shadow-xs border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 font-medium'
+            }`}
+          >
+            <RupiahIcon className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">e-SKRD</span>
+            {unpaidInvoices.length > 0 ? (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-red-500 text-white font-mono shadow-2xs">
+                {unpaidInvoices.length}
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 font-mono">
+                0
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileTab('applications')}
+            className={`flex-1 py-2 px-1.5 sm:px-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all text-center active:scale-[0.98] ${
+              mobileTab === 'applications'
+                ? 'bg-white text-[#3c8dbc] font-bold shadow-xs border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 font-medium'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Permohonan</span>
+            {applications.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-blue-100 text-[#3c8dbc] font-mono">
+                {applications.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobileTab('schedules')}
+            className={`flex-1 py-2 px-1.5 sm:px-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-all text-center active:scale-[0.98] ${
+              mobileTab === 'schedules'
+                ? 'bg-white text-[#3c8dbc] font-bold shadow-xs border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900 font-medium'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Jadwal &amp; Aset</span>
+            {schedules.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 font-mono">
+                {schedules.length}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Konten Mobile (Tampil bergantian sesuai Tab terpilih agar tidak monoton scroll ke bawah) */}
+      <div className="block lg:hidden">
+        {mobileTab === 'invoices' && (
+          <RecentInvoicesTable
+            unpaidInvoices={unpaidInvoices}
+            totalInvoiceCount={invoices.length}
+          />
+        )}
+        {mobileTab === 'applications' && (
+          <RecentApplicationsTable
+            applications={applications}
+          />
+        )}
+        {mobileTab === 'schedules' && (
+          <TenantSidebarCards
+            schedules={schedules}
+            activeContracts={activeContracts}
+          />
+        )}
+      </div>
+
+      {/* Konten Desktop (Layout 2 Kolom Klasik AdminLTE tetap utuh di desktop lg ke atas) */}
+      <div className="hidden lg:grid lg:grid-cols-3 gap-4 items-start">
         {/* Kolom Kiri: 2/3 Lebar (Tagihan e-SKRD & Permohonan Terkini) */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           <RecentInvoicesTable

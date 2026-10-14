@@ -17,78 +17,74 @@ export const MiniAirportKPICards: React.FC<MiniAirportKPICardsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Box 1: Izin Pendaratan Aktif */}
-      <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-        <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+        <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+          <Plane className="w-8 h-8" />
+        </div>
+        <div className="p-3 flex flex-col justify-center flex-1">
+          <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">
             Izin Pendaratan Aktif
           </span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-2xl font-black text-slate-800">{eligibleAppsCount}</span>
-            <span className="text-xs text-slate-500 font-medium">Slot</span>
-          </div>
-          <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">
+          <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+            {eligibleAppsCount} <span className="text-xs font-sans text-slate-500 font-normal">Slot</span>
+          </span>
+          <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
             Telah Disetujui Admin
           </span>
-        </div>
-        <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-          <Plane className="w-5 h-5" />
         </div>
       </div>
 
       {/* Box 2: Menunggu SKRD Dinas */}
-      <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-        <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+        <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+          <Clock className="w-8 h-8" />
+        </div>
+        <div className="p-3 flex flex-col justify-center flex-1">
+          <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">
             Menunggu SKRD Dinas
           </span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-2xl font-black text-slate-800">{unbilledCount}</span>
-            <span className="text-xs text-slate-500 font-medium">Log</span>
-          </div>
-          <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">
+          <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+            {unbilledCount} <span className="text-xs font-sans text-slate-500 font-normal">Log</span>
+          </span>
+          <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
             Siap Ditetapkan Dinas
           </span>
-        </div>
-        <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-          <Clock className="w-5 h-5" />
         </div>
       </div>
 
       {/* Box 3: SKRD Diterbitkan */}
-      <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-        <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+        <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+          <FileText className="w-8 h-8" />
+        </div>
+        <div className="p-3 flex flex-col justify-center flex-1">
+          <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">
             SKRD Diterbitkan
           </span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-2xl font-black text-slate-800">{billedCount}</span>
-            <span className="text-xs text-slate-500 font-medium">Tagihan</span>
-          </div>
-          <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">
+          <span className="text-[18px] font-bold text-[#00a65a] font-mono leading-tight mt-0.5">
+            {billedCount} <span className="text-xs font-sans text-slate-500 font-normal">Tagihan</span>
+          </span>
+          <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
             Terbit oleh Dinas
           </span>
-        </div>
-        <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-          <FileText className="w-5 h-5" />
         </div>
       </div>
 
       {/* Box 4: Pesawat Inap RON */}
-      <div className="bg-white p-4 shadow-xs border border-slate-200 border-l-4 border-l-[#3c8dbc] flex items-center justify-between">
-        <div>
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
+        <div className="w-[75px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
+          <Moon className="w-8 h-8" />
+        </div>
+        <div className="p-3 flex flex-col justify-center flex-1">
+          <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">
             Pesawat Menginap (RON)
           </span>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-2xl font-black text-slate-800">{overnightCount}</span>
-            <span className="text-xs text-slate-500 font-medium">Armada</span>
-          </div>
-          <span className="text-[10px] text-[#3c8dbc] font-semibold block mt-0.5">
+          <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+            {overnightCount} <span className="text-xs font-sans text-slate-500 font-normal">Armada</span>
+          </span>
+          <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
             Menempati Stand Malam
           </span>
-        </div>
-        <div className="w-11 h-11 bg-blue-50 text-[#3c8dbc] flex items-center justify-center">
-          <Moon className="w-5 h-5" />
         </div>
       </div>
     </div>

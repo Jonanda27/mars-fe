@@ -98,10 +98,10 @@ export const RequestExtensionModal: React.FC<RequestExtensionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
-      <div className="bg-white rounded-none shadow-2xl max-w-lg w-full overflow-hidden border border-slate-300 animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs font-sans">
+      <div className="bg-white rounded-none shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-300 animate-in zoom-in-95 duration-150">
         {/* Header Modal */}
-        <div className="bg-[#3c8dbc] text-white px-5 py-3.5 flex justify-between items-center rounded-none">
+        <div className="bg-[#3c8dbc] text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center rounded-none flex-shrink-0">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-white" />
             <div>
@@ -124,7 +124,7 @@ export const RequestExtensionModal: React.FC<RequestExtensionModalProps> = ({
 
         {/* Konten Modal */}
         {existingPendingRequest ? (
-          <div className="p-5 space-y-4 text-xs">
+          <div className="p-4 sm:p-5 space-y-4 text-xs overflow-y-auto">
             <div className="p-4 bg-amber-50 border-l-4 border-l-[#f39c12] text-amber-900 space-y-2 rounded-none">
               <div className="flex items-center gap-2 font-bold text-sm">
                 <AlertCircle className="w-4 h-4 text-[#f39c12]" />
@@ -151,7 +151,7 @@ export const RequestExtensionModal: React.FC<RequestExtensionModalProps> = ({
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs text-slate-700">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-5 space-y-4 text-xs text-slate-700 overflow-y-auto">
             {/* Info Permohonan Saat Ini */}
             <div className="bg-slate-50 border border-slate-200 p-3 rounded-none space-y-1.5">
               <div className="flex justify-between items-center text-[11px]">

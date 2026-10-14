@@ -5,6 +5,8 @@ import { NotificationItem } from '@/types/notification';
 import { UserData } from '@/types/auth';
 import { rentalService } from '@/services/rentalService';
 import { contractService } from '@/services/contractService';
+import { isAdminRole, isEksekutifRole } from '@/utils/routeGuard';
+import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
 export type Notification = NotificationItem;
@@ -137,6 +139,9 @@ const mergeAndSortNotifications = (
   });
 };
 
+// Set cache untuk mencegah notifikasi berulang kali (deduplikasi toast)
+const shownToastIds = new Set<string>();
+
 export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: [],
   rawDbNotifications: [],
@@ -249,7 +254,125 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             }
           });
         }
-      } else if (role === 'admin') {
+      } else if (isEksekutifRole(role)) {
+        // Khusus Kepala Dinas / Eksekutif
+        const [apps, allContracts] = await Promise.all([
+          rentalService.getAllApplications().catch(() => []),
+          contractService.getContracts().catch(() => [])
+        ]);
+
+        if (Array.isArray(apps)) {
+          apps.forEach((a) => {
+            if (a.status === 'Menunggu Verifikasi Kadis') {
+              const taskId = `task-kadis-app-${a.id}`;
+              const isRead = readTaskIds.includes(taskId);
+              taskList.push({
+                id: taskId,
+                title: `Persetujuan Surat (${a.application_type || 'Sewa'})`,
+                message: `Surat permohonan dari ${a.tenants?.nama_perusahaan || 'Mitra'} menunggu verifikasi dan tanda tangan Kadis.`,
+                type: 'TASK',
+                is_read: isRead,
+                link_url: `/eksekutif/permohonan/${a.id}`,
+                created_at: a.created_at || new Date().toISOString(),
+                is_task: true
+              });
+            }
+          });
+        }
+
+        if (Array.isArray(allContracts)) {
+          allContracts.forEach((c) => {
+            if (c.status === 'Menunggu Pengesahan Kadis') {
+              const taskId = `task-kadis-contract-${c.id}`;
+              const isRead = readTaskIds.includes(taskId);
+              taskList.push({
+                id: taskId,
+                title: `Pengesahan Kontrak ${c.contract_number}`,
+                message: `PKS untuk ${c.tenants?.nama_perusahaan || 'Mitra'} menunggu pengesahan Kadis.`,
+                type: 'TASK',
+                is_read: isRead,
+                link_url: `/eksekutif/kontrak`,
+                created_at: c.created_at || new Date().toISOString(),
+                is_task: true
+              });
+            }
+
+            if (c.end_date && (c.status === 'Aktif' || c.status === 'Active')) {
+              const endDate = new Date(c.end_date);
+              endDate.setHours(0, 0, 0, 0);
+              const diffTime = endDate.getTime() - today.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+              if (diffDays >= 0 && diffDays <= 7) {
+                const taskId = `task-h7-kadis-contract-${c.id}`;
+                const isRead = readTaskIds.includes(taskId);
+                taskList.push({
+                  id: taskId,
+                  title: `Masa Kontrak Tenant Segera Berakhir (H-${diffDays})`,
+                  message: `Kontrak No. ${c.contract_number} milik ${c.tenants?.nama_perusahaan || 'Mitra'} berakhir pada ${dayjs(c.end_date).format('DD/MM/YYYY')}.`,
+                  type: 'TASK',
+                  is_read: isRead,
+                  link_url: '/eksekutif/kontrak',
+                  created_at: new Date().toISOString(),
+                  is_task: true
+                });
+              }
+            }
+          });
+        }
+      } else if (role === 'dinas') {
+        // Khusus Dinas Perhubungan
+        const [apps, allContracts] = await Promise.all([
+          rentalService.getAllApplications().catch(() => []),
+          contractService.getContracts().catch(() => [])
+        ]);
+
+        if (Array.isArray(apps)) {
+          apps.forEach((a) => {
+            if (a.status === 'Menunggu Verifikasi Kadis' || a.status === 'Menunggu Validasi Admin') {
+              const taskId = `task-dinas-app-${a.id}`;
+              const isRead = readTaskIds.includes(taskId);
+              taskList.push({
+                id: taskId,
+                title: `Monitoring Permohonan (${a.application_type || 'Sewa'})`,
+                message: `Permohonan dari ${a.tenants?.nama_perusahaan || 'Mitra'} berstatus ${a.status}.`,
+                type: 'TASK',
+                is_read: isRead,
+                link_url: `/dinas/permohonan`,
+                created_at: a.created_at || new Date().toISOString(),
+                is_task: true
+              });
+            }
+          });
+        }
+
+        if (Array.isArray(allContracts)) {
+          allContracts.forEach((c) => {
+            if (c.end_date && (c.status === 'Aktif' || c.status === 'Active')) {
+              const endDate = new Date(c.end_date);
+              endDate.setHours(0, 0, 0, 0);
+              const diffTime = endDate.getTime() - today.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+              if (diffDays >= 0 && diffDays <= 7) {
+                const taskId = `task-h7-dinas-contract-${c.id}`;
+                const isRead = readTaskIds.includes(taskId);
+                taskList.push({
+                  id: taskId,
+                  title: `Masa Kontrak Tenant Segera Berakhir (H-${diffDays})`,
+                  message: `Kontrak No. ${c.contract_number} milik ${c.tenants?.nama_perusahaan || 'Mitra'} berakhir pada ${dayjs(c.end_date).format('DD/MM/YYYY')}.`,
+                  type: 'TASK',
+                  is_read: isRead,
+                  link_url: '/dinas/kontrak',
+                  created_at: new Date().toISOString(),
+                  is_task: true
+                });
+              }
+            }
+          });
+        }
+      } else if (isAdminRole(role)) {
+        // Seluruh Admin (Mozes, Mini Airport, Hanggar, Apron, Ruangan, Superadmin)
         const [apps, allContracts] = await Promise.all([
           rentalService.getAllApplications().catch(() => []),
           contractService.getContracts().catch(() => [])
@@ -262,8 +385,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
               const isRead = readTaskIds.includes(taskId);
               taskList.push({
                 id: taskId,
-                title: `Permohonan Baru (${a.application_type})`,
-                message: `Permohonan dari ${a.tenants?.nama_perusahaan || 'Tenant'} memerlukan peninjauan.`,
+                title: `Permohonan Baru (${a.application_type || 'Sewa'})`,
+                message: `Permohonan dari ${a.tenants?.nama_perusahaan || 'Mitra'} memerlukan peninjauan admin.`,
                 type: 'TASK',
                 is_read: isRead,
                 link_url: `/admin/permohonan/review/${a.id}`,
@@ -288,7 +411,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
                 taskList.push({
                   id: taskId,
                   title: `Masa Kontrak Tenant Segera Berakhir (H-${diffDays})`,
-                  message: `Kontrak No. ${c.contract_number} milik ${c.tenants?.nama_perusahaan || 'Tenant'} berakhir pada ${dayjs(c.end_date).format('DD/MM/YYYY')}.`,
+                  message: `Kontrak No. ${c.contract_number} milik ${c.tenants?.nama_perusahaan || 'Mitra'} berakhir pada ${dayjs(c.end_date).format('DD/MM/YYYY')}.`,
                   type: 'TASK',
                   is_read: isRead,
                   link_url: '/admin/kontrak',
@@ -299,58 +422,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             }
           });
         }
-      } else if (role.includes('dinas') || role.includes('eksekutif')) {
-        const [apps, allContracts] = await Promise.all([
-          rentalService.getAllApplications().catch(() => []),
-          contractService.getContracts().catch(() => [])
-        ]);
-
-        if (Array.isArray(apps)) {
-          apps.forEach((a) => {
-            if (a.status === 'Menunggu Verifikasi Kadis') {
-              const taskId = `task-kadis-app-${a.id}`;
-              const isRead = readTaskIds.includes(taskId);
-              taskList.push({
-                id: taskId,
-                title: `Persetujuan Surat (${a.application_type})`,
-                message: `Surat permohonan dari ${a.tenants?.nama_perusahaan || 'Tenant'} menunggu tanda tangan Kadis.`,
-                type: 'TASK',
-                is_read: isRead,
-                link_url: `/eksekutif/permohonan/${a.id}`,
-                created_at: a.created_at || new Date().toISOString(),
-                is_task: true
-              });
-            }
-          });
-        }
-
-        if (Array.isArray(allContracts)) {
-          allContracts.forEach((c) => {
-            if (c.end_date && (c.status === 'Aktif' || c.status === 'Active')) {
-              const endDate = new Date(c.end_date);
-              endDate.setHours(0, 0, 0, 0);
-              const diffTime = endDate.getTime() - today.getTime();
-              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-              if (diffDays >= 0 && diffDays <= 7) {
-                const taskId = `task-h7-dinas-contract-${c.id}`;
-                const isRead = readTaskIds.includes(taskId);
-                taskList.push({
-                  id: taskId,
-                  title: `Masa Kontrak Tenant Segera Berakhir (H-${diffDays})`,
-                  message: `Kontrak No. ${c.contract_number} milik ${c.tenants?.nama_perusahaan || 'Tenant'} berakhir pada ${dayjs(c.end_date).format('DD/MM/YYYY')}.`,
-                  type: 'TASK',
-                  is_read: isRead,
-                  link_url: '/dinas/kontrak',
-                  created_at: new Date().toISOString(),
-                  is_task: true
-                });
-              }
-            }
-          });
-        }
       }
-
 
       const currentDb = get().rawDbNotifications;
       const merged = mergeAndSortNotifications(currentDb, taskList);
@@ -380,6 +452,37 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         try {
           const data = JSON.parse(event.data);
           if (data.type === 'CONNECTED') return;
+
+          // Cegah popup berulang kali dan satukan layout toast konsisten dengan tema putih MARS
+          const toastKey = String(data.id || data.title);
+          const isOwnApplicationSubmission = data.title === 'Surat Permohonan Terkirim';
+
+          if (data.title && !shownToastIds.has(toastKey) && !isOwnApplicationSubmission) {
+            shownToastIds.add(toastKey);
+            setTimeout(() => {
+              shownToastIds.delete(toastKey);
+            }, 10000);
+
+            // Gunakan layout notifikasi putih yang konsisten (sesuai toast standar sistem)
+            toast(data.title, {
+              id: `notif-${data.id || toastKey}`,
+              duration: 4000,
+              style: {
+                background: '#fff',
+                color: '#333',
+                borderRadius: '4px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                fontSize: '13px',
+                fontWeight: '500',
+                padding: '12px 16px',
+                borderLeft: data.type === 'WARNING' || data.type === 'PENALTY'
+                  ? '4px solid #dd4b39'
+                  : data.type === 'SUCCESS'
+                    ? '4px solid #00a65a'
+                    : '4px solid #3c8dbc'
+              }
+            });
+          }
 
           set((state) => {
             const existingIndex = state.rawDbNotifications.findIndex(

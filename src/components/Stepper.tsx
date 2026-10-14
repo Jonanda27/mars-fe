@@ -5,12 +5,14 @@ interface StepperProps {
   readonly currentStep: number;
   readonly requiresPayung?: boolean;
   readonly isHangar?: boolean;
+  readonly onStepClick?: (stepId: number) => void;
 }
 
 export const Stepper: React.FC<StepperProps> = ({ 
   currentStep, 
   requiresPayung = false,
-  isHangar = true 
+  isHangar = true,
+  onStepClick,
 }) => {
   const getSteps = () => {
     if (!isHangar) {
@@ -51,9 +53,9 @@ export const Stepper: React.FC<StepperProps> = ({
       <div className="flex justify-between items-start w-full max-w-4xl mx-auto relative px-2">
         
         {/* Progress Line Background */}
-        <div className="absolute top-[20px] left-[10%] right-[10%] h-[2px] bg-slate-200 z-0"></div>
+        <div className="absolute top-[16px] sm:top-[20px] left-[10%] right-[10%] h-[2px] bg-slate-200 z-0"></div>
         {/* Progress Line Active */}
-        <div className="absolute top-[20px] left-[10%] h-[2px] bg-[#3c8dbc] z-0 transition-all duration-500" 
+        <div className="absolute top-[16px] sm:top-[20px] left-[10%] h-[2px] bg-[#3c8dbc] z-0 transition-all duration-500" 
              style={{ width: `${(Math.min(currentStep, steps.length) - 1) / (steps.length - 1) * 80}%` }}></div>
         
         {steps.map((step) => {
@@ -62,28 +64,35 @@ export const Stepper: React.FC<StepperProps> = ({
           const isActive = isCompleted || isCurrent;
 
           return (
-            <div key={step.id} className="flex flex-col items-center relative z-10 flex-1">
+            <div 
+              key={step.id} 
+              onClick={() => onStepClick?.(step.id)}
+              className={`flex flex-col items-center relative z-10 flex-1 ${
+                onStepClick ? 'cursor-pointer group' : ''
+              }`}
+            >
               
               {/* Circle */}
-              <div className={`w-[40px] h-[40px] rounded-full flex items-center justify-center transition-all duration-300 border-[3px] bg-white
+              <div className={`w-8 h-8 sm:w-[40px] sm:h-[40px] rounded-full flex items-center justify-center transition-all duration-300 border-2 sm:border-[3px] bg-white
                 ${isActive ? 'border-[#3c8dbc] text-[#3c8dbc]' : 'border-slate-200 text-slate-300'}
-                ${isCurrent ? 'shadow-md shadow-blue-100 ring-4 ring-blue-50' : ''}
+                ${isCurrent ? 'shadow-md shadow-blue-100 ring-2 sm:ring-4 ring-blue-50' : ''}
+                ${onStepClick ? 'group-hover:border-[#3c8dbc] group-hover:scale-105' : ''}
               `}>
                 {isCompleted ? (
-                  <CheckCircle2 size={20} className="text-[#3c8dbc]" />
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#3c8dbc]" />
                 ) : (
-                  <span className={`text-[14px] font-bold ${isActive ? 'text-[#3c8dbc]' : 'text-slate-300'}`}>
+                  <span className={`text-xs sm:text-[14px] font-bold ${isActive ? 'text-[#3c8dbc]' : 'text-slate-300'}`}>
                     {step.id}
                   </span>
                 )}
               </div>
 
               {/* Text */}
-              <div className="text-center mt-3">
-                <h4 className={`font-bold text-[13px] ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>
+              <div className="text-center mt-2 sm:mt-3 px-0.5">
+                <h4 className={`font-bold text-[10px] sm:text-[13px] leading-tight ${isActive ? 'text-slate-800' : 'text-slate-400'}`}>
                   {step.title}
                 </h4>
-                <p className={`text-[11px] mt-0.5 ${isActive ? 'text-slate-500' : 'text-slate-300'}`}>
+                <p className={`text-[9.5px] sm:text-[11px] mt-0.5 hidden sm:block ${isActive ? 'text-slate-500' : 'text-slate-300'}`}>
                   {step.description}
                 </p>
               </div>

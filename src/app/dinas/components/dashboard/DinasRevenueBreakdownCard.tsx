@@ -23,10 +23,10 @@ export const DinasRevenueBreakdownCard: React.FC<DinasRevenueBreakdownCardProps>
         </div>
 
         <div className="p-4 space-y-4 text-xs">
-          {/* Objek 1: Hanggar & Apron */}
+          {/* Objek 1: Hanggar */}
           <div>
             <div className="flex justify-between font-bold text-slate-800 mb-1">
-              <span>Sewa Hanggar &amp; Apron (4.1.2.02.02)</span>
+              <span>Sewa Hanggar (4.1.2.02.02)</span>
               <span className="font-mono">{formatRupiah(revenueBreakdown.hanggar)}</span>
             </div>
             <div className="w-full bg-slate-100 h-2 overflow-hidden">
@@ -39,6 +39,25 @@ export const DinasRevenueBreakdownCard: React.FC<DinasRevenueBreakdownCardProps>
             </div>
             <span className="text-[10px] text-slate-400 mt-0.5 block">
               {revenueBreakdown.total > 0 ? ((revenueBreakdown.hanggar / revenueBreakdown.total) * 100).toFixed(1) : 0}% dari total PAD
+            </span>
+          </div>
+
+          {/* Objek 2: Apron */}
+          <div>
+            <div className="flex justify-between font-bold text-slate-800 mb-1">
+              <span>Sewa Apron (4.1.2.02.03)</span>
+              <span className="font-mono">{formatRupiah(revenueBreakdown.apron || 0)}</span>
+            </div>
+            <div className="w-full bg-slate-100 h-2 overflow-hidden">
+              <div 
+                className="bg-[#0284c7] h-full" 
+                style={{ 
+                  width: `${revenueBreakdown.total > 0 ? ((revenueBreakdown.apron || 0) / revenueBreakdown.total) * 100 : 0}%` 
+                }}
+              />
+            </div>
+            <span className="text-[10px] text-slate-400 mt-0.5 block">
+              {revenueBreakdown.total > 0 ? (((revenueBreakdown.apron || 0) / revenueBreakdown.total) * 100).toFixed(1) : 0}% dari total PAD
             </span>
           </div>
 

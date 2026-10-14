@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   CreditCard, Search, Calendar, FileText, 
-  Loader2, ArrowRightLeft, CheckCircle2, RefreshCw 
+  Loader2, ArrowRightLeft, RefreshCw 
 } from 'lucide-react';
 import { invoiceService } from '@/services/invoiceService';
 import { Invoice } from '@/types/invoice';
@@ -71,12 +71,6 @@ export default function RiwayatPembayaranPage() {
     });
   }, [invoices, searchTerm, selectedMonth]);
 
-  const totalNominalLunas = useMemo(() => {
-    return paidTransactions
-      .filter((inv) => inv.status === 'Paid' || inv.status === 'Lunas')
-      .reduce((acc, inv) => acc + Number(inv.amount) + Number(inv.penalty_amount || 0), 0);
-  }, [paidTransactions]);
-
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
@@ -89,36 +83,6 @@ export default function RiwayatPembayaranPage() {
           <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Riwayat Pembayaran</span>
         </div>
       </header>
-
-      {/* Overview Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs p-4 flex items-center justify-between">
-          <div>
-            <span className="text-xs uppercase font-bold text-slate-500 block mb-1">Total Transaksi Lunas</span>
-            <div className="text-2xl font-bold text-[#3c8dbc]">
-              {paidTransactions.filter((inv) => inv.status === 'Paid' || inv.status === 'Lunas').length}{' '}
-              <span className="text-xs font-normal text-slate-500">e-SKRD</span>
-            </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">Bukti setor kasda terverifikasi</p>
-          </div>
-          <div className="w-12 h-12 bg-blue-50 text-[#3c8dbc] flex items-center justify-center rounded">
-            <CreditCard className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs p-4 flex items-center justify-between">
-          <div>
-            <span className="text-xs uppercase font-bold text-slate-500 block mb-1">Total Retribusi Terbayar</span>
-            <div className="text-2xl font-bold text-[#00a65a] font-mono">
-              {formatRupiah(totalNominalLunas)}
-            </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">Akumulasi penerimaan daerah</p>
-          </div>
-          <div className="w-12 h-12 bg-blue-50 text-[#3c8dbc] flex items-center justify-center rounded">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
-        </div>
-      </div>
 
       {/* Tabel Data Pembayaran */}
       <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex-1 flex flex-col">

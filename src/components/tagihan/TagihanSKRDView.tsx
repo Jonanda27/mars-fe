@@ -16,6 +16,8 @@ import { GeneratePenaltyModal } from './modals/GeneratePenaltyModal';
 import { CancelInvoiceModal } from './modals/CancelInvoiceModal';
 import { ReissueInvoiceModal } from './modals/ReissueInvoiceModal';
 import { SKRDPreviewModal } from './modals/SKRDPreviewModal';
+import { SSRDPreviewModal } from './modals/SSRDPreviewModal';
+import { normalizeRole } from '@/utils/routeGuard';
 
 interface TagihanSKRDViewProps {
   readonly role?: 'admin' | 'dinas';
@@ -35,6 +37,10 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
   // SKRD Print Modal State
   const [showSkrdModal, setShowSkrdModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  // SSRD Print Modal State (Lampiran III Perbup Mimika 25/2024)
+  const [showSsrdModal, setShowSsrdModal] = useState(false);
+  const [selectedSsrdInvoice, setSelectedSsrdInvoice] = useState<Invoice | null>(null);
 
   // SKRD Denda Modal State
   const [showPenaltyModal, setShowPenaltyModal] = useState(false);
@@ -91,9 +97,9 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
     fetchInvoices();
   }, [fetchUserData, fetchInvoices]);
 
-  const userRole = (currentUser?.role || '').toLowerCase();
+  const userRole = normalizeRole(currentUser?.role);
   const isMiniAdmin = userRole === 'admin_mini_airport' || Boolean(currentUser?.mini_airport_id);
-  const isMozesAdmin = userRole === 'admin' && !isMiniAdmin;
+  const isMozesAdmin = (userRole === 'admin' || ['admin_hanggar', 'admin_apron', 'admin_ruangan'].includes(userRole)) && !isMiniAdmin;
   const isDinas = role === 'dinas' || ['dinas', 'kepala dinas'].includes(userRole);
 
   useEffect(() => {
@@ -102,18 +108,33 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
     }
   }, [isMiniAdmin, activeTab]);
 
-  const handleVerify = async (id: number) => {
-    if (!confirm('Anda yakin ingin memverifikasi dan melunaskan tagihan ini?')) return;
+  const handleVerify = async (id: number, payload?: { amount_paid?: number; notes?: string }) => {
     try {
       setIsVerifying(true);
-      await invoiceService.verifyPayment(id);
-      toast.success('Verifikasi berhasil, status tagihan menjadi Lunas (Paid).');
+      await invoiceService.verifyPayment(id, payload);
+      toast.success('Verifikasi setoran berhasil disahkan dan dibukukan.');
       setShowVerifyModal(false);
       fetchInvoices();
     } catch (error: any) {
       console.error(error);
       const msg = error.response?.data?.message || 'Terjadi kesalahan saat memverifikasi';
       toast.error(`Gagal memverifikasi: ${msg}`);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleReject = async (id: number, reason: string) => {
+    try {
+      setIsVerifying(true);
+      await invoiceService.rejectPayment(id, reason);
+      toast.success('Bukti setoran ditolak dengan catatan.');
+      setShowVerifyModal(false);
+      fetchInvoices();
+    } catch (error: any) {
+      console.error(error);
+      const msg = error.response?.data?.message || 'Gagal menolak bukti pembayaran';
+      toast.error(`Gagal menolak: ${msg}`);
     } finally {
       setIsVerifying(false);
     }
@@ -253,7 +274,7 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-[#3c8dbc]"></span>
-            Penetapan SKRD Hanggar (Unbilled Roster)
+            {isDinas ? 'Penetapan SKRD Hanggar (Unbilled Roster)' : 'Antrean SKRD Dinas (Roster Hanggar)'}
           </button>
         )}
 
@@ -275,6 +296,7 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
 
       {activeTab === 'penetapan-hanggar' ? (
         <UnbilledHanggarTab 
+          isDinas={isDinas}
           onInvoiceGenerated={fetchInvoices}
           onViewInvoice={(inv) => {
             setSelectedInvoice(inv);
@@ -299,6 +321,10 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
             setSelectedInvoice(inv);
             setShowSkrdModal(true);
           }}
+          onOpenSsrd={(inv) => {
+            setSelectedSsrdInvoice(inv);
+            setShowSsrdModal(true);
+          }}
           onOpenPenalty={handleOpenPenaltyModal}
           onOpenReissue={handleOpenReissueModal}
           onOpenCancel={handleOpenCancelModal}
@@ -312,6 +338,8 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
         isVerifying={isVerifying}
         onClose={() => setShowVerifyModal(false)}
         onVerify={handleVerify}
+        onReject={handleReject}
+        onScanSuccess={fetchInvoices}
       />
 
       {/* MODAL PENERBITAN SKRD DENDA (OTORITAS DINAS) */}
@@ -358,6 +386,16 @@ export const TagihanSKRDView: React.FC<TagihanSKRDViewProps> = ({ role = 'admin'
         isOpen={showSkrdModal}
         invoice={selectedInvoice}
         onClose={() => setShowSkrdModal(false)}
+      />
+
+      {/* MODAL E-SSRD PREVIEW (Surat Setoran Retribusi Daerah - Lampiran III Perbup Mimika 25/2024) */}
+      <SSRDPreviewModal
+        isOpen={showSsrdModal}
+        invoice={selectedSsrdInvoice}
+        onClose={() => {
+          setShowSsrdModal(false);
+          setSelectedSsrdInvoice(null);
+        }}
       />
     </div>
   );

@@ -7,7 +7,7 @@ import { contractService } from '@/services/contractService';
 import { RentalApplication } from '@/types/rental';
 import { Contract } from '@/types/contract';
 import { 
-  FileText, Plus, Loader2, AlertTriangle, Clock, CheckCircle2 
+  FileText, Plus, Loader2, AlertTriangle, Clock, CheckCircle2, HelpCircle 
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { formatDate } from '@/utils/date';
@@ -16,6 +16,7 @@ import { ContractStatusBar } from '@/components/ContractStatusBar';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 import { RequestExtensionModal } from '../jadwal-hanggar/components/RequestExtensionModal';
+import { PermohonanTutorial } from './components/PermohonanTutorial';
 
 export default function PermohonanTenantPage() {
   const [applications, setApplications] = useState<RentalApplication[]>([]);
@@ -24,6 +25,7 @@ export default function PermohonanTenantPage() {
   const [contractsLoading, setContractsLoading] = useState(true);
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
   const [selectedAppForExtension, setSelectedAppForExtension] = useState<RentalApplication | null>(null);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   const { user } = useAuthStore();
   const isVerified = user?.status_verifikasi === 'Verified';
@@ -152,7 +154,7 @@ export default function PermohonanTenantPage() {
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-6">
         {applications.map((app) => {
           const spec = typeof app.specific_needs === 'string'
             ? JSON.parse(app.specific_needs)
@@ -173,7 +175,7 @@ export default function PermohonanTenantPage() {
               }`}
             >
               {/* Header Card */}
-              <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col gap-2">
+              <div className="p-3.5 sm:p-5 border-b border-slate-100 flex flex-col gap-1.5 sm:gap-2">
                 {/* Baris 1: Label Nomor Tiket & Status Utama */}
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -197,25 +199,25 @@ export default function PermohonanTenantPage() {
               </div>
               
               {/* Body Card */}
-              <div className="p-5 flex-1 flex flex-col gap-4">
+              <div className="p-3.5 sm:p-5 flex-1 flex flex-col gap-3 sm:gap-4">
                 {/* Aset yang Diminati */}
                 <div>
                   <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                     Tipe &amp; Aset yang Diminati
                   </div>
                   {app.assets ? (
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 flex items-center">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-                        <FileText className="w-5 h-5 text-blue-600" />
+                    <div className="bg-slate-50 p-2.5 sm:p-3 rounded-lg border border-slate-100 flex items-center">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center mr-2.5 sm:mr-3 flex-shrink-0">
+                        <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                       </div>
-                      <div>
-                        <div className="text-[11px] font-bold text-blue-600 mb-0.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[10px] sm:text-[11px] font-bold text-blue-600 mb-0.5 truncate">
                           {app.application_type || 'Sewa Baru'}
                         </div>
-                        <div className="font-bold text-slate-800 leading-tight">
+                        <div className="font-bold text-slate-800 leading-tight text-xs sm:text-sm truncate">
                           {app.assets.nama_aset}
                         </div>
-                        <div className="text-[12px] text-slate-500 mt-0.5 font-medium">
+                        <div className="text-[11px] sm:text-[12px] text-slate-500 mt-0.5 font-medium truncate">
                           {app.assets.kode_aset} • {app.assets.jenis_aset}
                         </div>
                       </div>
@@ -237,11 +239,11 @@ export default function PermohonanTenantPage() {
                 </div>
                 
                 {/* Periode Sewa & Highlight Perpanjangan */}
-                <div className="mt-auto pt-4 border-t border-slate-100">
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="mt-auto pt-3 sm:pt-4 border-t border-slate-100">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     <div>
                       <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mulai</div>
-                      <div className="font-semibold text-slate-700">{app.start_date ? formatDate(app.start_date) : '-'}</div>
+                      <div className="font-semibold text-xs sm:text-sm text-slate-700">{app.start_date ? formatDate(app.start_date) : '-'}</div>
                     </div>
                     <div>
                       <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center justify-between">
@@ -252,9 +254,9 @@ export default function PermohonanTenantPage() {
                           </span>
                         )}
                       </div>
-                      <div className="font-semibold text-slate-700">{app.end_date ? formatDate(app.end_date) : '-'}</div>
+                      <div className="font-semibold text-xs sm:text-sm text-slate-700">{app.end_date ? formatDate(app.end_date) : '-'}</div>
                       {hasApprovedExt && prevEndDate && (
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
                           Semula: <span className="line-through decoration-slate-400 font-mono text-slate-500">{formatDate(prevEndDate)}</span>
                         </div>
                       )}
@@ -263,28 +265,28 @@ export default function PermohonanTenantPage() {
 
                   {/* Highlight Banner Perpanjangan yang Rapi */}
                   {hasApprovedExt && (
-                    <div className="mt-3.5 p-2.5 bg-gradient-to-r from-emerald-50/90 to-teal-50/60 border border-emerald-200/80 rounded-lg flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-emerald-900">
+                    <div className="mt-3 p-2 sm:p-2.5 bg-gradient-to-r from-emerald-50/90 to-teal-50/60 border border-emerald-200/80 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-emerald-900">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
-                        <span className="font-medium text-[11px]">
+                        <span className="font-medium text-[10px] sm:text-[11px]">
                           Masa sewa bertambah <strong className="font-bold text-emerald-800">+{extReq.additional_days} hari</strong>
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200/80 shadow-2xs">
+                      <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200/80 shadow-2xs self-end sm:self-auto">
                         s/d {dayjs(extReq.requested_end_date).format('DD MMM YYYY')}
                       </span>
                     </div>
                   )}
 
                   {hasPendingExt && (
-                    <div className="mt-3.5 p-2.5 bg-gradient-to-r from-amber-50/90 to-orange-50/60 border border-amber-200/80 rounded-lg flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-amber-900">
+                    <div className="mt-3 p-2 sm:p-2.5 bg-gradient-to-r from-amber-50/90 to-orange-50/60 border border-amber-200/80 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-amber-900">
                         <Clock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-                        <span className="font-medium text-[11px]">
+                        <span className="font-medium text-[10px] sm:text-[11px]">
                           Menunggu verifikasi admin <strong className="font-bold text-amber-800">(+{extReq.additional_days} hari)</strong>
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-amber-700 bg-white px-2 py-0.5 rounded border border-amber-200/80 shadow-2xs">
+                      <span className="text-[10px] font-bold text-amber-700 bg-white px-2 py-0.5 rounded border border-amber-200/80 shadow-2xs self-end sm:self-auto">
                         Target: {dayjs(extReq.requested_end_date).format('DD MMM')}
                       </span>
                     </div>
@@ -293,7 +295,10 @@ export default function PermohonanTenantPage() {
               </div>
               
               {/* Footer Card */}
-              <div className="bg-slate-50/80 p-4 border-t border-slate-100 flex flex-col gap-2.5">
+              <div 
+                className="bg-slate-50/80 p-3 sm:p-4 border-t border-slate-100 flex flex-col gap-2"
+                {...(app === applications[0] ? { 'data-tour': 'tour-card-actions' } : {})}
+              >
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   {isActiveRental && (
                     hasPendingExt ? (
@@ -302,7 +307,7 @@ export default function PermohonanTenantPage() {
                       <button
                         type="button"
                         onClick={() => handleOpenExtensionModal(app)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-slate-50 text-blue-700 hover:text-blue-800 border border-blue-200 hover:border-blue-300 rounded-none text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 bg-white hover:bg-slate-50 text-blue-700 hover:text-blue-800 border border-blue-200 hover:border-blue-300 rounded-none text-xs font-bold shadow-2xs transition-all cursor-pointer"
                         title="Ajukan perpanjangan masa sewa untuk tiket ini"
                       >
                         <Clock className="w-3.5 h-3.5 text-blue-600" />
@@ -313,7 +318,7 @@ export default function PermohonanTenantPage() {
 
                   <Link 
                     href={`/tenant/permohonan/${app.id}`} 
-                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold bg-blue-50/60 hover:bg-blue-100/60 px-3 py-1.5 rounded-none text-xs border border-blue-100 transition-colors ml-auto"
+                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold bg-blue-50/60 hover:bg-blue-100/60 px-2.5 sm:px-3 py-1.5 rounded-none text-xs border border-blue-100 transition-colors ml-auto"
                   >
                     <span>Lihat Detail</span>
                     <span className="transition-transform group-hover:translate-x-0.5">&rarr;</span>
@@ -332,20 +337,20 @@ export default function PermohonanTenantPage() {
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full">
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-2">
+    <div className="p-3 sm:p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-3 sm:gap-4 font-sans">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
-            Permohonan Sewa <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin Timika</span>
+          <h1 className="text-xl sm:text-[24px] font-normal text-[#333] flex flex-wrap items-baseline gap-1 sm:gap-2">
+            Permohonan Sewa <span className="text-xs sm:text-[15px] font-light text-[#777]">Bandara Mozes Kilangin Timika</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Permohonan Sewa Mozes Kilangin</span>
+        <div className="text-[11px] sm:text-[12px] text-[#777] flex items-center bg-white sm:bg-transparent px-2.5 py-1 rounded border sm:border-0 border-gray-200">
+          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium text-gray-800">Permohonan Sewa Mozes Kilangin</span>
         </div>
       </header>
 
       {/* 2. Status Kontrak Payung Induk (Persis Tampilan Gambar) */}
-      <div className="mb-4">
+      <div data-tour="tour-payung-status">
         <ContractStatusBar
           activePayung={activePayung}
           companyName={companyName}
@@ -358,34 +363,45 @@ export default function PermohonanTenantPage() {
       </div>
 
       {!isVerified && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg flex items-start shadow-sm">
+        <div className="p-3.5 sm:p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg flex items-start shadow-xs">
           <AlertTriangle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-yellow-600" />
           <div>
-            <h4 className="font-bold text-sm">Fitur Terkunci (Akun Belum Diverifikasi)</h4>
-            <p className="text-sm mt-1">
+            <h4 className="font-bold text-xs sm:text-sm">Fitur Terkunci (Akun Belum Diverifikasi)</h4>
+            <p className="text-xs sm:text-sm mt-1 leading-relaxed">
               Anda tidak dapat mengajukan permohonan sewa baru. Silakan lengkapi Dokumen Legalitas (NIB, NPWP, Akta) di menu Profil & Dokumen, lalu tunggu persetujuan dari Admin UPBU.
             </p>
           </div>
         </div>
       )}
 
-      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-sm">
-        <div className="p-3 border-b border-[#f4f4f4] flex justify-between items-center bg-slate-50">
-          <h3 className="text-[16px] text-[#444] font-bold flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-[#3c8dbc]" /> Daftar Permohonan Anda
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm rounded-none">
+        <div className="p-3 border-b border-[#f4f4f4] flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 gap-2.5 sm:gap-2">
+          <h3 className="text-[14px] sm:text-[16px] text-[#444] font-bold flex items-center">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-[#3c8dbc]" /> Daftar Permohonan Anda
           </h3>
-          {isVerified ? (
-            <Link href="/tenant/permohonan/buat" className="bg-[#3c8dbc] text-white px-3 py-1.5 text-[12px] font-medium hover:bg-[#367fa9] transition-colors flex items-center rounded-sm">
-              <Plus className="w-4 h-4 mr-1" /> Ajukan Sewa Baru
-            </Link>
-          ) : (
-            <button disabled className="bg-gray-400 text-white px-3 py-1.5 text-[12px] font-medium cursor-not-allowed flex items-center rounded-sm opacity-60" title="Lengkapi Dokumen Legalitas untuk Mengajukan Sewa">
-              <Plus className="w-4 h-4 mr-1" /> Ajukan Sewa Baru (Terkunci)
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end" data-tour="tour-btn-ajukan">
+            <button
+              type="button"
+              onClick={() => setTutorialOpen(true)}
+              className="bg-white border border-[#3c8dbc] text-[#3c8dbc] hover:bg-blue-50 px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-colors flex items-center rounded-none cursor-pointer shadow-2xs"
+              title="Buka panduan & tutorial permohonan sewa"
+            >
+              <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-[#3c8dbc]" />
+              Panduan Tutorial
             </button>
-          )}
+            {isVerified ? (
+              <Link href="/tenant/permohonan/buat" className="bg-[#3c8dbc] text-white px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-[12px] font-medium hover:bg-[#367fa9] transition-colors flex items-center rounded-none shadow-2xs">
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Ajukan Sewa Baru
+              </Link>
+            ) : (
+              <button disabled className="bg-gray-400 text-white px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-[12px] font-medium cursor-not-allowed flex items-center rounded-none opacity-60" title="Lengkapi Dokumen Legalitas untuk Mengajukan Sewa">
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" /> Ajukan Sewa Baru (Terkunci)
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="p-4 bg-slate-50 min-h-[400px]">
+        <div className="p-3 sm:p-4 bg-slate-50 min-h-[400px]" data-tour="tour-daftar-permohonan">
           {renderContent()}
         </div>
       </div>
@@ -399,6 +415,12 @@ export default function PermohonanTenantPage() {
         }}
         application={selectedAppForExtension}
         onSuccess={fetchApplications}
+      />
+
+      {/* Modal & Guided Tour Tutorial Permohonan Sewa */}
+      <PermohonanTutorial
+        isOpen={tutorialOpen}
+        onClose={() => setTutorialOpen(false)}
       />
     </div>
   );

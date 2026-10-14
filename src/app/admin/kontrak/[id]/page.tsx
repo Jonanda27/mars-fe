@@ -6,7 +6,7 @@ import { contractService } from '@/services/contractService';
 import { invoiceService } from '@/services/invoiceService';
 import { Contract } from '@/types/contract';
 import Link from 'next/link';
-import { CheckCircle2, Download, FileSignature, Edit, AlertCircle, FileText, Eye, Loader2 } from 'lucide-react';
+import { CheckCircle2, Download, FileSignature, Edit, AlertCircle, FileText, Eye, Loader2, Clock } from 'lucide-react';
 import SignaturePad from '@/components/SignaturePad';
 import { toast } from 'react-hot-toast';
 import EditContractModal from '@/components/EditContractModal';
@@ -177,30 +177,12 @@ export default function AdminContractDetailPage() {
             </div>
           )}
 
-          {/* Generate SKRD Button - Available for Active/Approved/Waiting Payment if no invoice exists */}
+          {/* Status info SKRD untuk Admin - Penerbitan SKRD merupakan wewenang Dinas */}
           {['Active', 'Aktif', 'Approved', 'Waiting Payment', 'Expiring'].includes(contract.status || '') && (!contract.invoices || contract.invoices.length === 0) && (
-            <button
-              onClick={async () => {
-                if (window.confirm('Yakin ingin menerbitkan SKRD untuk kontrak ini?')) {
-                  try {
-                    setIsUpdating(true);
-                    await invoiceService.generateSkrd(contract.id as number);
-                    toast.success('SKRD berhasil diterbitkan!');
-                    fetchContract();
-                  } catch (error: any) {
-                    console.error(error);
-                    toast.error('Gagal menerbitkan SKRD: ' + (error.response?.data?.message || error.message));
-                  } finally {
-                    setIsUpdating(false);
-                  }
-                }
-              }}
-              disabled={isUpdating}
-              className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white px-4 py-2 rounded shadow-sm text-sm font-medium flex items-center disabled:opacity-70"
-            >
-              {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />} 
-              Terbitkan SKRD
-            </button>
+            <span className="inline-flex items-center text-xs font-semibold px-3 py-2 bg-amber-50 text-amber-800 border border-amber-200 rounded">
+              <Clock className="w-4 h-4 mr-1.5 text-amber-600" />
+              Menunggu Penetapan SKRD oleh Dinas
+            </span>
           )}
 
           {/* Terminate button */}

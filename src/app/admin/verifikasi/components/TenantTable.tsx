@@ -43,12 +43,12 @@ export const TenantTable: React.FC<TenantTableProps> = ({
   return (
     <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm">
       <div className="p-[10px] border-b border-[#f4f4f4] flex justify-between items-center">
-        <h3 className="text-[16px] text-[#444] font-normal">Daftar Pendaftar Tenant</h3>
+        <h3 className="text-[16px] text-[#444] font-normal">Daftar Mitra & Maskapai Pendaftar</h3>
         <div className="flex gap-2">
           <div className="relative">
             <input
               type="text"
-              placeholder="Cari perusahaan..."
+              placeholder="Cari nama, ID, NIB, PIC..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
               className="border border-[#d2d6de] px-3 py-1 text-sm focus:outline-none focus:border-[#3c8dbc]"
@@ -77,7 +77,7 @@ export const TenantTable: React.FC<TenantTableProps> = ({
               {filteredTenants.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-8 text-center text-gray-500">
-                    Belum ada data pendaftar.
+                    Belum ada data pendaftar mitra.
                   </td>
                 </tr>
               ) : (

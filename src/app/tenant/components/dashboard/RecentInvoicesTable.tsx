@@ -28,7 +28,8 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
         </Link>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Tampilan Desktop: Tabel Klasik Lengkap (hidden md:block) */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
             <tr className="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
@@ -74,8 +75,13 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="font-mono font-bold text-[#dd4b39]">
-                        {formatRupiah(totalAmount)}
+                        {formatRupiah(Math.max(0, totalAmount - Number(inv.paid_amount || 0)))}
                       </div>
+                      {Number(inv.paid_amount || 0) > 0 && (
+                        <div className="text-[10px] text-emerald-600 font-semibold">
+                          Telah Disetor {formatRupiah(Number(inv.paid_amount))}
+                        </div>
+                      )}
                       {Number(inv.penalty_amount) > 0 && (
                         <div className="text-[10px] text-red-500">
                           Termasuk Denda {formatRupiah(inv.penalty_amount)}
@@ -99,6 +105,64 @@ export const RecentInvoicesTable: React.FC<RecentInvoicesTableProps> = ({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Tampilan Mobile: Kartu Ringkas Modern Ala Fintech/M-Banking (block md:hidden) */}
+      <div className="block md:hidden">
+        {unpaidInvoices.length === 0 ? (
+          <div className="py-7 px-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-2.5">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+            </div>
+            <p className="font-bold text-xs text-slate-800">Seluruh Tagihan Tertib / Lunas</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">Tidak ada kewajiban pembayaran retribusi yang tertunda.</p>
+          </div>
+        ) : (
+          <div className="p-3 space-y-2.5 bg-slate-50/50">
+            {unpaidInvoices.slice(0, 5).map((inv) => {
+              const totalAmount = Number(inv.amount || 0) + Number(inv.penalty_amount || 0);
+              const isOverdue = inv.status === 'Overdue' || (inv.due_date && dayjs().isAfter(dayjs(inv.due_date)));
+
+              return (
+                <div key={inv.id} className="bg-white p-3 rounded border border-slate-200 shadow-2xs space-y-2">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <span className="font-mono font-bold text-xs text-[#3c8dbc] block truncate">
+                        {inv.invoice_number}
+                      </span>
+                      <span className="text-[11px] font-semibold text-slate-800 line-clamp-1 mt-0.5">
+                        {inv.contracts?.assets?.nama_aset || inv.invoice_type || 'Retribusi Pemakaian Fasilitas'}
+                      </span>
+                    </div>
+                    <StatusBadge status={isOverdue ? 'Jatuh Tempo' : (inv.status || 'Menunggu Bayar')} className="text-[10px] shrink-0" />
+                  </div>
+
+                  <div className="flex justify-between items-end pt-2 border-t border-dashed border-slate-200">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">
+                        Jatuh Tempo: {inv.due_date ? dayjs(inv.due_date).format('DD MMM YYYY') : '-'}
+                      </span>
+                      <span className="text-sm font-bold font-mono text-[#dd4b39]">
+                        {formatRupiah(Math.max(0, totalAmount - Number(inv.paid_amount || 0)))}
+                      </span>
+                      {Number(inv.penalty_amount) > 0 && (
+                        <span className="text-[9.5px] text-red-500 block">
+                          Termasuk Denda {formatRupiah(inv.penalty_amount)}
+                        </span>
+                      )}
+                    </div>
+                    <Link
+                      href="/tenant/tagihan"
+                      className="bg-[#3c8dbc] hover:bg-[#367fa9] text-white font-bold text-xs px-3 py-1.5 rounded transition-colors shadow-2xs shrink-0"
+                    >
+                      Bayar STS
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

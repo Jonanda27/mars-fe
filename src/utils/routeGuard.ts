@@ -16,7 +16,12 @@ export const isPublicRoute = (pathname: string): boolean => {
  * Helper Normalisasi Role
  */
 export const normalizeRole = (role?: string | null): string => {
-  return (role || '').trim().toLowerCase();
+  const r = (role || '').trim().toLowerCase();
+  if (r === 'adminhanggar' || r === 'adminhangar') return 'admin_hanggar';
+  if (r === 'adminapron') return 'admin_apron';
+  if (r === 'adminruangan') return 'admin_ruangan';
+  if (r === 'adminminiairport') return 'admin_mini_airport';
+  return r;
 };
 
 export const isPetugasRole = (role?: string | null): boolean => {
@@ -36,7 +41,17 @@ export const isSuperAdminRole = (role?: string | null): boolean => {
 
 export const isAdminRole = (role?: string | null): boolean => {
   const r = normalizeRole(role);
-  return r === 'admin' || r === 'admin_mini_airport' || r === 'superadmin' || r === 'super admin' || r === 'dinas';
+  return (
+    r === 'admin' ||
+    r === 'admin_mini_airport' ||
+    r === 'admin_hanggar' ||
+    r === 'admin_apron' ||
+    r === 'admin_ruangan' ||
+    r.startsWith('admin_') ||
+    r === 'superadmin' ||
+    r === 'super admin' ||
+    r === 'dinas'
+  );
 };
 
 export const isTenantRole = (role?: string | null): boolean => {
@@ -130,7 +145,7 @@ const checkDinasArea = (pathname: string, isAdmin: boolean, user: UserData): Rou
   }
 
   // Jika user adalah Admin/Superadmin dan mengakses rute /dinas/*, alihkan ke rute /admin/* yang selaras
-  if ((role === 'admin' || role === 'superadmin') && pathname.startsWith('/dinas')) {
+  if ((role === 'admin' || role === 'superadmin' || role.startsWith('admin_')) && pathname.startsWith('/dinas')) {
     if (pathname.startsWith('/dinas/permohonan')) {
       return { allowed: false, redirectTo: pathname.replace('/dinas/permohonan', '/admin/permohonan') };
     }

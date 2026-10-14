@@ -8,7 +8,7 @@ export interface ReportFilterParams {
   semester?: number;
   start_date?: string;
   end_date?: string;
-  service_type?: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA';
+  service_type?: 'ALL' | 'HANGGAR' | 'APRON' | 'RUANGAN' | 'DENDA';
   tenant_id?: number | string;
   status?: string;
 }
@@ -31,7 +31,7 @@ export interface ReportInvoiceItem {
   invoice_number: string;
   account_code: string;
   account_name: string;
-  service_category: 'HANGGAR' | 'RUANGAN' | 'DENDA';
+  service_category: 'HANGGAR' | 'APRON' | 'RUANGAN' | 'DENDA';
   tenant_name: string;
   contract_number: string | null;
   asset_name: string;

@@ -11,11 +11,13 @@ import { formatRupiah } from '@/utils/formatCurrency';
 import { useAuthStore } from '@/store/useAuthStore';
 import toast from 'react-hot-toast';
 import StatusBadge from '@/components/StatusBadge';
+import { normalizeRole } from '@/utils/routeGuard';
 
 export default function MasterTarifPage() {
   const { user } = useAuthStore();
-  const isMiniAdmin = (user?.role || '').toLowerCase() === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
-  const isMozesAdmin = (user?.role || '').toLowerCase() === 'admin' && !isMiniAdmin;
+  const normalizedRole = normalizeRole(user?.role);
+  const isMiniAdmin = normalizedRole === 'admin_mini_airport' || Boolean(user?.mini_airport_id);
+  const isMozesAdmin = (normalizedRole === 'admin' || ['admin_hanggar', 'admin_apron', 'admin_ruangan'].includes(normalizedRole)) && !isMiniAdmin;
 
   const [activeTab, setActiveTab] = useState<'tariff' | 'tax'>(isMiniAdmin ? 'tax' : 'tariff');
   const [tariffs, setTariffs] = useState<MasterTariff[]>([]);

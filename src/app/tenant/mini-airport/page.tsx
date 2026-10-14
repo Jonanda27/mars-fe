@@ -68,17 +68,17 @@ export default function TenantMiniAirportPage() {
   };
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-3.5 font-sans">
+    <div className="p-3 sm:p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-3 sm:gap-3.5 font-sans">
       {/* 1. Header Halaman (Dinas Perhubungan - Layanan Lapangan Terbang Perintis) */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+          <h1 className="text-xl sm:text-[24px] font-normal text-[#333] flex flex-wrap items-baseline gap-1 sm:gap-2">
             Permohonan Landing{' '}
-            <span className="text-[15px] font-light text-[#777] ml-2">Mini Airport</span>
+            <span className="text-xs sm:text-[15px] font-light text-[#777]">Mini Airport</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Mini Airport</span>
+        <div className="text-[11px] sm:text-[12px] text-[#777] flex items-center bg-white sm:bg-transparent px-2.5 py-1 rounded border sm:border-0 border-gray-200">
+          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium text-gray-800">Mini Airport</span>
         </div>
       </header>
 

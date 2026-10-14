@@ -14,6 +14,10 @@ interface UploadSTSModalProps {
   readonly setPaymentMethod: (val: string) => void;
   readonly receiptFile: File | null;
   readonly setReceiptFile: (val: File | null) => void;
+  readonly paymentAmount?: number | string;
+  readonly setPaymentAmount?: (val: number | string) => void;
+  readonly paymentNotes?: string;
+  readonly setPaymentNotes?: (val: string) => void;
   readonly isPaying: boolean;
   readonly onClose: () => void;
   readonly onSubmit: (e: React.SyntheticEvent) => Promise<void>;
@@ -26,6 +30,10 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
   setPaymentMethod,
   receiptFile,
   setReceiptFile,
+  paymentAmount,
+  setPaymentAmount,
+  paymentNotes,
+  setPaymentNotes,
   isPaying,
   onClose,
   onSubmit,
@@ -38,7 +46,10 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
   const strdWarning = invoice.warnings?.find(w => (w.type || '').toUpperCase().includes('STRD'));
   const pokok = Number(invoice.amount || 0);
   const denda = Number(invoice.penalty_amount || 0);
-  const grandTotal = pokok + denda;
+  const paid = Number(invoice.paid_amount || 0);
+  const totalObligation = pokok + denda;
+  const remainingDue = Math.max(0, totalObligation - paid);
+  const isPartiallyPaid = invoice.status === 'Partially Paid' || paid > 0;
 
   const handleValidateAndSetFile = (file: File) => {
     if (file.size > 2 * 1024 * 1024) {
@@ -75,10 +86,20 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
     }
   };
 
+  const handleFormSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (!receiptFile) {
+      toast.error('Silakan upload file bukti transfer/pembayaran terlebih dahulu!');
+      fileInputRef.current?.click();
+      return;
+    }
+    onSubmit(e);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-none shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 my-8">
-        <div className="bg-[#3c8dbc] text-white px-5 py-3.5 flex justify-between items-center">
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+      <div className="bg-white rounded-none shadow-2xl w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+        <div className="bg-[#3c8dbc] text-white px-5 py-3.5 flex justify-between items-center flex-shrink-0">
           <h2 className="text-sm font-bold flex items-center gap-2">
             <Banknote className="w-4 h-4" />
             Upload Bukti Pembayaran Setoran Daerah (STS)
@@ -92,8 +113,8 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={onSubmit}>
-          <div className="p-5 space-y-4 text-xs">
+        <form onSubmit={handleFormSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+          <div className="p-5 space-y-4 text-xs overflow-y-auto flex-1 min-h-0">
             {/* Box Rincian Wajib Setor (Opsi A: SKRD + STRD) */}
             <div className={`p-3.5 border ${strdWarning || denda > 0 ? 'bg-red-50/50 border-red-200' : 'bg-slate-50 border-slate-200'}`}>
               <div className="flex justify-between items-start">
@@ -114,7 +135,7 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
               {/* Rincian Finansial Transparan */}
               <div className="mt-3 pt-2.5 border-t border-slate-200 space-y-1.5">
                 <div className="flex justify-between text-[11px] text-slate-600">
-                  <span>Pokok Retribusi (SKRD):</span>
+                  <span>Pokok Retribusi:</span>
                   <span className="font-mono font-bold text-slate-900">{formatRupiah(pokok)}</span>
                 </div>
 
@@ -145,15 +166,26 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
                   </>
                 )}
 
+                {paid > 0 && (
+                  <div className="flex justify-between items-center text-[11px] text-emerald-800 font-bold bg-emerald-50 p-1.5 border border-emerald-200">
+                    <span>Telah Dibukukan / Disetor:</span>
+                    <span className="font-mono text-emerald-700">-{formatRupiah(paid)}</span>
+                  </div>
+                )}
+
                 <div className="pt-2 border-t border-slate-300 flex justify-between items-baseline">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-700 block">Total Wajib Disetor</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-700 block">
+                      {isPartiallyPaid ? 'Sisa Wajib Disetor (Kurang Dibayar)' : 'Total Wajib Disetor'}
+                    </span>
                     {strdWarning && (
-                      <span className="text-[9px] text-slate-500 italic block">1 Kali Transfer Sekaligus</span>
+                      <span className="text-[9px] text-red-600 italic block">
+                        {isPartiallyPaid ? 'Sisa Pokok + Bunga Berjalan STRD' : 'Pokok SKRD + Sanksi Bunga STRD'}
+                      </span>
                     )}
                   </div>
                   <div className="text-lg font-black text-slate-900 font-mono">
-                    {formatRupiah(grandTotal)}
+                    {formatRupiah(remainingDue)}
                   </div>
                 </div>
               </div>
@@ -192,6 +224,7 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
                 <option value="Setoran Tunai di Loket">Setoran Tunai di Loket Kasda / Bendahara Penerima</option>
               </select>
             </div>
+
 
             {/* Drag & Drop Upload Bukti Bayar */}
             <div>
@@ -243,26 +276,43 @@ export const UploadSTSModal: React.FC<UploadSTSModalProps> = ({
                   </div>
                 )}
               </div>
-              <p className="text-[10px] text-slate-400 mt-1">Pastikan nominal transfer ({formatRupiah(grandTotal)}) dan nomor rekening tujuan terbaca dengan jelas.</p>
+              <p className="text-[10px] text-slate-400 mt-1">Pastikan nominal transfer, nama rekening, dan nomor referensi transaksi terbaca dengan jelas.</p>
             </div>
           </div>
 
-          <div className="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-end gap-2">
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="px-4 py-1.5 bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              disabled={isPaying || !receiptFile}
-              className="px-5 py-1.5 bg-[#00a65a] hover:bg-[#008d4c] text-xs font-bold text-white disabled:opacity-70 flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
-            >
-              {isPaying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Banknote className="w-3.5 h-3.5" />}
-              Kirim Bukti Pembayaran
-            </button>
+          <div className="px-5 py-3 bg-slate-100 border-t border-slate-200 flex justify-between items-center gap-2 flex-shrink-0">
+            <div className="text-[11px] text-slate-500">
+              {receiptFile ? (
+                <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                  <FileCheck className="w-3.5 h-3.5" /> File terlampir: <span className="underline truncate max-w-[150px]">{receiptFile.name}</span>
+                </span>
+              ) : (
+                <span className="text-amber-700 flex items-center gap-1 font-medium">
+                  <AlertTriangle className="w-3.5 h-3.5" /> File bukti transfer wajib dipilih
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button 
+                type="button" 
+                onClick={onClose}
+                className="px-4 py-2 bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                disabled={isPaying}
+                className={`px-5 py-2 text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors ${
+                  !receiptFile
+                    ? 'bg-emerald-600/75 hover:bg-emerald-600'
+                    : 'bg-[#00a65a] hover:bg-[#008d4c]'
+                }`}
+              >
+                {isPaying ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Banknote className="w-3.5 h-3.5" />}
+                Kirim Bukti Pembayaran
+              </button>
+            </div>
           </div>
         </form>
       </div>

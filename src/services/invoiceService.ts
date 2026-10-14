@@ -57,8 +57,13 @@ export const invoiceService = {
     return response.data.data;
   },
 
-  verifyPayment: async (id: number, payload?: { payment_method?: string; reference_number?: string; amount_paid?: number; status?: string }): Promise<Invoice> => {
+  verifyPayment: async (id: number, payload?: { payment_method?: string; reference_number?: string; amount_paid?: number; status?: string; notes?: string }): Promise<Invoice> => {
     const response = await api.post(`/invoices/${id}/verify`, payload);
+    return response.data.data;
+  },
+
+  rejectPayment: async (id: number, reason: string): Promise<Invoice> => {
+    const response = await api.post(`/invoices/${id}/reject-payment`, { reason });
     return response.data.data;
   },
 
@@ -66,6 +71,11 @@ export const invoiceService = {
     const response = await api.post(`/invoices/${id}/upload-receipt`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
+    return response.data.data;
+  },
+
+  scanReceipt: async (id: number): Promise<Invoice> => {
+    const response = await api.post(`/invoices/${id}/scan-receipt`);
     return response.data.data;
   },
 

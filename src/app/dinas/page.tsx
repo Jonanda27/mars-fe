@@ -41,16 +41,16 @@ export default function DinasDashboardPage() {
   const { kpi, recent_applications, top_overdue_invoices, revenue_breakdown } = data;
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
+    <div className="p-3 sm:p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-3 sm:gap-4 font-sans">
       {/* Header Halaman */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
-            Dashboard Dinas <span className="text-[15px] font-light text-[#777] ml-2">Dinas Perhubungan Kab. Mimika</span>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex flex-wrap items-baseline gap-1.5">
+            Dashboard Dinas <span className="text-xs sm:text-sm font-normal text-gray-500">Dinas Perhubungan Kab. Mimika</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">Dinas</span> / <span className="ml-1 font-medium">Dashboard</span>
+        <div className="text-[11px] sm:text-xs text-gray-500 flex items-center bg-white sm:bg-transparent px-2.5 py-1 rounded border sm:border-0 border-gray-200">
+          <span className="mr-1">Dinas</span> / <span className="ml-1 font-semibold text-gray-800">Dashboard</span>
         </div>
       </header>
 

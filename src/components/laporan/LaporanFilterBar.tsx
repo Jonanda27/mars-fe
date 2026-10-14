@@ -18,8 +18,8 @@ interface LaporanFilterBarProps {
   readonly setStartDate: (val: string) => void;
   readonly endDate: string;
   readonly setEndDate: (val: string) => void;
-  readonly serviceType: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA';
-  readonly setServiceType: (val: 'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA') => void;
+  readonly serviceType: 'ALL' | 'HANGGAR' | 'APRON' | 'RUANGAN' | 'DENDA';
+  readonly setServiceType: (val: 'ALL' | 'HANGGAR' | 'APRON' | 'RUANGAN' | 'DENDA') => void;
   readonly selectedTenantId: string;
   readonly setSelectedTenantId: (val: string) => void;
   readonly selectedStatus: string;
@@ -31,6 +31,7 @@ interface LaporanFilterBarProps {
   readonly onExportExcel: () => void;
   readonly onRefresh: () => void;
   readonly onResetFilters: () => void;
+  readonly userRole?: string;
 }
 
 export const LaporanFilterBar: React.FC<LaporanFilterBarProps> = ({
@@ -61,6 +62,7 @@ export const LaporanFilterBar: React.FC<LaporanFilterBarProps> = ({
   onExportExcel,
   onRefresh,
   onResetFilters,
+  userRole,
 }) => {
   const currentYear = new Date().getFullYear();
   const yearOptions = [currentYear + 1, currentYear, currentYear - 1, currentYear - 2, currentYear - 3];
@@ -215,10 +217,21 @@ export const LaporanFilterBar: React.FC<LaporanFilterBarProps> = ({
             onChange={(e) => setServiceType(e.target.value as any)}
             className="w-full border border-slate-300 p-2 font-medium focus:border-[#3c8dbc] focus:outline-none bg-white"
           >
-            <option value="ALL">Semua Jenis Layanan</option>
-            <option value="HANGGAR">Hanggar &amp; Apron (4.1.2.02.02)</option>
-            <option value="RUANGAN">Ruang Kantor/Komersil (4.1.2.02.01)</option>
-            <option value="DENDA">Sanksi Denda (4.1.4.01.01)</option>
+            {userRole === 'admin_hanggar' ? (
+              <option value="HANGGAR">Sewa Hanggar (4.1.2.02.02)</option>
+            ) : userRole === 'admin_apron' ? (
+              <option value="APRON">Sewa Apron (4.1.2.02.03)</option>
+            ) : userRole === 'admin_ruangan' ? (
+              <option value="RUANGAN">Sewa Ruangan (4.1.2.02.01)</option>
+            ) : (
+              <>
+                <option value="ALL">Semua Jenis Layanan</option>
+                <option value="HANGGAR">Sewa Hanggar (4.1.2.02.02)</option>
+                <option value="APRON">Sewa Apron (4.1.2.02.03)</option>
+                <option value="RUANGAN">Ruang Kantor/Komersil (4.1.2.02.01)</option>
+                <option value="DENDA">Sanksi Denda (4.1.4.01.01)</option>
+              </>
+            )}
           </select>
         </div>
 

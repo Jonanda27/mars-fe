@@ -1,7 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Download, X } from 'lucide-react';
 import RupiahIcon from '@/components/icons/RupiahIcon';
 import SuratSKRD from '@/components/SuratSKRD';
+import SuratSKRDPerda from '@/components/SuratSKRDPerda';
 
 interface SkrdPreviewModalProps {
   readonly isOpen: boolean;
@@ -15,6 +16,7 @@ export const SkrdPreviewModal: React.FC<SkrdPreviewModalProps> = ({
   onClose,
 }) => {
   const skrdRef = useRef<HTMLDivElement>(null);
+  const [formatType, setFormatType] = useState<'perda' | 'standar'>('perda');
 
   if (!isOpen || !skrdInvoice) return null;
 
@@ -25,7 +27,7 @@ export const SkrdPreviewModal: React.FC<SkrdPreviewModalProps> = ({
       const element = skrdRef.current;
       const opt = {
         margin: 0,
-        filename: `SKRD_${skrdInvoice.invoice_number ? skrdInvoice.invoice_number.replace(/\//g, '_') : 'Doc'}.pdf`,
+        filename: `SKRD_${skrdInvoice.invoice_number ? skrdInvoice.invoice_number.replace(/\//g, '_') : 'Doc'}_${formatType}.pdf`,
         image: { type: 'jpeg' as const, quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
@@ -39,11 +41,40 @@ export const SkrdPreviewModal: React.FC<SkrdPreviewModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/60 flex flex-col justify-center items-center z-50 p-4">
       <div className="bg-white rounded-none shadow-xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-          <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
-            <RupiahIcon className="w-4 h-4 text-[#3c8dbc]" />
-            Preview Dokumen Ketetapan e-SKRD
-          </h2>
+        <div className="flex justify-between items-center p-3 border-b border-gray-200 bg-gray-50 flex-shrink-0 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-bold text-gray-800 flex items-center gap-2">
+              <RupiahIcon className="w-4 h-4 text-[#3c8dbc]" />
+              Preview Dokumen Ketetapan e-SKRD
+            </h2>
+
+            {/* Format Selector Pills */}
+            <div className="flex items-center bg-gray-200 p-0.5 rounded text-xs">
+              <button
+                type="button"
+                onClick={() => setFormatType('perda')}
+                className={`px-2.5 py-1 font-semibold rounded transition-colors cursor-pointer ${
+                  formatType === 'perda'
+                    ? 'bg-[#3c8dbc] text-white shadow-xs'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                Format Resmi Perda (Baru)
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormatType('standar')}
+                className={`px-2.5 py-1 font-semibold rounded transition-colors cursor-pointer ${
+                  formatType === 'standar'
+                    ? 'bg-[#3c8dbc] text-white shadow-xs'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                Format Standar
+              </button>
+            </div>
+          </div>
+
           <div className="flex gap-2">
             <button 
               type="button"
@@ -62,7 +93,11 @@ export const SkrdPreviewModal: React.FC<SkrdPreviewModalProps> = ({
           </div>
         </div>
         <div className="p-4 overflow-y-auto flex justify-center bg-gray-200 flex-1">
-          <SuratSKRD invoice={skrdInvoice} ref={skrdRef} />
+          {formatType === 'perda' ? (
+            <SuratSKRDPerda invoice={skrdInvoice} ref={skrdRef} />
+          ) : (
+            <SuratSKRD invoice={skrdInvoice} ref={skrdRef} />
+          )}
         </div>
       </div>
     </div>

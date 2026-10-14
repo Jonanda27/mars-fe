@@ -100,11 +100,11 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
   return (
     <div className="space-y-4">
       {/* ACTION & FILTER BAR */}
-      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs p-3.5 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+      <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs p-3 sm:p-3.5 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-2.5 sm:gap-3">
         {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 flex-1">
           {/* Search Box */}
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 w-full md:max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <Search className="w-4 h-4" />
             </div>
@@ -128,14 +128,14 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
           </div>
 
           {/* Status Filter Dropdown */}
-          <div className="relative shrink-0">
+          <div className="relative w-full sm:w-auto shrink-0">
             <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
               <Filter className="w-3.5 h-3.5" />
             </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-9 pl-8 pr-8 text-xs border border-[#d2d6de] rounded-xs bg-white text-slate-700 outline-none focus:ring-1 focus:ring-[#3c8dbc] focus:border-[#3c8dbc] appearance-none cursor-pointer"
+              className="w-full sm:w-auto h-9 pl-8 pr-8 text-xs border border-[#d2d6de] rounded-xs bg-white text-slate-700 outline-none focus:ring-1 focus:ring-[#3c8dbc] focus:border-[#3c8dbc] appearance-none cursor-pointer"
             >
               <option value="ALL">Semua Status</option>
               <option value="WAITING_KADIS">Menunggu Kadis</option>
@@ -154,7 +154,7 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
         <button
           type="button"
           onClick={onCreateNew}
-          className="h-9 inline-flex items-center justify-center gap-2 px-4 text-xs font-bold text-white bg-[#3c8dbc] hover:bg-[#367fa9] rounded-xs shadow-xs transition-colors cursor-pointer shrink-0"
+          className="w-full md:w-auto h-9 inline-flex items-center justify-center gap-2 px-4 text-xs font-bold text-white bg-[#3c8dbc] hover:bg-[#367fa9] rounded-xs shadow-xs transition-colors cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" />
           <span>Ajukan Permohonan Mini Airport Baru</span>
@@ -163,32 +163,32 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
 
       {/* 3. DAFTAR PERMOHONAN */}
       {isLoading ? (
-        <div className="p-12 text-center bg-white rounded-xs border border-[#d2d6de]">
+        <div className="p-8 sm:p-12 text-center bg-white rounded-xs border border-[#d2d6de]">
           <div className="inline-block w-8 h-8 border-4 border-[#3c8dbc] border-t-transparent rounded-full animate-spin mb-3"></div>
           <p className="text-xs text-slate-500 font-medium">Memuat data permohonan Mini Airport...</p>
         </div>
       ) : filteredApps.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-xs border border-dashed border-[#d2d6de] space-y-3">
-          <div className="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-            <FileText className="w-7 h-7" />
+        <div className="p-6 sm:p-12 text-center bg-white rounded-xs border border-dashed border-[#d2d6de] space-y-3">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+            <FileText className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
-          <div>
+          <div className="px-2">
             <h3 className="text-sm font-bold text-slate-800">Belum Ada Permohonan Mini Airport</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto leading-relaxed">
               Anda belum memiliki permohonan operasional ke lapangan terbang perintis. Mulai alur permohonan resmi dengan mengunggah Surat Permohonan.
             </p>
           </div>
           <button
             type="button"
             onClick={onCreateNew}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#3c8dbc] hover:bg-[#367fa9] rounded-xs shadow-xs transition-colors cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#3c8dbc] hover:bg-[#367fa9] rounded-xs shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Mulai Permohonan Mini Airport
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
           {filteredApps.map((app) => {
             let spec: any = app.specific_needs;
             if (typeof spec === 'string') {
@@ -201,20 +201,22 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
                 className="bg-white border border-[#d2d6de] hover:border-[#3c8dbc] rounded-xs shadow-xs hover:shadow-sm transition-all flex flex-col justify-between overflow-hidden group"
               >
                 {/* Header Card */}
-                <div className="p-4 border-b border-slate-100 flex justify-between items-start gap-2">
-                  <div>
+                <div className="p-3.5 sm:p-4 border-b border-slate-100 flex justify-between items-start gap-2">
+                  <div className="min-w-0 flex-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Nomor Tiket Permohonan
                     </span>
-                    <span className="font-mono font-bold text-sm text-[#3c8dbc] group-hover:text-[#367fa9] transition-colors">
+                    <span className="font-mono font-bold text-xs sm:text-sm text-[#3c8dbc] group-hover:text-[#367fa9] transition-colors truncate block">
                       {app.application_number}
                     </span>
                   </div>
-                  <StatusBadge status={app.status} />
+                  <div className="shrink-0">
+                    <StatusBadge status={app.status} />
+                  </div>
                 </div>
 
                 {/* Body Card */}
-                <div className="p-4 space-y-3 flex-1 text-xs">
+                <div className="p-3.5 sm:p-4 space-y-3 flex-1 text-xs">
                   {/* Target Mini Airport */}
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
@@ -223,9 +225,9 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
                     {spec?.airport_name ? (
                       <div className="bg-blue-50/60 p-2.5 rounded-xs border border-blue-100 flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-[#3c8dbc] flex-shrink-0" />
-                        <div>
-                          <p className="font-bold text-slate-800 leading-tight">{spec.airport_name}</p>
-                          <p className="text-[10px] text-slate-500 font-mono">
+                        <div className="min-w-0">
+                          <p className="font-bold text-slate-800 leading-tight truncate">{spec.airport_name}</p>
+                          <p className="text-[10px] text-slate-500 font-mono truncate">
                             {spec.airport_code || '-'} • {spec.airport_location || 'Papua Tengah'}
                           </p>
                         </div>
@@ -240,16 +242,16 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
                   {/* Armada & Manifes */}
                   {spec?.registration_number && (
                     <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2 rounded-xs border border-slate-100">
-                      <div>
+                      <div className="min-w-0">
                         <span className="text-slate-400 block text-[10px]">Armada:</span>
-                        <span className="font-mono font-bold text-[#3c8dbc] flex items-center gap-1">
-                          <Plane className="w-3 h-3" />
-                          {spec.registration_number}
+                        <span className="font-mono font-bold text-[#3c8dbc] flex items-center gap-1 truncate">
+                          <Plane className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{spec.registration_number}</span>
                         </span>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <span className="text-slate-400 block text-[10px]">Penumpang:</span>
-                        <span className="font-bold text-emerald-700">
+                        <span className="font-bold text-emerald-700 truncate block">
                           {spec.passengers_count || 0} Pax
                         </span>
                       </div>
@@ -257,12 +259,12 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
                   )}
 
                   {/* Tanggal Pengajuan */}
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-slate-400" />
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100 gap-2">
+                    <span className="flex items-center gap-1 shrink-0">
+                      <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
                       {dayjs(app.created_at).format('DD MMM YYYY')}
                     </span>
-                    <span className="text-slate-600 font-medium">
+                    <span className="text-slate-600 font-medium truncate text-right">
                       {spec?.allocated_stand || 'Alokasi Apron'}
                     </span>
                   </div>
@@ -273,7 +275,7 @@ export const MiniAirportApplicationList: React.FC<MiniAirportApplicationListProp
                   <button
                     type="button"
                     onClick={() => onSelectApp(app)}
-                    className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold text-[#3c8dbc] hover:text-white bg-white hover:bg-[#3c8dbc] border border-[#3c8dbc] rounded-xs transition-colors cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-3 text-xs font-bold text-[#3c8dbc] hover:text-white bg-white hover:bg-[#3c8dbc] border border-[#3c8dbc] rounded-xs transition-colors cursor-pointer"
                   >
                     Buka Alur Permohonan
                     <ArrowRight className="w-3.5 h-3.5" />

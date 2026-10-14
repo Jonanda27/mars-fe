@@ -1,4 +1,5 @@
 import React from 'react';
+import { FileCheck } from 'lucide-react';
 import { Invoice } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
 import StatusBadge from '@/components/StatusBadge';
@@ -12,6 +13,7 @@ interface TenantInvoiceCardProps {
   readonly onOpenSkrd: (invoice: Invoice) => void;
   readonly onOpenUploadModal: (invoice: Invoice) => void;
   readonly onOpenWarningDoc?: (invoice: Invoice, warning: any) => void;
+  readonly onOpenSsrd?: (invoice: Invoice) => void;
 }
 
 export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
@@ -22,12 +24,20 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
   onOpenSkrd,
   onOpenUploadModal,
   onOpenWarningDoc,
+  onOpenSsrd,
 }) => {
   const isMiniAirport = propIsMiniAirport ?? Boolean(
     invoice.invoice_type === 'Mini Airport' ||
     invoice.invoice_number?.includes('MAP') ||
     invoice.details?.type === 'MINI_AIRPORT_LANDING' ||
     invoice.details?.airport_code
+  );
+
+  const isApron = !isDenda && !isMiniAirport && !isRuangan && Boolean(
+    invoice.invoice_type?.toLowerCase().includes('apron') ||
+    invoice.invoice_number?.includes('APRN') ||
+    invoice.contracts?.assets?.jenis_aset?.toLowerCase() === 'apron' ||
+    (invoice.contracts?.assets?.nama_aset?.toLowerCase().includes('apron') && !invoice.contracts?.assets?.nama_aset?.toLowerCase().includes('hanggar'))
   );
 
   const isScheduled = invoice.status === 'Scheduled';
@@ -48,13 +58,20 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
   const penaltyRatePercent = monthsOverdue * 1;
 
   const baseAmount = Number(invoice.amount || 0);
+  const paidAmount = Number(invoice.paid_amount || 0);
+  const remainingPrincipal = Math.max(0, baseAmount - paidAmount);
+
   const penaltyAmount = Number(invoice.penalty_amount || 0) > 0 
     ? Number(invoice.penalty_amount) 
-    : (penaltyRatePercent > 0 ? Math.round((baseAmount * penaltyRatePercent) / 100) : 0);
-  const grandTotal = baseAmount + penaltyAmount;
+    : (penaltyRatePercent > 0 ? Math.round((remainingPrincipal * penaltyRatePercent) / 100) : 0);
+
+  const totalObligation = baseAmount + penaltyAmount;
+  const remainingObligation = Math.max(0, totalObligation - paidAmount);
+  const isPartiallyPaid = invoice.status === 'Partially Paid' || (paidAmount > 0 && remainingObligation > 0);
 
   return (
     <div 
+      data-tour-card="true"
       className={`bg-white border-t-[3px] ${
         strdWarning
           ? 'border-t-red-600 ring-1 ring-red-100'
@@ -87,7 +104,7 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
         {/* ======================================================== */}
         {/* CARD HEADER: BADGES, STATUS & NOMOR DOKUMEN             */}
         {/* ======================================================== */}
-        <div className={`p-4 border-b border-slate-200 ${
+        <div data-tour="tour-tagihan-card-header" className={`p-4 border-b border-slate-200 ${
           strdWarning 
             ? 'bg-red-50/30' 
             : isDenda 
@@ -101,22 +118,19 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
           {/* Top Line: Badges Layanan & Status */}
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex flex-wrap items-center gap-1.5">
-              {/* Service Badge */}
-              {isDenda ? (
+              {isDenda && (
                 <span className="bg-red-100 text-red-900 border border-red-300 font-bold px-2 py-0.5 text-[10px] rounded">
                   RETRIBUSI DENDA KETERLAMBATAN
                 </span>
-              ) : isMiniAirport ? (
+              )}
+              {isMiniAirport && (
                 <span className="bg-amber-100 text-amber-900 border border-amber-300 font-bold px-2 py-0.5 text-[10px] rounded">
                   RETRIBUSI MINI AIRPORT
                 </span>
-              ) : isRuangan ? (
+              )}
+              {isRuangan && (
                 <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold px-2 py-0.5 text-[10px] rounded">
                   RETRIBUSI SEWA RUANGAN
-                </span>
-              ) : (
-                <span className="bg-blue-100 text-[#205072] border border-blue-300 font-bold px-2 py-0.5 text-[10px] rounded">
-                  RETRIBUSI SEWA HANGGAR &amp; APRON
                 </span>
               )}
 
@@ -221,7 +235,7 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
         {/* ======================================================== */}
         {/* BODY GRID: RINCIAN OBJEK & RINCIAN KEWAJIBAN PEMBAYARAN  */}
         {/* ======================================================== */}
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div data-tour="tour-tagihan-detail" className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           
           {/* KOLOM 1: Rincian Objek Layanan */}
           <div>
@@ -357,14 +371,14 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
                 <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-2">
                   <span className="text-[11px] font-bold text-slate-700">Komponen Biaya</span>
                   <span className="text-[10px] font-mono text-slate-400">
-                    {strdWarning ? 'SKRD Pokok + STRD' : 'SKRD Pokok'}
+                    {isPartiallyPaid ? 'SKRD + STRD (Kurang Dibayar)' : (strdWarning ? 'SKRD Pokok + STRD' : 'SKRD Pokok')}
                   </span>
                 </div>
 
                 <div className="space-y-2 text-xs">
                   {/* Pokok Retribusi */}
                   <div className="flex justify-between items-center text-slate-700">
-                    <span className="text-[11px]">Pokok Retribusi (SKRD):</span>
+                    <span className="text-[11px]">Pokok Retribusi:</span>
                     <span className="font-mono font-bold text-slate-900">{formatRupiah(baseAmount)}</span>
                   </div>
 
@@ -388,7 +402,7 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
                         <div>
                           <span className="text-red-700 font-bold">Sanksi Bunga Administrasi ({penaltyRatePercent}%):</span>
                           <div className="text-[9.5px] text-red-600/90 italic font-normal">
-                            1%/Bulan x {monthsOverdue} Bulan
+                            1%/Bulan x {monthsOverdue} Bulan (atas sisa pokok)
                           </div>
                         </div>
                         <span className="font-mono font-bold text-red-700 text-xs">
@@ -397,19 +411,32 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
                       </div>
                     </div>
                   )}
+
+                  {/* Riwayat Setoran yang Sudah Diterima */}
+                  {paidAmount > 0 && (
+                    <div className="pt-2 border-t border-slate-200 space-y-1 bg-emerald-50/70 -mx-3.5 px-3.5 py-2 border-y border-emerald-200">
+                      <div className="flex justify-between items-center text-[11px] text-emerald-900 font-bold">
+                        <span>Telah Disetor:</span>
+                        <span className="font-mono text-emerald-700">-{formatRupiah(paidAmount)}</span>
+                      </div>
+                      <div className="text-[9.5px] text-emerald-700 italic">
+                        Telah dibukukan &amp; memotong sanksi bunga / pokok terutang
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Total Wajib Setor Highlight */}
-              <div className={`mt-3 pt-2.5 border-t-2 ${strdWarning || penaltyAmount > 0 ? 'border-red-300 bg-red-100/30 -mx-3.5 -mb-3.5 p-3.5' : 'border-slate-300'}`}>
+              <div className={`mt-3 pt-2.5 border-t-2 ${strdWarning || penaltyAmount > 0 || isPartiallyPaid ? 'border-red-300 bg-red-100/30 -mx-3.5 -mb-3.5 p-3.5' : 'border-slate-300'}`}>
                 <div className="flex justify-between items-baseline">
                   <div>
                     <div className="text-[11px] font-bold uppercase tracking-wider text-slate-900">
-                      Total Wajib Setor
+                      {isPartiallyPaid ? 'Sisa Wajib Setor (Kurang Dibayar)' : 'Total Wajib Setor'}
                     </div>
                     {strdWarning ? (
                       <div className="text-[9.5px] text-red-700 italic">
-                        Pokok SKRD + Sanksi Bunga STRD
+                        {isPartiallyPaid ? 'Sisa Pokok + Bunga Berjalan STRD' : 'Pokok SKRD + Sanksi Bunga STRD'}
                       </div>
                     ) : (
                       <div className="text-[9.5px] text-slate-500 italic">
@@ -417,8 +444,8 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
                       </div>
                     )}
                   </div>
-                  <div className={`font-black text-xl font-mono ${strdWarning || penaltyAmount > 0 ? 'text-red-900' : 'text-slate-900'}`}>
-                    {formatRupiah(grandTotal)}
+                  <div className={`font-black text-xl font-mono ${strdWarning || penaltyAmount > 0 || isPartiallyPaid ? 'text-red-900' : 'text-slate-900'}`}>
+                    {formatRupiah(remainingObligation)}
                   </div>
                 </div>
               </div>
@@ -430,14 +457,16 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
       {/* ======================================================== */}
       {/* CARD ACTIONS FOOTER: TOMBOL SEDERHANA & RAPI             */}
       {/* ======================================================== */}
-      <div className="p-3 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-2 z-20">
+      <div data-tour="tour-tagihan-card-actions" className="p-3 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-2 z-20">
         <div className="text-[10px] text-slate-400 font-mono">
           {isDenda 
             ? 'Kode Rek: 4.1.4.01.01 (Denda)' 
             : isMiniAirport
-            ? 'Kode Rek: 4.1.2.02.03 (Mini Airport)'
+            ? 'Kode Rek: 4.1.2.02.04 (Mini Airport)'
             : isRuangan 
             ? 'Kode Rek: 4.1.2.02.01 (Ruangan)' 
+            : isApron
+            ? 'Kode Rek: 4.1.2.02.03 (Apron)'
             : 'Kode Rek: 4.1.2.02.02 (Hanggar)'}
         </div>
 
@@ -488,23 +517,34 @@ export const TenantInvoiceCard: React.FC<TenantInvoiceCardProps> = ({
           )}
 
           {/* Tombol Upload Bukti Bayar / Setor */}
-          {!isScheduled && !isCancelled && (invoice.status === 'Unpaid' || invoice.status === 'Overdue') && (
+          {!isScheduled && !isCancelled && (invoice.status === 'Unpaid' || invoice.status === 'Overdue' || invoice.status === 'Partially Paid') && (
             <button 
               type="button"
+              data-tour="tour-tagihan-btn-upload"
               onClick={() => onOpenUploadModal(invoice)}
               className="px-4 py-1.5 bg-[#00a65a] hover:bg-[#008d4c] text-white font-semibold text-xs cursor-pointer transition-colors"
               title="Upload Bukti Setoran ke Rekening Kas Daerah"
             >
-              {strdWarning ? 'Upload Bukti Setor (Pokok + STRD)' : 'Upload Bukti Bayar'}
+              {isPartiallyPaid ? 'Upload Setoran Sisa STRD' : (strdWarning ? 'Upload Bukti Setor (Pokok + STRD)' : 'Upload Bukti Bayar')}
+            </button>
+          )}
+
+          {/* Tombol Lihat e-SSRD (Bukti Setor Kasda Resmi Perbup 25/2024) */}
+          {(invoice.status === 'Paid' || Number(invoice.paid_amount || 0) > 0) && (
+            <button 
+              type="button"
+              data-tour="tour-tagihan-btn-ssrd"
+              onClick={() => onOpenSsrd?.(invoice)}
+              className="px-3.5 py-1.5 bg-[#00a65a] hover:bg-[#008d4c] text-white font-semibold text-xs cursor-pointer transition-colors flex items-center gap-1.5 shadow-xs"
+              title="Buka Dokumen Resmi Surat Setoran Retribusi Daerah (e-SSRD)"
+            >
+              <FileCheck className="w-3.5 h-3.5" />
+              Lihat e-SSRD
             </button>
           )}
 
           {!isScheduled && invoice.status === 'Pending Verification' && (
             <StatusBadge status="Menunggu Verifikasi" label="Bukti Sedang Diverifikasi" />
-          )}
-
-          {!isScheduled && invoice.status === 'Paid' && (
-            <StatusBadge status="Lunas" />
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ import Link from 'next/link';
 
 import { useAuthStore } from '@/store/useAuthStore';
 import { rentalService, StandAvailability } from '@/services/rentalService';
+import { normalizeRole, isAdminRole } from '@/utils/routeGuard';
 
 interface AdminReviewActionPanelProps {
   app: RentalApplication;
@@ -47,10 +48,10 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
   handleAction,
 }) => {
   const { user: currentUser } = useAuthStore();
-  const effectiveRole = (userRole || currentUser?.role || '').toLowerCase();
+  const effectiveRole = normalizeRole(userRole || currentUser?.role);
   const isKadis = effectiveRole === 'kadis' || effectiveRole === 'kepala dinas' || effectiveRole === 'dinas';
   const isMiniAdmin = effectiveRole === 'admin_mini_airport' || Boolean(currentUser?.mini_airport_id);
-  const isAdmin = effectiveRole === 'admin' || effectiveRole === 'admin_mini_airport' || effectiveRole === 'superadmin' || isMiniAdmin;
+  const isAdmin = isAdminRole(effectiveRole);
 
   const spec = typeof app.specific_needs === 'string'
     ? (() => { try { return JSON.parse(app.specific_needs); } catch (e) { return {}; } })()
@@ -115,9 +116,42 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
   const isSelectedStandOccupied = selectedStandInfo?.is_occupied || false;
   const areAllStandsOccupied = isMini && standsAvailability.length > 0 && standsAvailability.every(s => s.is_occupied);
 
+  let specStr = '';
+  if (app.specific_needs) {
+    specStr = typeof app.specific_needs === 'string'
+      ? app.specific_needs.toLowerCase()
+      : JSON.stringify(app.specific_needs).toLowerCase();
+  }
+
+  const appType = (app.application_type || '').toLowerCase();
+  const assetJenis = (app.assets?.jenis_aset || '').toLowerCase();
+  const assetKategori = (app.assets?.kategori || '').toLowerCase();
+  const assetNama = (app.assets?.nama_aset || '').toLowerCase();
+
+  const isHangar = Boolean(
+    appType.includes('hanggar') ||
+    assetJenis.includes('hanggar') ||
+    assetKategori.includes('hanggar') ||
+    assetNama.includes('hanggar') ||
+    specStr.includes('"hanggar"') ||
+    specStr.includes('trf-hgr') ||
+    app.contracts?.contract_type === 'Payung'
+  );
+
+  const isApron = Boolean(
+    appType.includes('apron') ||
+    assetJenis.includes('apron') ||
+    assetKategori.includes('apron') ||
+    assetNama.includes('apron') ||
+    specStr.includes('"apron"') ||
+    specStr.includes('trf-apron')
+  );
+
+  const isRuangan = !isHangar && !isApron && !isMini;
+
   const isGlobalRole = ['superadmin', 'kepala dinas', 'dinas'].includes(effectiveRole);
   
-  // Check if admin is authorized for this airport
+  // Check if admin is authorized for this airport / asset category
   let isAuthorizedForAirport = true;
   let unauthorizedReason = '';
 
@@ -131,17 +165,20 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
       if (currentUser?.mini_airport_id) {
         isAuthorizedForAirport = false;
         unauthorizedReason = `Permohonan sewa ini berada di bawah pengelolaan Bandara Mozes Kilangin Timika dan tidak dapat divalidasi oleh Administrator Mini Airport.`;
+      } else if (effectiveRole === 'admin_hanggar' && !isHangar) {
+        isAuthorizedForAirport = false;
+        unauthorizedReason = 'Akun Anda adalah Administrator Hanggar Mozes Kilangin. Permohonan ini berada di luar lingkup pengelolaan Hanggar.';
+      } else if (effectiveRole === 'admin_apron' && !isApron) {
+        isAuthorizedForAirport = false;
+        unauthorizedReason = 'Akun Anda adalah Administrator Apron Mozes Kilangin. Permohonan ini berada di luar lingkup pengelolaan Apron.';
+      } else if (effectiveRole === 'admin_ruangan' && !isRuangan) {
+        isAuthorizedForAirport = false;
+        unauthorizedReason = 'Akun Anda adalah Administrator Ruangan/Lahan Mozes Kilangin. Permohonan ini berada di luar lingkup pengelolaan Ruangan/Lahan.';
       }
     }
   }
 
   const canValidate = (isAdmin || isKadis) && isAuthorizedForAirport;
-
-  const isHangar = Boolean(
-    app.application_type?.toLowerCase().includes('hanggar') ||
-    app.assets?.kategori?.toLowerCase().includes('hanggar') ||
-    app.contracts?.contract_type === 'Payung'
-  );
 
   const durasiMalam = (() => {
     if (!app.end_date || !app.start_date) return 1;
@@ -523,7 +560,7 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
               </div>
             )}
             <button 
-              onClick={() => handleAction(isMini ? 'Aktif' : (isHangar ? 'Aktif' : 'Draft Kontrak'), selectedStand)} 
+              onClick={() => handleAction(isMini ? 'Aktif' : ((isHangar || isApron) ? 'Aktif' : 'Draft Kontrak'), selectedStand)} 
               disabled={
                 saving || 
                 (!isMini && !!isOverCapacity) || 
@@ -544,7 +581,11 @@ export const AdminReviewActionPanel: React.FC<AdminReviewActionPanelProps> = ({
                     : !selectedStand 
                     ? 'Pilih Stand Apron Terlebih Dahulu' 
                     : 'Validasi & Terbitkan Izin Pendaratan Aktif') 
-                : (isHangar ? 'Validasi & Setujui Sewa Hanggar' : 'Validasi & Terbitkan Kontrak Sewa (Surat PKS)')}
+                : (isHangar 
+                    ? 'Validasi & Setujui Sewa Hanggar' 
+                    : (isApron 
+                        ? 'Validasi & Setujui Sewa Apron' 
+                        : 'Validasi & Terbitkan Kontrak Sewa (Surat PKS)'))}
             </button>
             
             <button 

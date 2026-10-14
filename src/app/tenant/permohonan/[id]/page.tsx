@@ -200,7 +200,7 @@ export default function TenantPermohonanDetailPage() {
       <ApplicationDetailHeader applicationNumber={app.application_number} />
 
       {/* Stepper Visualization */}
-      <div className="mb-6">
+      <div className="mb-6" data-tour="tour-step4-stepper">
         <Stepper currentStep={currentStep} requiresPayung={requiresPayung} isHangar={isHangar} />
       </div>
 

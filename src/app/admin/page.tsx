@@ -65,32 +65,34 @@ export default function AdminExecutiveDashboard() {
   const { kpi, visual_assets, expiring_contracts, master_tariffs } = data;
 
   return (
-    <div className="p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-4 font-sans">
+    <div className="p-3 sm:p-4 bg-[#ecf0f5] min-h-full flex flex-col gap-3 sm:gap-4 font-sans">
       {/* Header */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div>
-          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
-            Dashboard Admin <span className="text-[15px] font-light text-[#777] ml-2">Bandara Mozes Kilangin</span>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex flex-wrap items-baseline gap-1.5">
+            Dashboard Admin <span className="text-xs sm:text-sm font-normal text-gray-500">Bandara Mozes Kilangin</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">Admin</span> / <span className="ml-1 font-medium">Dashboard</span>
+        <div className="text-[11px] sm:text-xs text-gray-500 flex items-center bg-white sm:bg-transparent px-2.5 py-1 rounded border sm:border-0 border-gray-200">
+          <span className="mr-1">Admin</span> / <span className="ml-1 font-semibold text-gray-800">Dashboard</span>
         </div>
       </header>
 
       {/* Baris 1: 4 KPI Cards (AdminLTE Flat Style) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* KPI 1: Realisasi Pendapatan */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
-          <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
-            <RupiahIcon className="w-8 h-8" />
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <RupiahIcon className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center flex-1">
-            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Realisasi Pendapatan (YTD)</span>
-            <span className="text-[18px] font-bold text-[#00a65a] font-mono leading-tight mt-0.5">
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Realisasi Pendapatan (YTD)
+            </span>
+            <span className="text-[16px] sm:text-[18px] font-bold text-[#00a65a] font-mono leading-tight mt-0.5 truncate">
               {formatRupiah(kpi.realisasi_pad)}
             </span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+            <span className="text-[10px] sm:text-[11px] text-[#3c8dbc] font-bold mt-1 line-clamp-1 sm:line-clamp-none">
               Target: Rp 15 M ({kpi.achievement_percent}%) • {kpi.paid_invoices_count} SKRD Lunas
             </span>
           </div>
@@ -98,15 +100,17 @@ export default function AdminExecutiveDashboard() {
         
         {/* KPI 2: Occupancy Rate Aset */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
-          <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
-            <Activity className="w-8 h-8" />
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <Activity className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center flex-1">
-            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Occupancy Rate Aset</span>
-            <span className="text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5">
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Occupancy Rate Aset
+            </span>
+            <span className="text-[16px] sm:text-[18px] font-bold text-[#333] font-mono leading-tight mt-0.5 truncate">
               {kpi.occupancy_rate}%
             </span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+            <span className="text-[10px] sm:text-[11px] text-[#3c8dbc] font-bold mt-1 line-clamp-1 sm:line-clamp-none">
               Terisi: {kpi.used_area_m2.toLocaleString('id-ID')} m² dari {kpi.total_area_m2.toLocaleString('id-ID')} m²
             </span>
           </div>
@@ -114,15 +118,17 @@ export default function AdminExecutiveDashboard() {
 
         {/* KPI 3: Total Penyewa (Tenant) */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
-          <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
-            <Users className="w-8 h-8" />
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <Users className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center flex-1">
-            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Total Penyewa (Tenant)</span>
-            <span className="text-[18px] font-bold text-[#333] leading-tight mt-0.5">
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Total Penyewa (Tenant)
+            </span>
+            <span className="text-[16px] sm:text-[18px] font-bold text-[#333] leading-tight mt-0.5 truncate">
               {kpi.total_tenants} Mitra
             </span>
-            <span className="text-[11px] text-[#3c8dbc] font-bold mt-1">
+            <span className="text-[10px] sm:text-[11px] text-[#3c8dbc] font-bold mt-1 line-clamp-1 sm:line-clamp-none">
               {kpi.pending_tenants > 0 ? `${kpi.pending_tenants} Menunggu Verifikasi` : 'Semua Terverifikasi'} • {kpi.active_contracts_count} PKS Aktif
             </span>
           </div>
@@ -130,15 +136,17 @@ export default function AdminExecutiveDashboard() {
 
         {/* KPI 4: Piutang (Outstanding) */}
         <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-sm flex items-stretch">
-          <div className="w-[80px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc]">
-            <TrendingUp className="w-8 h-8" />
+          <div className="w-14 sm:w-[70px] bg-slate-50 border-r border-[#f4f4f4] flex items-center justify-center text-[#3c8dbc] shrink-0">
+            <TrendingUp className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
-          <div className="p-3 flex flex-col justify-center flex-1">
-            <span className="uppercase text-[11px] text-[#777] font-bold tracking-wider">Piutang (Outstanding)</span>
-            <span className="text-[18px] font-bold text-[#dd4b39] font-mono leading-tight mt-0.5">
+          <div className="p-2.5 sm:p-3 flex flex-col justify-center flex-1 min-w-0">
+            <span className="uppercase text-[10px] sm:text-[11px] text-[#777] font-bold tracking-wider truncate block">
+              Piutang (Outstanding)
+            </span>
+            <span className="text-[16px] sm:text-[18px] font-bold text-[#dd4b39] font-mono leading-tight mt-0.5 truncate">
               {formatRupiah(kpi.total_piutang)}
             </span>
-            <span className="text-[11px] text-slate-500 font-bold mt-1">
+            <span className="text-[10px] sm:text-[11px] text-slate-500 font-bold mt-1 line-clamp-1 sm:line-clamp-none">
               {kpi.overdue_invoices_count > 0 ? (
                 <span className="text-[#dd4b39] font-bold">⚠️ Terdapat {kpi.overdue_invoices_count} SKRD Jatuh Tempo</span>
               ) : (

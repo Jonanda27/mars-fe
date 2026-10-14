@@ -1,6 +1,7 @@
 import { 
   Building2, Plane, AlertTriangle, FileText, 
-  CheckCircle2, FileEdit, Ban, Loader2, ShieldAlert, Link as LinkIcon, TowerControl 
+  CheckCircle2, FileEdit, Ban, Loader2, ShieldAlert, Link as LinkIcon, TowerControl,
+  FileCheck 
 } from 'lucide-react';
 import { Invoice } from '@/types/invoice';
 import { formatRupiah } from '@/utils/formatCurrency';
@@ -14,6 +15,7 @@ interface TagihanTableProps {
   readonly isDinas: boolean;
   readonly onOpenVerify: (inv: Invoice) => void;
   readonly onOpenSkrd: (inv: Invoice) => void;
+  readonly onOpenSsrd?: (inv: Invoice) => void;
   readonly onOpenPenalty: (inv: Invoice) => void;
   readonly onOpenReissue: (inv: Invoice) => void;
   readonly onOpenCancel: (inv: Invoice) => void;
@@ -25,6 +27,7 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
   isDinas,
   onOpenVerify,
   onOpenSkrd,
+  onOpenSsrd,
   onOpenPenalty,
   onOpenReissue,
   onOpenCancel,
@@ -89,6 +92,13 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                   (item.details && typeof item.details === 'object' && (item.details as any).service_type === 'Mini Airport')
                 );
 
+                const isApron = !isDenda && !isMiniAirport && !isRuangan && Boolean(
+                  item.invoice_type?.toLowerCase().includes('apron') ||
+                  item.invoice_number?.includes('APRN') ||
+                  item.contracts?.assets?.jenis_aset?.toLowerCase() === 'apron' ||
+                  (item.contracts?.assets?.nama_aset?.toLowerCase().includes('apron') && !item.contracts?.assets?.nama_aset?.toLowerCase().includes('hanggar'))
+                );
+
                 return (
                   <tr key={item.id} className="border-b border-[#f4f4f4] hover:bg-slate-50">
                     <td className="py-4 px-5">
@@ -109,6 +119,10 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                         ) : isRuangan ? (
                           <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold px-1.5 py-0.5">
                             <Building2 className="w-3 h-3 text-emerald-600" /> Sewa Ruangan (4.1.2.02.01)
+                          </span>
+                        ) : isApron ? (
+                          <span className="inline-flex items-center gap-1 bg-sky-50 text-sky-800 border border-sky-300 text-[10px] font-bold px-1.5 py-0.5">
+                            <Plane className="w-3 h-3 text-[#0284c7]" /> Sewa Apron (4.1.2.02.03)
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-bold px-1.5 py-0.5">
@@ -143,6 +157,18 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                       {Number(item.penalty_amount) > 0 && (
                         <div className="text-[11px] text-red-600 font-bold mt-1">+ Denda: {formatRupiah(Number(item.penalty_amount))}</div>
                       )}
+                      {Number(item.paid_amount || 0) > 0 && (
+                        <>
+                          <div className="text-[11px] text-emerald-600 font-semibold mt-0.5">
+                            Setor: {formatRupiah(Number(item.paid_amount))}
+                          </div>
+                          {Math.max(0, (Number(item.amount) + Number(item.penalty_amount || 0)) - Number(item.paid_amount)) > 0 && (
+                            <div className="text-[11px] text-amber-700 font-bold mt-0.5">
+                              Sisa: {formatRupiah(Math.max(0, (Number(item.amount) + Number(item.penalty_amount || 0)) - Number(item.paid_amount)))}
+                            </div>
+                          )}
+                        </>
+                      )}
                     </td>
                     <td className="py-4 px-5 text-center">
                       <span className="font-bold text-[#333]">{item.due_date ? dayjs(item.due_date).format('DD MMM YYYY') : '-'}</span>
@@ -155,13 +181,21 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                     </td>
                     <td className="py-4 px-5 text-center">
                       <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                        {item.status === 'Pending Verification' && (
+                        {(item.status === 'Pending Verification' || item.invoice_payments?.some((p) => p.status === 'Pending')) ? (
                           <button 
                             onClick={() => onOpenVerify(item)}
-                            className="bg-[#3c8dbc] border border-[#367fa9] text-white hover:bg-[#367fa9] px-2 py-1 text-[11px] font-bold inline-flex items-center justify-center shadow-xs cursor-pointer"
-                            title="Verifikasi Bukti Pembayaran"
+                            className="bg-[#3c8dbc] border border-[#367fa9] text-white hover:bg-[#367fa9] px-2 py-1 text-[11px] font-bold inline-flex items-center justify-center shadow-xs cursor-pointer animate-pulse"
+                            title="Verifikasi Bukti Pembayaran Tenant"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-white" /> Verifikasi
+                          </button>
+                        ) : (item.status === 'Partially Paid' && isDinas) && (
+                          <button 
+                            onClick={() => onOpenVerify(item)}
+                            className="bg-amber-50 border border-amber-300 text-amber-800 hover:bg-amber-100 px-2 py-1 text-[11px] font-bold inline-flex items-center justify-center shadow-xs cursor-pointer"
+                            title="Catat / Sahkan Setoran Kasda Lanjutan"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-amber-700" /> Sahkan Setoran
                           </button>
                         )}
 
@@ -172,6 +206,18 @@ export const TagihanTable: React.FC<TagihanTableProps> = ({
                         >
                           <FileText className="w-3.5 h-3.5 mr-1 text-[#3c8dbc]" /> Lihat
                         </button>
+
+                        {/* Tombol Lihat/Cetak e-SSRD (Surat Setoran Retribusi Daerah) jika Lunas atau Ada Pembayaran Terverifikasi */}
+                        {(item.status === 'Paid' || Number(item.paid_amount || 0) > 0) && (
+                          <button 
+                            type="button"
+                            onClick={() => onOpenSsrd?.(item)}
+                            className="bg-emerald-50 border border-emerald-400 text-emerald-800 hover:bg-emerald-100 px-2 py-1 text-[11px] font-bold inline-flex items-center justify-center shadow-xs cursor-pointer"
+                            title="Lihat / Cetak Dokumen Resmi e-SSRD (Tanda Bukti Setor Kasda)"
+                          >
+                            <FileCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" /> e-SSRD
+                          </button>
+                        )}
 
                         {/* Tombol Salin Link Bayar Khusus Pendaratan Darurat */}
                         {isEmergency && (() => {

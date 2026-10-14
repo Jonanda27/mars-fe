@@ -14,9 +14,10 @@ interface ActiveHangarAircraftTableProps {
   readonly isLoadingLogs: boolean;
   readonly searchLogTerm: string;
   readonly setSearchLogTerm: (val: string) => void;
-  readonly onOpenCheckInModal: () => void;
+  readonly onOpenCheckInModal?: () => void;
   readonly onOpenEmergencyModal?: () => void;
   readonly onOpenCheckOutModal: (logId: number, registration: string) => void;
+  readonly hideHeader?: boolean;
 }
 
 export const ActiveHangarAircraftTable: React.FC<ActiveHangarAircraftTableProps> = ({
@@ -27,51 +28,12 @@ export const ActiveHangarAircraftTable: React.FC<ActiveHangarAircraftTableProps>
   setSearchLogTerm,
   onOpenCheckInModal,
   onOpenCheckOutModal,
+  hideHeader = false,
 }) => {
   const [selectedEmergencyContract, setSelectedEmergencyContract] = useState<Contract | null>(null);
-  return (
-    <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs">
-      <div className="p-3.5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <div>
-          <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-            <Plane className="w-4 h-4 text-[#3c8dbc]" />
-            Pesawat Sedang Parkir di Fasilitas ({activeLogs.length} Armada)
-          </h3>
-          <p className="text-[11px] text-slate-500 mt-0.5">
-            Armada yang saat ini berada di dalam hanggar atau apron. Catat Check-Out saat pesawat fisik keluar.
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-52">
-            <input
-              type="text"
-              placeholder="Cari registrasi / tenant..."
-              value={searchLogTerm}
-              onChange={(e) => setSearchLogTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 border border-slate-300 text-xs focus:ring-1 focus:ring-[#3c8dbc] focus:border-[#3c8dbc] outline-none"
-            />
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
-          </div>
-
-          <Link
-            href="/petugas/pendaratan-darurat"
-            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
-          >
-            <AlertTriangle className="w-3.5 h-3.5" /> Pendaratan Darurat
-          </Link>
-
-          <button
-            type="button"
-            onClick={onOpenCheckInModal}
-            className="px-3 py-1.5 bg-[#00a65a] hover:bg-[#008d4c] text-white font-bold text-xs shadow-xs flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" /> Check-In Manual
-          </button>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto">
+  const tableContent = (
+    <div className="overflow-x-auto">
         {isLoadingLogs ? (
           <div className="p-8 text-center text-slate-400">
             <Loader2 className="w-6 h-6 animate-spin mx-auto mb-1 text-[#3c8dbc]" />
@@ -217,14 +179,60 @@ export const ActiveHangarAircraftTable: React.FC<ActiveHangarAircraftTableProps>
           </table>
         )}
       </div>
+  );
 
-      {/* MODAL SURAT PKS DARURAT */}
-      {selectedEmergencyContract && (
-        <SuratPKSDaruratModal
-          contract={selectedEmergencyContract}
-          onClose={() => setSelectedEmergencyContract(null)}
-        />
-      )}
+  const emergencyModal = selectedEmergencyContract && (
+    <SuratPKSDaruratModal
+      contract={selectedEmergencyContract}
+      onClose={() => setSelectedEmergencyContract(null)}
+    />
+  );
+
+  if (hideHeader) {
+    return (
+      <>
+        {tableContent}
+        {emergencyModal}
+      </>
+    );
+  }
+
+  return (
+    <div className="bg-white border-t-[3px] border-[#3c8dbc] shadow-xs">
+      <div className="p-3.5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <Plane className="w-4 h-4 text-[#3c8dbc]" />
+            Pesawat Sedang Parkir di Fasilitas ({activeLogs.length} Armada)
+          </h3>
+          <p className="text-[11px] text-slate-500 mt-0.5">
+            Armada yang saat ini berada di dalam hanggar atau apron. Catat Check-Out saat pesawat fisik keluar.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-52">
+            <input
+              type="text"
+              placeholder="Cari registrasi / tenant..."
+              value={searchLogTerm}
+              onChange={(e) => setSearchLogTerm(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 border border-slate-300 text-xs focus:ring-1 focus:ring-[#3c8dbc] focus:border-[#3c8dbc] outline-none"
+            />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+          </div>
+
+          <Link
+            href="/petugas/pendaratan-darurat"
+            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
+          >
+            <AlertTriangle className="w-3.5 h-3.5" /> Pendaratan Darurat
+          </Link>
+        </div>
+      </div>
+
+      {tableContent}
+      {emergencyModal}
     </div>
   );
 };

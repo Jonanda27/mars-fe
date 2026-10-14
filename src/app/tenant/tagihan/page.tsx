@@ -4,14 +4,17 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { invoiceService } from '@/services/invoiceService';
 import { Invoice } from '@/types/invoice';
 import { 
-  Banknote, AlertTriangle, Building2, Plane, Compass, Loader2 
+  Banknote, AlertTriangle, Building2, Plane, Compass, Loader2, Sparkles, HelpCircle 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { TenantInvoiceFilterBar } from './components/TenantInvoiceFilterBar';
 import { TenantInvoiceCard } from './components/TenantInvoiceCard';
+import { TagihanTutorial } from './components/TagihanTutorial';
+import { DUMMY_TUTORIAL_INVOICES } from './constants/tutorialDummyData';
 import { UploadSTSModal } from '@/components/tagihan/modals/UploadSTSModal';
 import { SKRDPreviewModal } from '@/components/tagihan/modals/SKRDPreviewModal';
+import { SSRDPreviewModal } from '@/components/tagihan/modals/SSRDPreviewModal';
 import { WarningDocModal } from '@/components/tagihan/modals/WarningDocModal';
 import { InvoiceWarning } from '@/types/invoice';
 
@@ -19,6 +22,9 @@ export default function TenantTagihanPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
+
+  // Tutorial state & dummy simulation mode
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   
   // Filter state
   const [serviceFilter, setServiceFilter] = useState<'ALL' | 'HANGGAR' | 'RUANGAN' | 'MINI_AIRPORT' | 'DENDA'>('ALL');
@@ -29,10 +35,16 @@ export default function TenantTagihanPage() {
   const [uploadInvoice, setUploadInvoice] = useState<Invoice | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('Transfer Bank Papua');
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<number | string>('');
+  const [paymentNotes, setPaymentNotes] = useState<string>('');
 
   // SKRD Modal state
   const [showSkrdModal, setShowSkrdModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  // SSRD Modal state (Lampiran III Perbup Mimika 25/2024)
+  const [showSsrdModal, setShowSsrdModal] = useState(false);
+  const [selectedSsrdInvoice, setSelectedSsrdInvoice] = useState<Invoice | null>(null);
 
   // Opsi A: Warning / STRD Document Modal State
   const [showWarningDocModal, setShowWarningDocModal] = useState(false);
@@ -90,17 +102,33 @@ export default function TenantTagihanPage() {
       return;
     }
     
+    // Simulasi safety check untuk data dummy tutorial
+    if (uploadInvoice && uploadInvoice.id >= 9990) {
+      toast.success('Simulasi upload bukti bayar berhasil dicoba! (Mode Tutorial)');
+      setShowUploadModal(false);
+      setReceiptFile(null);
+      setPaymentNotes('');
+      return;
+    }
+
     try {
       setIsPaying(true);
       const formData = new FormData();
       formData.append('receipt', receiptFile);
       formData.append('payment_method', paymentMethod);
+      if (paymentAmount) {
+        formData.append('amount', paymentAmount.toString());
+      }
+      if (paymentNotes) {
+        formData.append('notes', paymentNotes);
+      }
 
       await invoiceService.uploadReceipt(uploadInvoice.id, formData);
 
-      toast.success('Bukti bayar berhasil diunggah! Menunggu verifikasi admin.');
+      toast.success('Bukti bayar berhasil diunggah! Menunggu verifikasi bendahara dinas.');
       setShowUploadModal(false);
       setReceiptFile(null);
+      setPaymentNotes('');
       fetchInvoices();
     } catch (error: any) {
       console.error(error);
@@ -111,14 +139,18 @@ export default function TenantTagihanPage() {
     }
   };
 
+  // Mode data simulasi dummy jika data invoice kosong dan tutorial sedang aktif
+  const isDummyMode = tutorialOpen && invoices.length === 0;
+  const activeInvoices = isDummyMode ? DUMMY_TUTORIAL_INVOICES : invoices;
+
   // Counts for tabs
-  const dendaCount = invoices.filter(inv => isInvoiceDenda(inv)).length;
-  const miniAirportCount = invoices.filter(inv => isInvoiceMiniAirport(inv)).length;
-  const ruanganCount = invoices.filter(inv => isInvoiceRuangan(inv)).length;
-  const hanggarCount = invoices.filter(inv => !isInvoiceRuangan(inv) && !isInvoiceDenda(inv) && !isInvoiceMiniAirport(inv)).length;
+  const dendaCount = activeInvoices.filter(inv => isInvoiceDenda(inv)).length;
+  const miniAirportCount = activeInvoices.filter(inv => isInvoiceMiniAirport(inv)).length;
+  const ruanganCount = activeInvoices.filter(inv => isInvoiceRuangan(inv)).length;
+  const hanggarCount = activeInvoices.filter(inv => !isInvoiceRuangan(inv) && !isInvoiceDenda(inv) && !isInvoiceMiniAirport(inv)).length;
 
   // Filtered invoices
-  const filteredInvoices = invoices.filter(inv => {
+  const filteredInvoices = activeInvoices.filter(inv => {
     const isDenda = isInvoiceDenda(inv);
     const isMiniAirport = isInvoiceMiniAirport(inv);
     const isRuangan = isInvoiceRuangan(inv);
@@ -298,12 +330,24 @@ export default function TenantTagihanPage() {
                     }}
                     onOpenUploadModal={(inv) => {
                       setUploadInvoice(inv);
+                      const pokok = Number(inv.amount || 0);
+                      const denda = Number(inv.penalty_amount || 0);
+                      const paid = Number(inv.paid_amount || 0);
+                      const remaining = Math.max(0, (pokok + denda) - paid);
+                      setPaymentAmount(remaining);
+                      setPaymentNotes('');
+                      setPaymentMethod('Transfer Bank Papua');
+                      setReceiptFile(null);
                       setShowUploadModal(true);
                     }}
                     onOpenWarningDoc={(inv, warn) => {
                       setSelectedWarningInvoice(inv);
                       setSelectedWarningDoc(warn);
                       setShowWarningDocModal(true);
+                    }}
+                    onOpenSsrd={(inv) => {
+                      setSelectedSsrdInvoice(inv);
+                      setShowSsrdModal(true);
                     }}
                   />
                 ))}
@@ -325,8 +369,19 @@ export default function TenantTagihanPage() {
             <span className="text-[15px] font-light text-[#777] ml-2">Pembayaran Retribusi e-SKRD Daerah</span>
           </h1>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Tagihan &amp; e-SKRD</span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setTutorialOpen(true)}
+            className="bg-white border border-[#3c8dbc] text-[#3c8dbc] hover:bg-blue-50 px-3 py-1.5 text-[12px] font-semibold transition-colors flex items-center rounded cursor-pointer shadow-2xs"
+            title="Buka panduan langkah tagihan e-SKRD"
+          >
+            <HelpCircle className="w-4 h-4 mr-1.5 text-[#3c8dbc]" />
+            Panduan Langkah
+          </button>
+          <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+            <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Tagihan &amp; e-SKRD</span>
+          </div>
         </div>
       </header>
 
@@ -335,7 +390,7 @@ export default function TenantTagihanPage() {
         <TenantInvoiceFilterBar
           serviceFilter={serviceFilter}
           setServiceFilter={setServiceFilter}
-          totalCount={invoices.length}
+          totalCount={activeInvoices.length}
           hanggarCount={hanggarCount}
           ruanganCount={ruanganCount}
           miniAirportCount={miniAirportCount}
@@ -347,13 +402,34 @@ export default function TenantTagihanPage() {
 
         {/* Invoices List */}
         <div className="p-4 bg-slate-50/50 min-h-[400px]">
+          {isDummyMode && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-900 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#3c8dbc] shrink-0" />
+                <div>
+                  <span className="font-bold">Mode Simulasi Panduan Tutorial:</span>
+                  <span className="ml-1 text-blue-800">
+                    Menampilkan 2 contoh tagihan e-SKRD realistis karena daftar tagihan Anda masih kosong. Data ini otomatis disembunyikan saat tutorial ditutup.
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTutorialOpen(false)}
+                className="text-xs text-blue-700 hover:text-blue-900 font-semibold underline shrink-0 cursor-pointer"
+              >
+                Tutup Tutorial
+              </button>
+            </div>
+          )}
           {renderInvoiceList()}
         </div>
 
         {/* Footer info */}
         <div className="p-3 bg-slate-50 border-t border-slate-200 text-slate-500 text-[11px] flex justify-between items-center">
           <span>
-            Menampilkan {filteredInvoices.length} dari total {invoices.length} SKRD
+            Menampilkan {filteredInvoices.length} dari total {activeInvoices.length} SKRD
+            {isDummyMode && ' (Data Simulasi Tutorial)'}
           </span>
           <span>UPBU Bandara Mozes Kilangin Timika</span>
         </div>
@@ -367,10 +443,15 @@ export default function TenantTagihanPage() {
         setPaymentMethod={setPaymentMethod}
         receiptFile={receiptFile}
         setReceiptFile={setReceiptFile}
+        paymentAmount={paymentAmount}
+        setPaymentAmount={setPaymentAmount}
+        paymentNotes={paymentNotes}
+        setPaymentNotes={setPaymentNotes}
         isPaying={isPaying}
         onClose={() => {
           setShowUploadModal(false);
           setReceiptFile(null);
+          setPaymentNotes('');
         }}
         onSubmit={handleUploadReceipt}
       />
@@ -380,6 +461,16 @@ export default function TenantTagihanPage() {
         isOpen={showSkrdModal}
         invoice={selectedInvoice}
         onClose={() => setShowSkrdModal(false)}
+      />
+
+      {/* MODAL E-SSRD PREVIEW (Surat Setoran Retribusi Daerah - Lampiran III Perbup Mimika 25/2024) */}
+      <SSRDPreviewModal
+        isOpen={showSsrdModal}
+        invoice={selectedSsrdInvoice}
+        onClose={() => {
+          setShowSsrdModal(false);
+          setSelectedSsrdInvoice(null);
+        }}
       />
 
       {/* OPSI A: MODAL NASKAH DINAS RESMI (STRD / TEGURAN / PEMBERITAHUAN) */}
@@ -392,6 +483,12 @@ export default function TenantTagihanPage() {
           setSelectedWarningDoc(null);
           setSelectedWarningInvoice(null);
         }}
+      />
+
+      {/* PANDUAN TUTORIAL INTERAKTIF & BUKU PANDUAN */}
+      <TagihanTutorial
+        isOpen={tutorialOpen}
+        onClose={() => setTutorialOpen(false)}
       />
     </div>
   );

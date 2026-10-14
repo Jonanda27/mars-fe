@@ -82,7 +82,16 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
     (Boolean(contractFasilitas.airport_name) && !contractFasilitas.airport_name.toLowerCase().includes('mozes'))
   );
 
-  const isHanggar = !isDenda && !isRuangan && !isMiniAirport && Boolean(
+  const isApron = !isDenda && !isRuangan && !isMiniAirport && Boolean(
+    invoice.invoice_type === 'Sewa Apron' ||
+    invoice.invoice_type?.toLowerCase().includes('apron') ||
+    invoice.invoice_number?.includes('APRN') ||
+    invoice.invoice_number?.includes('APN') ||
+    asset?.jenis_aset?.toLowerCase() === 'apron' ||
+    (asset?.nama_aset?.toLowerCase().includes('apron') && !asset?.nama_aset?.toLowerCase().includes('hanggar'))
+  );
+
+  const isHanggar = !isDenda && !isRuangan && !isMiniAirport && !isApron && Boolean(
     invoice.invoice_type === 'Sewa Hanggar' || 
     (Array.isArray(invoice.details) && invoice.details.length > 0) || 
     invoice.invoice_number?.includes('HGR') ||
@@ -267,7 +276,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
             {/* Items Body */}
             <tr>
               <td className="border border-black p-2 text-center align-top" style={{ minHeight: '120px' }}>
-                 {isDenda ? '4.1.4.01.01' : isMiniAirport ? '4.1.2.02.03' : isHanggar ? '4.1.2.02.02' : '4.1.2.02.01'}
+                 {isDenda ? '4.1.4.01.01' : isApron ? '4.1.2.02.03' : isMiniAirport ? '4.1.2.02.04' : isHanggar ? '4.1.2.02.02' : '4.1.2.02.01'}
               </td>
               <td className="border border-black p-2 align-top">
                 {isDenda ? (
@@ -351,10 +360,10 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                       </div>
                     )}
                   </div>
-                ) : isHanggar ? (
+                ) : (isHanggar || isApron) ? (
                   <div>
                     <div className="font-bold text-base mb-1">
-                      Retribusi Sewa Hanggar & Apron Pesawat Udara
+                      {isApron ? 'Retribusi Sewa Apron Pesawat Udara' : 'Retribusi Sewa Hanggar Pesawat Udara'}
                     </div>
                     <div className="text-xs text-slate-600 mb-2">
                       Pemakaian fasilitas parkir & inap armada di Bandara Mozes Kilangin berdasarkan hasil verifikasi Laporan Tutup Hari.
@@ -557,7 +566,7 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                             <td className="w-28 py-1">Status Pembayaran</td>
                             <td className="w-2 py-1">:</td>
                             <td className="font-bold py-1">
-                              {invoice.status === 'Paid' ? 'LUNAS' : invoice.status === 'Overdue' ? 'Overdue (Menunggak)' : invoice.status === 'Cancelled' ? 'DIBATALKAN' : 'Belum Lunas'}
+                              {invoice.status === 'Paid' ? 'LUNAS' : invoice.status === 'Partially Paid' ? 'KURANG DIBAYAR (STRD)' : invoice.status === 'Overdue' ? 'OVERDUE (MENUNGGAK)' : invoice.status === 'Cancelled' ? 'DIBATALKAN' : 'BELUM LUNAS'}
                             </td>
                           </tr>
                           <tr>
@@ -582,6 +591,20 @@ const SuratSKRD = forwardRef<HTMLDivElement, SuratSKRDProps>(({ invoice }, ref) 
                             <td className="py-1">:</td>
                             <td className="font-bold text-base py-1">{totalAmount.toLocaleString('id-ID')}</td>
                           </tr>
+                          {Number(invoice.paid_amount || 0) > 0 && (
+                            <>
+                              <tr>
+                                <td className="py-1" style={{ color: '#047857' }}>Telah Disetor</td>
+                                <td className="py-1">:</td>
+                                <td className="py-1 font-semibold" style={{ color: '#047857' }}>{Number(invoice.paid_amount).toLocaleString('id-ID')}</td>
+                              </tr>
+                              <tr>
+                                <td className="py-1 font-bold" style={{ color: '#b91c1c' }}>Sisa Terutang</td>
+                                <td className="py-1">:</td>
+                                <td className="py-1 font-bold" style={{ color: '#b91c1c' }}>{Math.max(0, totalAmount - Number(invoice.paid_amount)).toLocaleString('id-ID')}</td>
+                              </tr>
+                            </>
+                          )}
                         </tbody>
                       </table>
                    </div>

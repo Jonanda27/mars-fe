@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useWarningStore } from '@/store/useWarningStore';
-import { AlertTriangle, Home, Loader2, Clock, Printer, Download, X, FileText, CheckCircle2, BellRing, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, Loader2, Clock, Printer, Download, X, FileText, CheckCircle2, BellRing, ShieldAlert } from 'lucide-react';
 import { formatRupiah } from '@/utils/formatCurrency';
 import StatusBadge from '@/components/StatusBadge';
 import { SuratPemberitahuan, SuratPemberitahuanData } from '@/components/SuratPemberitahuan';
@@ -261,17 +261,16 @@ export default function TenantPeringatanPage() {
 
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full space-y-4 font-sans">
-      <header className="flex justify-between items-end">
+      {/* Header Halaman */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div>
-          <h1 className="text-[22px] font-bold text-[#333] flex items-center gap-2">
-            Surat Pemberitahuan &amp; Teguran Retribusi
+          <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
+            Surat Pemberitahuan &amp; Teguran Retribusi{' '}
+            <span className="text-[15px] font-light text-[#777] ml-2">Naskah Dinas Perbup Mimika No. 25/2024</span>
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Naskah dinas resmi pemungutan retribusi daerah sesuai <strong>Peraturan Bupati Mimika Nomor 25 Tahun 2024</strong>.
-          </p>
         </div>
-        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2 hidden sm:flex">
-          <Home className="w-3 h-3 mr-1" /> <span className="mr-1">Home</span> / <span className="ml-1 font-medium text-slate-700">Surat Penagihan</span>
+        <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
+          <span className="mr-1">Tenant</span> / <span className="ml-1 font-medium">Surat Penagihan</span>
         </div>
       </header>
 

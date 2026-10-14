@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { reportService, RetributionReportData, ReportFilterParams } from '@/services/reportService';
 import { tenantService } from '@/services/tenantService';
 import { Tenant } from '@/types/tenant';
@@ -11,6 +11,7 @@ import { LaporanTransactionTable } from './LaporanTransactionTable';
 import { X, Loader2, Download } from 'lucide-react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface LaporanRealisasiViewProps {
   readonly roleLabel?: string;
@@ -19,8 +20,19 @@ interface LaporanRealisasiViewProps {
 export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
   roleLabel = 'Admin / Dinas'
 }) => {
+  const { user } = useAuthStore();
+  const userRole = (user?.role || '').toLowerCase();
+
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
+
+  // Tentukan default jenis retribusi sesuai akun admin spesifik
+  const defaultServiceType = useMemo<'ALL' | 'HANGGAR' | 'APRON' | 'RUANGAN' | 'DENDA'>(() => {
+    if (userRole === 'admin_hanggar') return 'HANGGAR';
+    if (userRole === 'admin_apron') return 'APRON';
+    if (userRole === 'admin_ruangan') return 'RUANGAN';
+    return 'ALL';
+  }, [userRole]);
 
   // Filter States
   const [periodType, setPeriodType] = useState<'monthly' | 'quarterly' | 'semester' | 'annual' | 'custom'>('monthly');
@@ -30,7 +42,7 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
   const [selectedSemester, setSelectedSemester] = useState<number>(currentMonth <= 6 ? 1 : 2);
   const [startDate, setStartDate] = useState<string>(dayjs().startOf('month').format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState<string>(dayjs().endOf('month').format('YYYY-MM-DD'));
-  const [serviceType, setServiceType] = useState<'ALL' | 'HANGGAR' | 'RUANGAN' | 'DENDA'>('ALL');
+  const [serviceType, setServiceType] = useState<'ALL' | 'HANGGAR' | 'APRON' | 'RUANGAN' | 'DENDA'>(defaultServiceType);
   const [selectedTenantId, setSelectedTenantId] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
 
@@ -85,6 +97,10 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
   }, []);
 
   useEffect(() => {
+    setServiceType(defaultServiceType);
+  }, [defaultServiceType]);
+
+  useEffect(() => {
     loadReport();
   }, [loadReport]);
 
@@ -96,7 +112,7 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
     setSelectedSemester(currentMonth <= 6 ? 1 : 2);
     setStartDate(dayjs().startOf('month').format('YYYY-MM-DD'));
     setEndDate(dayjs().endOf('month').format('YYYY-MM-DD'));
-    setServiceType('ALL');
+    setServiceType(defaultServiceType);
     setSelectedTenantId('ALL');
     setSelectedStatus('ALL');
     setSearchQuery('');
@@ -187,6 +203,23 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
     toast.success('Data laporan berhasil diekspor ke format spreadsheet (CSV/Excel)');
   };
 
+  const getSubTitle = () => {
+    if (roleLabel === 'Dinas') return 'Dinas Perhubungan Kab. Mimika';
+    if (userRole === 'admin_hanggar') return 'Sewa Hanggar Pesawat (Mozes Kilangin)';
+    if (userRole === 'admin_apron') return 'Sewa Apron Pesawat (Mozes Kilangin)';
+    if (userRole === 'admin_ruangan') return 'Sewa Ruangan & Fasilitas (Mozes Kilangin)';
+    if (userRole === 'admin_mini_airport') return user?.airport_name ? `Mini Airport ${user.airport_name}` : 'Jaringan Mini Airport';
+    return 'Bandara Mozes Kilangin';
+  };
+
+  const getDisplayRole = () => {
+    if (userRole === 'admin_hanggar') return 'Admin Hanggar';
+    if (userRole === 'admin_apron') return 'Admin Apron';
+    if (userRole === 'admin_ruangan') return 'Admin Ruangan';
+    if (userRole === 'admin_mini_airport') return 'Admin Mini Airport';
+    return roleLabel;
+  };
+
   return (
     <div className="p-4 bg-[#ecf0f5] min-h-full space-y-4">
       {/* Header Halaman */}
@@ -195,12 +228,12 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
           <h1 className="text-[24px] font-normal text-[#333] flex items-baseline">
             Laporan Realisasi Retribusi{' '}
             <span className="text-[15px] font-light text-[#777] ml-2">
-              {roleLabel === 'Dinas' ? 'Dinas Perhubungan Kab. Mimika' : 'Bandara Mozes Kilangin'}
+              {getSubTitle()}
             </span>
           </h1>
         </div>
         <div className="text-[12px] text-[#777] flex items-center bg-[#ecf0f5] p-2">
-          <span className="mr-1">{roleLabel}</span> / <span className="ml-1 font-medium">Laporan Realisasi</span>
+          <span className="mr-1">{getDisplayRole()}</span> / <span className="ml-1 font-medium">Laporan Realisasi</span>
         </div>
       </header>
 
@@ -233,10 +266,11 @@ export const LaporanRealisasiView: React.FC<LaporanRealisasiViewProps> = ({
         onExportExcel={handleExportExcel}
         onRefresh={loadReport}
         onResetFilters={handleResetFilters}
+        userRole={userRole}
       />
 
       {/* 2. STATISTIK & KPI PAD */}
-      <LaporanKPICards reportData={reportData} />
+      <LaporanKPICards reportData={reportData} userRole={userRole} />
 
       {/* 3. TABEL RINCIAN TRANSAKSI */}
       <LaporanTransactionTable

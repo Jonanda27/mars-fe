@@ -35,7 +35,14 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [lastOtpEmail, setLastOtpEmail] = useState('');
   const [otpArray, setOtpArray] = useState<string[]>(Array(6).fill(''));
+
+  const formatCountdown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
 
   const [formData, setFormData] = useState({
     nama_perusahaan: '',
@@ -53,17 +60,20 @@ export default function RegisterPage() {
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (countdown > 0 && step === 2) {
+    if (countdown > 0) {
       timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
+        setCountdown((prev) => Math.max(0, prev - 1));
       }, 1000);
     }
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [countdown, step]);
+  }, [countdown]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    if (e.target.name === 'email' && e.target.value.trim().toLowerCase() !== lastOtpEmail.toLowerCase()) {
+      setCountdown(0);
+    }
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError('');
   };
@@ -186,13 +196,21 @@ export default function RegisterPage() {
       return;
     }
 
+    // Jika masih dalam hitung mundur untuk email yang sama dan dipanggil saat user kembali ke formulir
+    if (countdown > 0 && formData.email.trim().toLowerCase() === lastOtpEmail.toLowerCase()) {
+      setStep(2);
+      setSuccess('Kode OTP sebelumnya masih aktif. Silakan masukkan kode OTP atau tunggu hitung mundur untuk kirim ulang.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     try {
       await authService.requestOtp(formData.email.trim());
       setSuccess('Kode OTP verifikasi berhasil dikirimkan ke email Anda.');
-      setCountdown(60);
+      setLastOtpEmail(formData.email.trim());
+      setCountdown(120); // 2 menit
       setStep(2);
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || 'Gagal mengirim OTP ke email');
@@ -774,7 +792,7 @@ export default function RegisterPage() {
                     }`}
                   >
                     {countdown > 0 ? (
-                      `Kirim ulang OTP (${countdown}s)`
+                      `Kirim ulang OTP (${formatCountdown(countdown)})`
                     ) : (
                       <>
                         <RefreshCw className="w-3.5 h-3.5 mr-1" />
@@ -791,7 +809,6 @@ export default function RegisterPage() {
                       setStep(1); 
                       setError(''); 
                       setSuccess(''); 
-                      setCountdown(0); 
                       setOtpArray(Array(6).fill('')); 
                       setFormData({...formData, otp_code: ''}); 
                     }}

@@ -5,6 +5,7 @@ import { invoiceService } from '@/services/invoiceService';
 import { UnbilledHanggarLog } from '@/types/invoice';
 import toast from 'react-hot-toast';
 
+import { Plane } from 'lucide-react';
 import { UnbilledHanggarStats } from './unbilled-hanggar/UnbilledHanggarStats';
 import { UnbilledHanggarToolbar } from './unbilled-hanggar/UnbilledHanggarToolbar';
 import { UnbilledHanggarTable } from './unbilled-hanggar/UnbilledHanggarTable';
@@ -12,11 +13,16 @@ import { BatchActionBottomBar } from './unbilled-hanggar/BatchActionBottomBar';
 import { GenerateMassSkrdModal } from './unbilled-hanggar/GenerateMassSkrdModal';
 
 interface UnbilledHanggarTabProps {
+  isDinas?: boolean;
   onInvoiceGenerated?: () => void;
   onViewInvoice?: (invoice: any) => void;
 }
 
-export default function UnbilledHanggarTab({ onInvoiceGenerated, onViewInvoice }: UnbilledHanggarTabProps) {
+export default function UnbilledHanggarTab({ 
+  isDinas = false,
+  onInvoiceGenerated, 
+  onViewInvoice 
+}: UnbilledHanggarTabProps) {
   const [logs, setLogs] = useState<UnbilledHanggarLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedLogIds, setSelectedLogIds] = useState<number[]>([]);
@@ -170,6 +176,22 @@ export default function UnbilledHanggarTab({ onInvoiceGenerated, onViewInvoice }
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Top Banner Notice jika Admin (Non-Dinas) */}
+      {!isDinas && (
+        <div className="bg-[#e8f0fe] border-l-4 border-[#3c8dbc] p-4 text-xs text-slate-700 flex items-start gap-3 rounded-r shadow-xs">
+          <Plane className="w-5 h-5 text-[#3c8dbc] flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <strong className="block text-slate-900 font-bold text-sm">
+              Antrean Penetapan SKRD Dinas (Roster Armada Hanggar)
+            </strong>
+            <p className="leading-relaxed">
+              Daftar di bawah memuat pergerakan armada pesawat di Hanggar yang siap ditagihkan.
+              Sesuai SOP dan wewenang regulasi pendapatan daerah, penetapan serta penerbitan dokumen resmi SKRD merupakan wewenang <strong>Dinas Perhubungan Kab. Mimika</strong>.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Top Banner & KPI Metrics */}
       <UnbilledHanggarStats totalStats={totalStats} />
 
@@ -186,6 +208,7 @@ export default function UnbilledHanggarTab({ onInvoiceGenerated, onViewInvoice }
 
       {/* Main Table */}
       <UnbilledHanggarTable
+        isDinas={isDinas}
         isLoading={isLoading}
         filteredLogs={filteredLogs}
         selectedLogIds={selectedLogIds}
@@ -193,6 +216,7 @@ export default function UnbilledHanggarTab({ onInvoiceGenerated, onViewInvoice }
         onSelectAll={handleSelectAll}
         onToggleSelect={handleToggleSelect}
         onTriggerSingle={(log) => {
+          if (!isDinas) return;
           if (!log.exit_time) {
             toast('Perhatian: Armada ini belum melakukan checkout di lapangan', { icon: '⚠️' });
           }
@@ -200,30 +224,34 @@ export default function UnbilledHanggarTab({ onInvoiceGenerated, onViewInvoice }
         }}
       />
 
-      {/* Floating Bottom Batch Action Bar */}
-      <BatchActionBottomBar
-        selectedCount={selectedLogIds.length}
-        totalNights={selectedItemsData.totalNights}
-        grandTotal={selectedItemsData.grandTotal}
-        onTriggerBatch={() => setConfirmModal({ isOpen: true, mode: 'batch' })}
-      />
+      {/* Floating Bottom Batch Action Bar - Khusus Otoritas Dinas */}
+      {isDinas && (
+        <BatchActionBottomBar
+          selectedCount={selectedLogIds.length}
+          totalNights={selectedItemsData.totalNights}
+          grandTotal={selectedItemsData.grandTotal}
+          onTriggerBatch={() => setConfirmModal({ isOpen: true, mode: 'batch' })}
+        />
+      )}
 
-      {/* Confirmation Modal */}
-      <GenerateMassSkrdModal
-        isOpen={confirmModal.isOpen}
-        mode={confirmModal.mode}
-        targetLog={confirmModal.targetLog}
-        selectedItemsData={selectedItemsData}
-        isGenerating={isGenerating}
-        onClose={() => setConfirmModal({ isOpen: false, mode: 'batch' })}
-        onConfirm={() => {
-          if (confirmModal.mode === 'single' && confirmModal.targetLog) {
-            handleGenerateSingle(confirmModal.targetLog);
-          } else {
-            handleGenerateBatch();
-          }
-        }}
-      />
+      {/* Confirmation Modal - Khusus Otoritas Dinas */}
+      {isDinas && (
+        <GenerateMassSkrdModal
+          isOpen={confirmModal.isOpen}
+          mode={confirmModal.mode}
+          targetLog={confirmModal.targetLog}
+          selectedItemsData={selectedItemsData}
+          isGenerating={isGenerating}
+          onClose={() => setConfirmModal({ isOpen: false, mode: 'batch' })}
+          onConfirm={() => {
+            if (confirmModal.mode === 'single' && confirmModal.targetLog) {
+              handleGenerateSingle(confirmModal.targetLog);
+            } else {
+              handleGenerateBatch();
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
