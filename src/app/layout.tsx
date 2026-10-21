@@ -57,6 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               iconTheme: { primary: '#dd4b39', secondary: '#fff' },
               style: { borderLeft: '4px solid #dd4b39' },
             },
+            blank: {
+              style: { borderLeft: '4px solid #3c8dbc' },
+            },
           }}
         />
       </body>

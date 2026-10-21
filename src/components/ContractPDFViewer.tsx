@@ -141,7 +141,7 @@ export default function ContractPDFViewer({ contract, tenant, onClose, isInline 
     const element = document.getElementById('contract-document');
     if (!element) {
       setIsDownloading(false);
-      toast("Dokumen tidak ditemukan.");
+      toast.error("Dokumen tidak ditemukan.");
       return;
     }
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { invoiceService } from '@/services/invoiceService';
 import { UnbilledHanggarLog } from '@/types/invoice';
-import toast from 'react-hot-toast';
+import { toast, toastWarning } from '@/utils/toast';
 
 import { Plane } from 'lucide-react';
 import { UnbilledHanggarStats } from './unbilled-hanggar/UnbilledHanggarStats';
@@ -218,7 +218,7 @@ export default function UnbilledHanggarTab({
         onTriggerSingle={(log) => {
           if (!isDinas) return;
           if (!log.exit_time) {
-            toast('Perhatian: Armada ini belum melakukan checkout di lapangan', { icon: '⚠️' });
+            toastWarning('Perhatian: Armada ini belum melakukan checkout di lapangan');
           }
           setConfirmModal({ isOpen: true, mode: 'single', targetLog: log });
         }}
