@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 import { generateTiketPdf } from '@/utils/exportTiketPdf';
+import { getApiUrl } from '@/services/api';
 
 export default function PublicTiketIzinPage() {
   const routeParams = useParams();
@@ -41,9 +42,8 @@ export default function PublicTiketIzinPage() {
           return;
         }
 
-        // Tentukan endpoint backend sesuai hostname aktif (localhost atau IP jaringan)
-        const hostName = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-        const apiUrl = `http://${hostName}:5000/api/schedules/public/ticket/${targetId}`;
+        // Tentukan endpoint backend melalui konfigurasi API (mendukung NEXT_PUBLIC_API_URL & fallback lokal)
+        const apiUrl = `${getApiUrl()}/schedules/public/ticket/${targetId}`;
 
         const res = await fetch(apiUrl, { cache: 'no-store' });
         if (!res.ok) {
